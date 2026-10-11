@@ -77,3 +77,31 @@ bash nfc_dumps/pm3_parity/out/2026-10-11-fnfc013/tools/final_checks.sh nfc_dumps
 
 ## Files
 `tools/` (measure_steps.sh, dwt_run.sh, final_checks.sh, dwt_table.py, pm3delay.py, compare_dump.py, rpc.py + make_pb.sh, emu_open.py, emu_exit.py, logcap.py, flcli.py, unit_tests_run.py); `host/` (run.sh, encode_equiv.c, crc_equiv.c, rdm80_frame.c, stubs/, outputs *.txt); `latency_probe_v2_rebased.patch`, `latency_probe_v3.patch` (compile-checked, not applied); `hw_blocker_evidence.txt`.
+
+## On-device results (2026-10-11, evening) — supersedes the model above
+Full tables: `dwt_table.md`. EOF→DMA µs (DWT, median of 3); PM3 SOF matched DWT within ~5 µs where a reply was decoded.
+
+| step | 1 blk | 8 | 32 | 64 | 80 | 80/1 |
+|---|---|---|---|---|---|---|
+| baseline | 466 | 662 | 1308 | 2173 | 2606 | 5.59 |
+| step1 | 437 | 510 | 730 | 1020 | 1166 | 2.67 |
+| step2 | 433 | 445 | 496 | 567 | 593 | 1.37 |
+| step3 | 371 | 384 | 438 | 505 | 542 | 1.46 |
+| step4 (v3 probe) | 367 | 388 | 439 | 503 | 540 | 1.47 |
+
+- Encode 323 B in firmware: 4032–4037 cycles ≈ 63 µs (baseline 1502 µs) — **met**.
+- `test_nfc`: 54/54 passed twice on `2415dd016` — **met**.
+- SOF 80 vs 1 within ±10 %: +46 % — **not met**; vs t1: 1 blk +52 µs, 80 blk +226 µs.
+- 64/80-block replies: silent on every build incl. baseline. Cause is NOT latency (DMA starts ≈0.54 ms ≪ 1.56 ms) but frame length: `DIGITAL_SIGNAL_T_TIM` = 1562 vs real 1562.5 (0.01 ns) → every period ~320 ppm long; PM3 syncs only on SOF, so drift breaks decoding beyond ~131 B (36 blocks/147 B already silent). Pre-existing upstream. Experiment (`exp_ttim/`, not applied) with durations pre-scaled: 64 blk 6/8, 80 blk 2/11 `(323)` = dump, CRC `24 9E`.
+- One-shot `hf 15 raw … 004F` on HEAD: silent 3/3 — **not met** (timing bug above).
+- `hf 15 dump` on HEAD: 2/4 complete & 80/80 equal, 2/4 aborted on a missed single-block reply (~1 in 40–80 short reads; also seen at step 2, so not caused by prefill 32) — **flaky, not investigated**.
+- Prefill 32: no underrun logged in a 32–80 block sweep; 32-block data byte-equal on every step.
+
+### v3 breakdown of the fixed handler cost (1 block, 16682 cyc / 261 µs)
+parser copy + dispatch 572 · listener_run entry → after request CRC 7902 · after CRC → command handler 7317 · handler+SLIX 467 (+24 cyc/B) · tx copy + reply CRC 351 (+16.7 cyc/B) · → tx 73.
+The two big stages are `bit_buffer_reset(tx_buffer)` (memset of 1027 B + 129 B parity with bytewise newlib memset), once in `iso15693_3_listener_run` and once in `iso15693_3_listener_handle_standard_request` — ≈238 of 261 µs. Resetting only the size / dropping the redundant reset → ~130 µs EOF→DMA for 1 block; FDT then has to be raised to land at t1.
+
+### Proposed follow-ups
+1. `digital_signal` exact tick arithmetic (fixes 64/80-block silence; affects ISO14443-A too) + find the remaining timing error.
+2. Remove the double `bit_buffer_reset` of the 1 KB tx buffer; then raise the listener FDT so every length answers at ≈t1 (flat).
+3. Investigate the occasional missed short reply.
