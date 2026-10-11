@@ -1,0 +1,2217 @@
+	CC	build/f7-firmware-C/assets/compiled/assets_icons.c
+	CC	build/f7-firmware-C/assets/compiled/application.pb.c
+	CC	build/f7-firmware-C/assets/compiled/desktop.pb.c
+	CC	build/f7-firmware-C/assets/compiled/flipper.pb.c
+	CC	build/f7-firmware-C/assets/compiled/gpio.pb.c
+	CC	build/f7-firmware-C/assets/compiled/gps.pb.c
+	CC	build/f7-firmware-C/assets/compiled/gui.pb.c
+	CC	build/f7-firmware-C/assets/compiled/network.pb.c
+	CC	build/f7-firmware-C/assets/compiled/property.pb.c
+	CC	build/f7-firmware-C/assets/compiled/storage.pb.c
+	CC	build/f7-firmware-C/assets/compiled/system.pb.c
+	CC	build/f7-firmware-C/assets/compiled/assets_dolphin_blocking.c
+	CC	build/f7-firmware-C/assets/compiled/assets_dolphin_internal.c
+	CC	lib/bit_lib/bit_lib.c
+	CC	lib/ble_profile/extra_profiles/hid_profile.c
+	CC	lib/ble_profile/extra_services/hid_service.c
+	CC	lib/datetime/datetime.c
+	CC	lib/digital_signal/presets/nfc/iso14443_3a_signal.c
+	CC	lib/digital_signal/presets/nfc/iso15693_signal.c
+	CC	lib/digital_signal/digital_sequence.c
+	CC	lib/digital_signal/digital_signal.c
+	CC	lib/fatfs/option/unicode.c
+	CC	lib/fatfs/diskio.c
+	CC	lib/fatfs/ff.c
+	CC	lib/fatfs/ff_gen_drv.c
+	CC	targets/f7/ble_glue/furi_ble/event_dispatcher.c
+	CC	targets/f7/ble_glue/furi_ble/gatt.c
+	AR	build/f7-firmware-C/digital_signal/libdigital_signal.a
+	RANLIB	build/f7-firmware-C/digital_signal/libdigital_signal.a
+	INSTALL	build/f7-firmware-C/lib/libdigital_signal.a
+	CC	targets/f7/ble_glue/profiles/serial_profile.c
+	CC	targets/f7/ble_glue/services/battery_service.c
+	CC	targets/f7/ble_glue/services/dev_info_service.c
+	CC	targets/f7/ble_glue/services/serial_service.c
+	CC	targets/f7/ble_glue/app_debug.c
+	CC	targets/f7/ble_glue/ble_app.c
+	CC	targets/f7/ble_glue/ble_event_thread.c
+	CC	targets/f7/ble_glue/ble_glue.c
+	CC	targets/f7/ble_glue/ble_tl_hooks.c
+	CC	targets/f7/ble_glue/extra_beacon.c
+	CC	targets/f7/ble_glue/gap.c
+	CC	targets/f7/ble_glue/hw_ipcc.c
+	CC	targets/f7/fatfs/fatfs.c
+	CC	targets/f7/fatfs/sector_cache.c
+	CC	targets/f7/fatfs/user_diskio.c
+	CC	targets/f7/furi_hal/furi_hal.c
+	CC	targets/f7/furi_hal/furi_hal_adc.c
+	CC	targets/f7/furi_hal/furi_hal_bt.c
+	CC	targets/f7/furi_hal/furi_hal_bus.c
+	CC	targets/f7/furi_hal/furi_hal_clock.c
+	CC	targets/f7/furi_hal/furi_hal_cortex.c
+	CC	targets/f7/furi_hal/furi_hal_crypto.c
+	CC	targets/f7/furi_hal/furi_hal_debug.c
+	CC	targets/f7/furi_hal/furi_hal_dma.c
+	CC	targets/f7/furi_hal/furi_hal_flash.c
+	CC	targets/f7/furi_hal/furi_hal_gpio.c
+	CC	targets/f7/furi_hal/furi_hal_i2c.c
+	CC	targets/f7/furi_hal/furi_hal_i2c_config.c
+	CC	targets/f7/furi_hal/furi_hal_ibutton.c
+	CC	targets/f7/furi_hal/furi_hal_info.c
+	CC	targets/f7/furi_hal/furi_hal_infrared.c
+	CC	targets/f7/furi_hal/furi_hal_interrupt.c
+	CC	targets/f7/furi_hal/furi_hal_light.c
+	CC	targets/f7/furi_hal/furi_hal_memory.c
+	CC	targets/f7/furi_hal/furi_hal_mpu.c
+	CC	targets/f7/furi_hal/furi_hal_nfc.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_event.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_felica.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_irq.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_iso14443a.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_iso14443b.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_iso15693.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_timer.c
+	CC	targets/f7/furi_hal/furi_hal_os.c
+	CC	targets/f7/furi_hal/furi_hal_power.c
+	CC	targets/f7/furi_hal/furi_hal_power_config.c
+	CC	targets/f7/furi_hal/furi_hal_pwm.c
+	CC	targets/f7/furi_hal/furi_hal_random.c
+	CC	targets/f7/furi_hal/furi_hal_region.c
+	CC	targets/f7/furi_hal/furi_hal_resources.c
+	CC	targets/f7/furi_hal/furi_hal_rfid.c
+	CC	targets/f7/furi_hal/furi_hal_rtc.c
+	CC	targets/f7/furi_hal/furi_hal_sd.c
+	CC	targets/f7/furi_hal/furi_hal_serial.c
+	CC	targets/f7/furi_hal/furi_hal_serial_control.c
+	CC	targets/f7/furi_hal/furi_hal_speaker.c
+	CC	targets/f7/furi_hal/furi_hal_spi.c
+	CC	targets/f7/furi_hal/furi_hal_spi_config.c
+	CC	targets/f7/furi_hal/furi_hal_subghz.c
+	CC	targets/f7/furi_hal/furi_hal_usb.c
+	CC	targets/f7/furi_hal/furi_hal_usb_cdc.c
+	CC	targets/f7/furi_hal/furi_hal_usb_hid.c
+	CC	targets/f7/furi_hal/furi_hal_usb_u2f.c
+	CC	targets/f7/furi_hal/furi_hal_version.c
+	CC	targets/f7/furi_hal/furi_hal_version_device.c
+	CC	targets/f7/furi_hal/furi_hal_vibro.c
+	CC	targets/f7/platform_specific/cxx_virtual_stub.c
+	CC	targets/f7/src/dfu.c
+	CC	targets/f7/src/main.c
+	CC	targets/f7/src/recovery.c
+	CC	targets/f7/src/stm32wb55_startup.c
+	CC	targets/f7/src/update.c
+	CC	lib/flipper_application/elf/elf_file.c
+	CC	lib/flipper_application/plugins/composite_resolver.c
+	CC	lib/flipper_application/plugins/plugin_manager.c
+	CC	lib/flipper_application/application_assets.c
+	AR	build/f7-firmware-C/targets/libflipper7.a
+	RANLIB	build/f7-firmware-C/targets/libflipper7.a
+	INSTALL	build/f7-firmware-C/lib/libflipper7.a
+	CC	lib/flipper_application/application_manifest.c
+	CC	lib/flipper_application/flipper_application.c
+	CPP	lib/flipper_application/api_hashtable/api_hashtable.cpp
+	CC	lib/flipper_format/flipper_format.c
+	CC	lib/flipper_format/flipper_format_stream.c
+	CC	lib/FreeRTOS-Kernel/croutine.c
+	CC	lib/FreeRTOS-Kernel/event_groups.c
+	CC	lib/FreeRTOS-Kernel/list.c
+	CC	lib/FreeRTOS-Kernel/queue.c
+	CC	lib/FreeRTOS-Kernel/stream_buffer.c
+	CC	lib/FreeRTOS-Kernel/tasks.c
+	CC	lib/FreeRTOS-Kernel/timers.c
+	CC	lib/FreeRTOS-Kernel/portable/GCC/ARM_CM4F/port.c
+	CC	furi/core/check.c
+	CC	furi/core/critical.c
+	CC	furi/core/event_flag.c
+	CC	furi/core/event_loop.c
+	CC	furi/core/event_loop_tick.c
+	CC	furi/core/event_loop_timer.c
+	CC	furi/core/kernel.c
+	CC	furi/core/log.c
+	CC	furi/core/memmgr.c
+	CC	furi/core/memmgr_heap.c
+	CC	furi/core/message_queue.c
+	CC	furi/core/mutex.c
+	CC	furi/core/pubsub.c
+	CC	furi/core/record.c
+	CC	furi/core/semaphore.c
+	CC	furi/core/stream_buffer.c
+	CC	furi/core/string.c
+	CC	furi/core/thread.c
+	CC	furi/core/thread_list.c
+	CC	furi/core/timer.c
+	CC	furi/flipper.c
+	CC	furi/furi.c
+	CC	lib/heatshrink/heatshrink_decoder.c
+	CC	lib/heatshrink/heatshrink_encoder.c
+	CC	lib/drivers/SK6805.c
+	CC	lib/drivers/bq25896.c
+	CC	lib/drivers/bq27220.c
+	CC	lib/drivers/cc1101.c
+	CC	lib/drivers/lp5562.c
+	CC	lib/drivers/st25r3916.c
+	CC	lib/drivers/st25r3916_reg.c
+	CC	lib/ibutton/protocols/blanks/rw1990.c
+	CC	lib/ibutton/protocols/blanks/tm01x.c
+	CC	lib/ibutton/protocols/blanks/tm2004.c
+	CC	lib/ibutton/protocols/dallas/dallas_common.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds1420.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds1971.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds1990.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds1992.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds1996.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds_generic.c
+	CC	lib/ibutton/protocols/dallas/protocol_group_dallas.c
+	CC	lib/ibutton/protocols/dallas/protocol_group_dallas_defs.c
+	CC	lib/ibutton/protocols/misc/protocol_cyfral.c
+	CC	lib/ibutton/protocols/misc/protocol_group_misc.c
+	CC	lib/ibutton/protocols/misc/protocol_group_misc_defs.c
+	CC	lib/ibutton/protocols/misc/protocol_metakom.c
+	CC	lib/ibutton/protocols/protocol_group_defs.c
+	CC	lib/ibutton/ibutton_key.c
+	CC	lib/ibutton/ibutton_protocols.c
+	CC	lib/ibutton/ibutton_settings.c
+	CC	lib/ibutton/ibutton_worker.c
+	CC	lib/ibutton/ibutton_worker_modes.c
+	CC	lib/ibutton/ibutton_write_targets.c
+	CC	lib/ieee754_parse_wrap/wrappers.c
+	CC	lib/infrared/encoder_decoder/common/infrared_common_decoder.c
+	CC	lib/infrared/encoder_decoder/common/infrared_common_encoder.c
+	CC	lib/infrared/encoder_decoder/kaseikyo/infrared_decoder_kaseikyo.c
+	CC	lib/infrared/encoder_decoder/kaseikyo/infrared_encoder_kaseikyo.c
+	CC	lib/infrared/encoder_decoder/kaseikyo/infrared_protocol_kaseikyo.c
+	CC	lib/infrared/encoder_decoder/nec/infrared_decoder_nec.c
+	CC	lib/infrared/encoder_decoder/nec/infrared_encoder_nec.c
+	CC	lib/infrared/encoder_decoder/nec/infrared_protocol_nec.c
+	CC	lib/infrared/encoder_decoder/pioneer/infrared_decoder_pioneer.c
+	CC	lib/infrared/encoder_decoder/pioneer/infrared_encoder_pioneer.c
+	CC	lib/infrared/encoder_decoder/pioneer/infrared_protocol_pioneer.c
+	CC	lib/infrared/encoder_decoder/rc5/infrared_decoder_rc5.c
+	CC	lib/infrared/encoder_decoder/rc5/infrared_encoder_rc5.c
+	CC	lib/infrared/encoder_decoder/rc5/infrared_protocol_rc5.c
+	CC	lib/infrared/encoder_decoder/rc6/infrared_decoder_rc6.c
+	CC	lib/infrared/encoder_decoder/rc6/infrared_encoder_rc6.c
+	CC	lib/infrared/encoder_decoder/rc6/infrared_protocol_rc6.c
+	CC	lib/infrared/encoder_decoder/rca/infrared_decoder_rca.c
+	CC	lib/infrared/encoder_decoder/rca/infrared_encoder_rca.c
+	CC	lib/infrared/encoder_decoder/rca/infrared_protocol_rca.c
+	CC	lib/infrared/encoder_decoder/samsung/infrared_decoder_samsung.c
+	CC	lib/infrared/encoder_decoder/samsung/infrared_encoder_samsung.c
+	CC	lib/infrared/encoder_decoder/samsung/infrared_protocol_samsung.c
+	CC	lib/infrared/encoder_decoder/sirc/infrared_decoder_sirc.c
+	CC	lib/infrared/encoder_decoder/sirc/infrared_encoder_sirc.c
+	CC	lib/infrared/encoder_decoder/sirc/infrared_protocol_sirc.c
+	CC	lib/infrared/encoder_decoder/infrared.c
+	CC	lib/infrared/signal/infrared_brute_force.c
+	CC	lib/infrared/signal/infrared_signal.c
+	CC	lib/infrared/worker/infrared_transmit.c
+	CC	lib/infrared/worker/infrared_worker.c
+	CC	lib/lfrfid/protocols/lfrfid_protocols.c
+	CC	lib/lfrfid/protocols/protocol_awid.c
+	CC	lib/lfrfid/protocols/protocol_electra.c
+	CC	lib/lfrfid/protocols/protocol_em4100.c
+	CC	lib/lfrfid/protocols/protocol_fdx_a.c
+	CC	lib/lfrfid/protocols/protocol_fdx_b.c
+	CC	lib/lfrfid/protocols/protocol_gallagher.c
+	CC	lib/lfrfid/protocols/protocol_gproxii.c
+	CC	lib/lfrfid/protocols/protocol_h10301.c
+	CC	lib/lfrfid/protocols/protocol_hid_ex_generic.c
+	CC	lib/lfrfid/protocols/protocol_hid_generic.c
+	CC	lib/lfrfid/protocols/protocol_idteck.c
+	CC	lib/lfrfid/protocols/protocol_indala224.c
+	CC	lib/lfrfid/protocols/protocol_indala26.c
+	CC	lib/lfrfid/protocols/protocol_io_prox_xsf.c
+	CC	lib/lfrfid/protocols/protocol_jablotron.c
+	CC	lib/lfrfid/protocols/protocol_keri.c
+	CC	lib/lfrfid/protocols/protocol_nexwatch.c
+	CC	lib/lfrfid/protocols/protocol_noralsy.c
+	CC	lib/lfrfid/protocols/protocol_pac_stanley.c
+	CC	lib/lfrfid/protocols/protocol_paradox.c
+	CC	lib/lfrfid/protocols/protocol_pyramid.c
+	CC	lib/lfrfid/protocols/protocol_securakey.c
+	CC	lib/lfrfid/protocols/protocol_viking.c
+	CC	lib/lfrfid/tools/em4305.c
+	CC	lib/lfrfid/tools/fsk_demod.c
+	CC	lib/lfrfid/tools/fsk_ocs.c
+	CC	lib/lfrfid/tools/hitagmicro.c
+	CC	lib/lfrfid/tools/hitags.c
+	CC	lib/lfrfid/tools/iso_3166.c
+	CC	lib/lfrfid/tools/t5577.c
+	CC	lib/lfrfid/tools/varint_pair.c
+	CC	lib/lfrfid/lfrfid_dict_file.c
+	CC	lib/lfrfid/lfrfid_raw_file.c
+	CC	lib/lfrfid/lfrfid_raw_worker.c
+	CC	lib/lfrfid/lfrfid_settings.c
+	CC	lib/lfrfid/lfrfid_worker.c
+	CC	lib/lfrfid/lfrfid_worker_modes.c
+	CC	lib/lfrfid/lfrfid_write_targets.c
+	CC	lib/mbedtls/library/aes.c
+	CC	lib/mbedtls/library/bignum.c
+	CC	lib/mbedtls/library/bignum_core.c
+	CC	lib/mbedtls/library/ecdsa.c
+	CC	lib/mbedtls/library/ecp.c
+	CC	lib/mbedtls/library/ecp_curves.c
+	CC	lib/mbedtls/library/md.c
+	CC	lib/mbedtls/library/md5.c
+	CC	lib/mbedtls/library/platform_util.c
+	CC	lib/mbedtls/library/ripemd160.c
+	CC	lib/mbedtls/library/sha1.c
+	CC	lib/mbedtls/library/sha256.c
+	CC	lib/mbedtls/library/des.c
+	CC	lib/microtar/src/microtar.c
+	CC	lib/mjs/common/frozen/frozen.c
+	CC	lib/mjs/common/platforms/platform_flipper.c
+	CC	lib/mjs/common/cs_dbg.c
+	CC	lib/mjs/common/cs_dirent.c
+	CC	lib/mjs/common/cs_file.c
+	CC	lib/mjs/common/cs_time.c
+	CC	lib/mjs/common/cs_varint.c
+	CC	lib/mjs/common/mbuf.c
+	CC	lib/mjs/common/mg_str.c
+	CC	lib/mjs/common/str_util.c
+	CC	lib/mjs/ffi/ffi.c
+	CC	lib/mjs/mjs_array.c
+	CC	lib/mjs/mjs_array_buf.c
+	CC	lib/mjs/mjs_bcode.c
+	CC	lib/mjs/mjs_builtin.c
+	CC	lib/mjs/mjs_core.c
+	CC	lib/mjs/mjs_dataview.c
+	CC	lib/mjs/mjs_exec.c
+	CC	lib/mjs/mjs_ffi.c
+	CC	lib/mjs/mjs_gc.c
+	CC	lib/mjs/mjs_json.c
+	CC	lib/mjs/mjs_object.c
+	CC	lib/mjs/mjs_parser.c
+	CC	lib/mjs/mjs_primitive.c
+	CC	lib/mjs/mjs_string.c
+	CC	lib/mjs/mjs_tok.c
+	CC	lib/mjs/mjs_util.c
+	CC	lib/music_worker/music_worker.c
+	CC	lib/nanopb/pb_common.c
+	CC	lib/nanopb/pb_decode.c
+	CC	lib/nanopb/pb_encode.c
+	CC	lib/nfc/helpers/crypto1.c
+	CC	lib/nfc/helpers/felica_crc.c
+	CC	lib/nfc/helpers/iso13239_crc.c
+	CC	lib/nfc/helpers/iso14443_4_layer.c
+	CC	lib/nfc/helpers/iso14443_crc.c
+	CC	lib/nfc/helpers/nfc_data_generator.c
+	CC	lib/nfc/helpers/nfc_util.c
+	CC	lib/nfc/helpers/nxp_native_command.c
+	CC	lib/nfc/protocols/emv/emv.c
+	CC	lib/nfc/protocols/emv/emv_poller.c
+	CC	lib/nfc/protocols/emv/emv_poller_i.c
+	CC	lib/nfc/protocols/felica/felica.c
+	CC	lib/nfc/protocols/felica/felica_i.c
+	CC	lib/nfc/protocols/felica/felica_listener.c
+	CC	lib/nfc/protocols/felica/felica_listener_i.c
+	CC	lib/nfc/protocols/felica/felica_poller.c
+	CC	lib/nfc/protocols/felica/felica_poller_i.c
+	CC	lib/nfc/protocols/felica/felica_poller_sync.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a_listener.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a_listener_i.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a_poller.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_i.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_sync.c
+	CC	lib/nfc/protocols/iso14443_3b/iso14443_3b.c
+	CC	lib/nfc/protocols/iso14443_3b/iso14443_3b_poller.c
+	CC	lib/nfc/protocols/iso14443_3b/iso14443_3b_poller_i.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a_i.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a_listener.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a_listener_i.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a_poller.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a_poller_i.c
+	CC	lib/nfc/protocols/iso14443_4b/iso14443_4b.c
+	CC	lib/nfc/protocols/iso14443_4b/iso14443_4b_i.c
+	CC	lib/nfc/protocols/iso14443_4b/iso14443_4b_poller.c
+	CC	lib/nfc/protocols/iso14443_4b/iso14443_4b_poller_i.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3_i.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3_listener.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3_listener_i.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3_poller.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3_poller_i.c
+	CC	lib/nfc/protocols/mf_classic/mf_classic.c
+	CC	lib/nfc/protocols/mf_classic/mf_classic_listener.c
+	CC	lib/nfc/protocols/mf_classic/mf_classic_poller.c
+	CC	lib/nfc/protocols/mf_classic/mf_classic_poller_i.c
+	CC	lib/nfc/protocols/mf_classic/mf_classic_poller_sync.c
+	CC	lib/nfc/protocols/mf_desfire/mf_desfire.c
+	CC	lib/nfc/protocols/mf_desfire/mf_desfire_i.c
+	CC	lib/nfc/protocols/mf_desfire/mf_desfire_poller.c
+	CC	lib/nfc/protocols/mf_desfire/mf_desfire_poller_i.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_crypto.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_i.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_listener.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_listener_i.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_poller.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_poller_i.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_aes_crypto.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_listener.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_listener_i.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_poller.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_poller_i.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_poller_sync.c
+	CC	lib/nfc/protocols/ntag4xx/ntag4xx.c
+	CC	lib/nfc/protocols/ntag4xx/ntag4xx_i.c
+	CC	lib/nfc/protocols/ntag4xx/ntag4xx_poller.c
+	CC	lib/nfc/protocols/ntag4xx/ntag4xx_poller_i.c
+	CC	lib/nfc/protocols/slix/slix.c
+	CC	lib/nfc/protocols/slix/slix_i.c
+	CC	lib/nfc/protocols/slix/slix_listener.c
+	CC	lib/nfc/protocols/slix/slix_listener_i.c
+	CC	lib/nfc/protocols/slix/slix_poller.c
+	CC	lib/nfc/protocols/slix/slix_poller_i.c
+	CC	lib/nfc/protocols/st25tb/st25tb.c
+	CC	lib/nfc/protocols/st25tb/st25tb_poller.c
+	CC	lib/nfc/protocols/st25tb/st25tb_poller_i.c
+	CC	lib/nfc/protocols/st25tb/st25tb_poller_sync.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag_i.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag_listener.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag_listener_i.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag_poller.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag_poller_i.c
+	CC	lib/nfc/protocols/nfc_device_defs.c
+	CC	lib/nfc/protocols/nfc_listener_defs.c
+	CC	lib/nfc/protocols/nfc_poller_defs.c
+	CC	lib/nfc/protocols/nfc_protocol.c
+	CC	lib/nfc/nfc.c
+	CC	lib/nfc/nfc_device.c
+	CC	lib/nfc/nfc_device_i.c
+	CC	lib/nfc/nfc_listener.c
+	CC	lib/nfc/nfc_mock.c
+	CC	lib/nfc/nfc_poller.c
+	CC	lib/nfc/nfc_scanner.c
+	CC	lib/one_wire/maxim_crc.c
+	CC	lib/one_wire/one_wire_host.c
+	CC	lib/one_wire/one_wire_slave.c
+	CC	lib/print/printf_tiny.c
+	AR	build/f7-firmware-C/nfc/libnfc.a
+	RANLIB	build/f7-firmware-C/nfc/libnfc.a
+	INSTALL	build/f7-firmware-C/lib/libnfc.a
+	CC	lib/print/wrappers.c
+	CC	lib/pulse_reader/pulse_reader.c
+	CC	lib/signal_reader/parsers/iso15693/iso15693_parser.c
+	CC	lib/signal_reader/signal_reader.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_adc.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_comp.c
+	AR	build/f7-firmware-C/signal_reader/libsignal_reader.a
+	RANLIB	build/f7-firmware-C/signal_reader/libsignal_reader.a
+	INSTALL	build/f7-firmware-C/lib/libsignal_reader.a
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_crc.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_crs.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_dma.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_exti.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_gpio.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_i2c.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_lptim.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_lpuart.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_pka.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_pwr.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_rcc.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_rng.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_rtc.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_spi.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_tim.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_usart.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_utils.c
+	CC	lib/stm32wb_copro/wpan/interface/patterns/ble_thread/shci/shci.c
+	CC	lib/stm32wb_copro/wpan/interface/patterns/ble_thread/tl/hci_tl.c
+	CC	lib/stm32wb_copro/wpan/interface/patterns/ble_thread/tl/shci_tl.c
+	CC	lib/stm32wb_copro/wpan/interface/patterns/ble_thread/tl/tl_mbox.c
+	CC	lib/stm32wb_copro/wpan/ble/core/auto/ble_gap_aci.c
+	CC	lib/stm32wb_copro/wpan/ble/core/auto/ble_gatt_aci.c
+	CC	lib/stm32wb_copro/wpan/ble/core/auto/ble_hal_aci.c
+	CC	lib/stm32wb_copro/wpan/ble/core/auto/ble_hci_le.c
+	CC	lib/stm32wb_copro/wpan/ble/core/auto/ble_l2cap_aci.c
+	CC	lib/stm32wb_copro/wpan/ble/core/template/osal.c
+	CC	lib/stm32wb_copro/wpan/utilities/dbg_trace.c
+	CC	lib/stm32wb_copro/wpan/utilities/stm_list.c
+	CC	lib/subghz/blocks/custom_btn.c
+	CC	lib/subghz/blocks/decoder.c
+	CC	lib/subghz/blocks/encoder.c
+	CC	lib/subghz/blocks/generic.c
+	CC	lib/subghz/blocks/math.c
+	CC	lib/subghz/devices/cc1101_int/cc1101_int_interconnect.c
+	CC	lib/subghz/devices/cc1101_configs.c
+	CC	lib/subghz/devices/devices.c
+	CC	lib/subghz/devices/registry.c
+	CC	lib/subghz/protocols/aes_common.c
+	CC	lib/subghz/protocols/allstar_firefly.c
+	CC	lib/subghz/protocols/alutech_at_4n.c
+	CC	lib/subghz/protocols/ansonic.c
+	CC	lib/subghz/protocols/base.c
+	CC	lib/subghz/protocols/beninca_arc.c
+	CC	lib/subghz/protocols/bett.c
+	CC	lib/subghz/protocols/bin_raw.c
+	CC	lib/subghz/protocols/came.c
+	CC	lib/subghz/protocols/came_atomo.c
+	CC	lib/subghz/protocols/came_twee.c
+	CC	lib/subghz/protocols/chamberlain_code.c
+	CC	lib/subghz/protocols/clemsa.c
+	CC	lib/subghz/protocols/common.c
+	CC	lib/subghz/protocols/dickert_mahs.c
+	CC	lib/subghz/protocols/ditec_gol4.c
+	CC	lib/subghz/protocols/doitrand.c
+	CC	lib/subghz/protocols/doorbell32.c
+	CC	lib/subghz/protocols/dooya.c
+	CC	lib/subghz/protocols/elplast.c
+	CC	lib/subghz/protocols/faac_slh.c
+	CC	lib/subghz/protocols/feron.c
+	CC	lib/subghz/protocols/gangqi.c
+	CC	lib/subghz/protocols/gate_tx.c
+	CC	lib/subghz/protocols/hay21.c
+	CC	lib/subghz/protocols/hollarm.c
+	CC	lib/subghz/protocols/holtek.c
+	CC	lib/subghz/protocols/holtek_ht12x.c
+	CC	lib/subghz/protocols/honeywell.c
+	CC	lib/subghz/protocols/honeywell_wdb.c
+	CC	lib/subghz/protocols/hormann.c
+	CC	lib/subghz/protocols/ido.c
+	CC	lib/subghz/protocols/intertechno_v3.c
+	CC	lib/subghz/protocols/jarolift.c
+	CC	lib/subghz/protocols/keeloq.c
+	CC	lib/subghz/protocols/keeloq_common.c
+	CC	lib/subghz/protocols/keyfinder.c
+	CC	lib/subghz/protocols/keyfinder2.c
+	CC	lib/subghz/protocols/kinggates_stylo_4k.c
+	CC	lib/subghz/protocols/legrand.c
+	CC	lib/subghz/protocols/linear.c
+	CC	lib/subghz/protocols/linear_delta3.c
+	CC	lib/subghz/protocols/magellan.c
+	CC	lib/subghz/protocols/marantec.c
+	CC	lib/subghz/protocols/marantec24.c
+	CC	lib/subghz/protocols/mastercode.c
+	CC	lib/subghz/protocols/megacode.c
+	CC	lib/subghz/protocols/nero_radio.c
+	CC	lib/subghz/protocols/nero_sketch.c
+	CC	lib/subghz/protocols/nice_flo.c
+	CC	lib/subghz/protocols/nice_flor_s.c
+	CC	lib/subghz/protocols/nord_ice.c
+	CC	lib/subghz/protocols/phoenix_v2.c
+	CC	lib/subghz/protocols/power_smart.c
+	CC	lib/subghz/protocols/prastel.c
+	CC	lib/subghz/protocols/princeton.c
+	CC	lib/subghz/protocols/protocol_items.c
+	CC	lib/subghz/protocols/raw.c
+	CC	lib/subghz/protocols/revers_rb2.c
+	CC	lib/subghz/protocols/roger.c
+	CC	lib/subghz/protocols/secplus_v1.c
+	CC	lib/subghz/protocols/secplus_v2.c
+	CC	lib/subghz/protocols/smc5326.c
+	CC	lib/subghz/protocols/somfy_keytis.c
+	CC	lib/subghz/protocols/somfy_telis.c
+	CC	lib/subghz/protocols/telcoma_edge.c
+	CC	lib/subghz/protocols/treadmill37.c
+	CC	lib/subghz/environment.c
+	CC	lib/subghz/receiver.c
+	CC	lib/subghz/registry.c
+	CC	lib/subghz/subghz_file_encoder_worker.c
+	CC	lib/subghz/subghz_keystore.c
+	CC	lib/subghz/subghz_setting.c
+	CC	lib/subghz/subghz_tx_rx_worker.c
+	CC	lib/subghz/subghz_worker.c
+	CC	lib/subghz/transmitter.c
+	CC	lib/toolbox/cli/shell/cli_shell.c
+	CC	lib/toolbox/cli/shell/cli_shell_completions.c
+	CC	lib/toolbox/cli/shell/cli_shell_line.c
+	CC	lib/toolbox/cli/cli_ansi.c
+	CC	lib/toolbox/cli/cli_command.c
+	CC	lib/toolbox/cli/cli_registry.c
+	CC	lib/toolbox/protocols/protocol_dict.c
+	CC	lib/toolbox/pulse_protocols/pulse_glue.c
+	CC	lib/toolbox/settings_helpers/submenu_based.c
+	CC	lib/toolbox/stream/buffered_file_stream.c
+	CC	lib/toolbox/stream/file_stream.c
+	CC	lib/toolbox/stream/stream.c
+	CC	lib/toolbox/stream/stream_cache.c
+	CC	lib/toolbox/stream/string_stream.c
+	CC	lib/toolbox/tar/tar_archive.c
+	CC	lib/toolbox/args.c
+	CC	lib/toolbox/bit_buffer.c
+	CC	lib/toolbox/buffer_stream.c
+	CC	lib/toolbox/compress.c
+	CC	lib/toolbox/crc32_calc.c
+	CC	lib/toolbox/dir_walk.c
+	CC	lib/toolbox/float_tools.c
+	CC	lib/toolbox/hex.c
+	CC	lib/toolbox/keys_dict.c
+	CC	lib/toolbox/manchester_decoder.c
+	CC	lib/toolbox/manchester_encoder.c
+	CC	lib/toolbox/md5_calc.c
+	CC	lib/toolbox/name_generator.c
+	CC	lib/toolbox/path.c
+	CC	lib/toolbox/pipe.c
+	CC	lib/toolbox/pretty_format.c
+	CC	lib/toolbox/profiler.c
+	CC	lib/toolbox/property.c
+	CC	lib/toolbox/pulse_joiner.c
+	CC	lib/toolbox/run_parallel.c
+	CC	lib/toolbox/saved_struct.c
+	CC	lib/toolbox/simple_array.c
+	CC	lib/toolbox/str_buffer.c
+	CC	lib/toolbox/strint.c
+	CC	lib/toolbox/value_index.c
+	CC	lib/toolbox/varint.c
+	VERSION	build/f7-firmware-C/toolbox/version.inc.h
+	CC	lib/u8g2/u8g2_bitmap.c
+	CC	lib/u8g2/u8g2_box.c
+	CC	lib/u8g2/u8g2_buffer.c
+	CC	lib/u8g2/u8g2_circle.c
+	CC	lib/u8g2/u8g2_d_memory.c
+	CC	lib/u8g2/u8g2_font.c
+Version information updated
+	CC	lib/toolbox/version.c
+	CC	lib/u8g2/u8g2_fonts.c
+	AR	build/f7-firmware-C/toolbox/libtoolbox.a
+	RANLIB	build/f7-firmware-C/toolbox/libtoolbox.a
+	CC	lib/u8g2/u8g2_glue.c
+	CC	lib/u8g2/u8g2_hvline.c
+	INSTALL	build/f7-firmware-C/lib/libtoolbox.a
+	CC	lib/u8g2/u8g2_intersection.c
+	CC	lib/u8g2/u8g2_line.c
+	CC	lib/u8g2/u8g2_ll_hvline.c
+	CC	lib/u8g2/u8g2_setup.c
+	CC	lib/u8g2/u8x8_8x8.c
+	CC	lib/u8g2/u8x8_byte.c
+	CC	lib/u8g2/u8x8_cad.c
+	CC	lib/u8g2/u8x8_display.c
+	CC	lib/u8g2/u8x8_gpio.c
+	CC	lib/u8g2/u8x8_setup.c
+	CC	lib/update_util/resources/manifest.c
+	CC	lib/update_util/dfu_file.c
+	CC	lib/update_util/int_backup.c
+	CC	lib/update_util/update_manifest.c
+	CC	lib/update_util/update_operation.c
+	CC	lib/libusb_stm32/src/usbd_core.c
+	CC	lib/libusb_stm32/src/usbd_stm32wb55_devfs.c
+	APIPREP	build/f7-firmware-C/sdk_origin.i
+	APIPP	build/f7-firmware-C/sdk_origin.i
+	APPS	build/f7-firmware-C/applications/applications.c
+	CC	applications/main/archive/helpers/archive_apps.c
+	CC	build/f7-firmware-C/applications/applications.c
+	CC	applications/main/archive/helpers/archive_browser.c
+	SDKCHK	targets/f7/api_symbols.csv
+	CC	applications/main/archive/helpers/archive_favorites.c
+	CC	applications/main/archive/helpers/archive_files.c
+	CC	applications/main/archive/scenes/archive_scene.c
+	CC	applications/main/archive/scenes/archive_scene_browser.c
+	CC	applications/main/archive/scenes/archive_scene_delete.c
+	CC	applications/main/archive/scenes/archive_scene_info.c
+	CC	applications/main/archive/scenes/archive_scene_new_dir.c
+	CC	applications/main/archive/scenes/archive_scene_rename.c
+	CC	applications/main/archive/scenes/archive_scene_show.c
+	CC	applications/main/archive/views/archive_browser_view.c
+	CC	applications/main/archive/archive.c
+	CPP	applications/main/subghz/api/subghz_app_api_table.cpp
+	CC	applications/main/subghz/helpers/subghz_add_manually_plugin.c
+	CC	applications/main/subghz/helpers/subghz_chat.c
+	CC	applications/main/subghz/helpers/subghz_feature_plugin.c
+	CC	applications/main/subghz/helpers/subghz_frequency_analyzer_plugin.c
+	CC	applications/main/subghz/helpers/subghz_threshold_rssi.c
+	CC	applications/main/subghz/helpers/subghz_txrx.c
+	CC	applications/main/subghz/scenes/subghz_scene.c
+	CC	applications/main/subghz/scenes/subghz_scene_decode_raw.c
+	CC	applications/main/subghz/scenes/subghz_scene_delete.c
+	CC	applications/main/subghz/scenes/subghz_scene_delete_raw.c
+	CC	applications/main/subghz/scenes/subghz_scene_delete_success.c
+	CC	applications/main/subghz/scenes/subghz_scene_frequency_analyzer.c
+	CC	applications/main/subghz/scenes/subghz_scene_more_raw.c
+	CC	applications/main/subghz/scenes/subghz_scene_need_saving.c
+	CC	applications/main/subghz/scenes/subghz_scene_radio_settings.c
+	CC	applications/main/subghz/scenes/subghz_scene_read_raw.c
+	CC	applications/main/subghz/scenes/subghz_scene_receiver.c
+	CC	applications/main/subghz/scenes/subghz_scene_receiver_config.c
+	CC	applications/main/subghz/scenes/subghz_scene_receiver_info.c
+	CC	applications/main/subghz/scenes/subghz_scene_rpc.c
+	CC	applications/main/subghz/scenes/subghz_scene_save_name.c
+	CC	applications/main/subghz/scenes/subghz_scene_save_success.c
+	CC	applications/main/subghz/scenes/subghz_scene_saved.c
+[32mAPI version 88.17 is up to date[0m
+	SDKTREE	build/f7-firmware-C/sdk_headers/sdk.opts
+	CC	applications/main/subghz/scenes/subghz_scene_saved_menu.c
+	CC	applications/main/subghz/scenes/subghz_scene_set_button.c
+	CC	applications/main/subghz/scenes/subghz_scene_set_counter.c
+	CC	applications/main/subghz/scenes/subghz_scene_set_key.c
+	CC	applications/main/subghz/scenes/subghz_scene_set_seed.c
+	CC	applications/main/subghz/scenes/subghz_scene_set_serial.c
+	CC	applications/main/subghz/scenes/subghz_scene_set_type.c
+	CC	applications/main/subghz/scenes/subghz_scene_show_error.c
+	CC	applications/main/subghz/scenes/subghz_scene_show_error_sub.c
+	CC	applications/main/subghz/scenes/subghz_scene_signal_settings.c
+	CC	applications/main/subghz/scenes/subghz_scene_start.c
+	CC	applications/main/subghz/scenes/subghz_scene_transmitter.c
+	CC	applications/main/subghz/views/receiver.c
+	CC	applications/main/subghz/views/subghz_read_raw.c
+	CC	applications/main/subghz/views/transmitter.c
+	CC	applications/main/subghz/subghz.c
+	CC	applications/main/subghz/subghz_cli.c
+	CC	applications/main/subghz/subghz_dangerous_freq.c
+	CC	applications/main/subghz/subghz_history.c
+	CC	applications/main/subghz/subghz_i.c
+	CC	applications/main/subghz/subghz_last_settings.c
+	CC	applications/services/bt/bt_service/bt.c
+	CC	applications/services/bt/bt_service/bt_api.c
+	CC	applications/services/bt/bt_service/bt_keys_storage.c
+	CC	applications/services/bt/bt_cli.c
+	CC	applications/services/bt/bt_settings.c
+	CC	applications/services/cli/cli_command_gpio.c
+	CC	applications/services/cli/cli_main_commands.c
+	CC	applications/services/cli/cli_main_shell.c
+	CC	applications/services/cli/cli_vcp.c
+	CC	applications/services/crypto/crypto_cli.c
+	CC	applications/services/desktop/animations/views/bubble_animation_view.c
+	CC	applications/services/desktop/animations/views/one_shot_animation_view.c
+	CC	applications/services/desktop/animations/animation_manager.c
+	CC	applications/services/desktop/animations/animation_storage.c
+	CC	applications/services/desktop/helpers/pin_code.c
+	CC	applications/services/desktop/helpers/slideshow.c
+	CC	applications/services/desktop/scenes/desktop_scene.c
+	CC	applications/services/desktop/scenes/desktop_scene_debug.c
+	CC	applications/services/desktop/scenes/desktop_scene_fault.c
+	CC	applications/services/desktop/scenes/desktop_scene_hw_mismatch.c
+	CC	applications/services/desktop/scenes/desktop_scene_lock_menu.c
+	CC	applications/services/desktop/scenes/desktop_scene_locked.c
+	CC	applications/services/desktop/scenes/desktop_scene_main.c
+	CC	applications/services/desktop/scenes/desktop_scene_pin_input.c
+	CC	applications/services/desktop/scenes/desktop_scene_pin_timeout.c
+	CC	applications/services/desktop/scenes/desktop_scene_quick_settings.c
+	CC	applications/services/desktop/scenes/desktop_scene_secure_enclave.c
+	CC	applications/services/desktop/scenes/desktop_scene_slideshow.c
+	CC	applications/services/desktop/views/desktop_view_debug.c
+	CC	applications/services/desktop/views/desktop_view_lock_menu.c
+	CC	applications/services/desktop/views/desktop_view_locked.c
+	CC	applications/services/desktop/views/desktop_view_main.c
+	CC	applications/services/desktop/views/desktop_view_pin_input.c
+	CC	applications/services/desktop/views/desktop_view_pin_timeout.c
+	CC	applications/services/desktop/views/desktop_view_quick_settings.c
+	CC	applications/services/desktop/views/desktop_view_slideshow.c
+	CC	applications/services/desktop/desktop.c
+	CC	applications/services/desktop/desktop_settings.c
+	CC	applications/services/dialogs/dialogs.c
+	CC	applications/services/dialogs/dialogs_api.c
+	CC	applications/services/dialogs/dialogs_module_file_browser.c
+	CC	applications/services/dialogs/dialogs_module_message.c
+	CC	applications/services/dolphin/helpers/dolphin_deed.c
+	CC	applications/services/dolphin/helpers/dolphin_state.c
+	CC	applications/services/dolphin/dolphin.c
+	CC	applications/services/expansion/expansion.c
+	CC	applications/services/expansion/expansion_settings.c
+	CC	applications/services/expansion/expansion_worker.c
+	CC	applications/services/gps/gps.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_button.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_circle.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_icon.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_line.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_rect.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_string.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_string_multiline.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_text_box.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_text_scroll.c
+	CC	applications/services/gui/modules/button_menu.c
+	CC	applications/services/gui/modules/button_panel.c
+	CC	applications/services/gui/modules/byte_input.c
+	CC	applications/services/gui/modules/date_time_input.c
+	CC	applications/services/gui/modules/dialog_ex.c
+	CC	applications/services/gui/modules/empty_screen.c
+	CC	applications/services/gui/modules/file_browser.c
+	CC	applications/services/gui/modules/file_browser_worker.c
+	CC	applications/services/gui/modules/loading.c
+	CC	applications/services/gui/modules/menu.c
+	CC	applications/services/gui/modules/number_input.c
+	CC	applications/services/gui/modules/popup.c
+	CC	applications/services/gui/modules/submenu.c
+	CC	applications/services/gui/modules/text_box.c
+	CC	applications/services/gui/modules/text_input.c
+	CC	applications/services/gui/modules/validators.c
+	CC	applications/services/gui/modules/variable_item_list.c
+	CC	applications/services/gui/modules/widget.c
+	CC	applications/services/gui/canvas.c
+	CC	applications/services/gui/elements.c
+	CC	applications/services/gui/gui.c
+	CC	applications/services/gui/icon.c
+	CC	applications/services/gui/icon_animation.c
+	CC	applications/services/gui/scene_manager.c
+	CC	applications/services/gui/view.c
+	CC	applications/services/gui/view_dispatcher.c
+	CC	applications/services/gui/view_holder.c
+	CC	applications/services/gui/view_port.c
+	CC	applications/services/gui/view_stack.c
+	CC	applications/services/input/input.c
+	CC	applications/services/input/input_cli.c
+	CC	applications/services/input/input_settings.c
+	CPP	applications/services/loader/firmware_api/firmware_api.cpp
+	CC	applications/services/loader/loader.c
+	CC	applications/services/loader/loader_applications.c
+	CC	applications/services/loader/loader_cli.c
+	CC	applications/services/loader/loader_menu.c
+	CC	applications/services/loader/loader_queue.c
+	CC	applications/services/locale/locale.c
+	CC	applications/services/namechanger/namechanger.c
+	CC	applications/services/network/network.c
+	CC	applications/services/notification/notification_app.c
+	CC	applications/services/notification/notification_app_api.c
+	CC	applications/services/notification/notification_messages.c
+	CC	applications/services/notification/notification_messages_notes.c
+	CC	applications/services/power/power_service/views/power_off.c
+	CC	applications/services/power/power_service/views/power_unplug_usb.c
+	CC	applications/services/power/power_service/power.c
+	CC	applications/services/power/power_service/power_api.c
+	CC	applications/services/power/power_service/power_settings.c
+	CC	applications/services/power/power_cli.c
+	CC	applications/services/rpc/rpc.c
+	CC	applications/services/rpc/rpc_app.c
+	CC	applications/services/rpc/rpc_cli.c
+	CC	applications/services/rpc/rpc_debug.c
+	CC	applications/services/rpc/rpc_desktop.c
+	CC	applications/services/rpc/rpc_gpio.c
+	CC	applications/services/rpc/rpc_gps.c
+	CC	applications/services/rpc/rpc_gui.c
+	CC	applications/services/rpc/rpc_network.c
+	CC	applications/services/rpc/rpc_property.c
+	CC	applications/services/rpc/rpc_storage.c
+	CC	applications/services/rpc/rpc_system.c
+	CC	applications/services/storage/storages/sd_notify.c
+	CC	applications/services/storage/storages/storage_ext.c
+	CC	applications/services/storage/filesystem_api.c
+	CC	applications/services/storage/storage.c
+	CC	applications/services/storage/storage_cli.c
+	CC	applications/services/storage/storage_external_api.c
+	CC	applications/services/storage/storage_glue.c
+	CC	applications/services/storage/storage_internal_api.c
+	CC	applications/services/storage/storage_processing.c
+	CC	applications/services/storage/storage_sd_api.c
+	CC	applications/settings/clock_settings/scenes/clock_settings_scene.c
+	CC	applications/settings/clock_settings/scenes/clock_settings_scene_start.c
+	CC	applications/settings/clock_settings/views/clock_settings_module.c
+	CC	applications/settings/clock_settings/clock_settings.c
+	CC	applications/settings/clock_settings/clock_settings_alarm.c
+	CC	applications/settings/power_settings_app/scenes/power_settings_scene.c
+	CC	applications/settings/power_settings_app/scenes/power_settings_scene_battery_info.c
+	CC	applications/settings/power_settings_app/scenes/power_settings_scene_power_off.c
+	CC	applications/settings/power_settings_app/scenes/power_settings_scene_reboot.c
+	CC	applications/settings/power_settings_app/scenes/power_settings_scene_reboot_confirm.c
+	CC	applications/settings/power_settings_app/scenes/power_settings_scene_start.c
+	CC	applications/settings/power_settings_app/views/battery_info.c
+	CC	applications/settings/power_settings_app/power_settings_app.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_benchmark.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_benchmark_confirm.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_factory_reset.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_format_confirm.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_formatting.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_internal_info.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_sd_info.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_start.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_unmount_confirm.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_unmounted.c
+	CC	applications/settings/storage_settings/storage_settings.c
+	CC	applications/settings/system/system_settings.c
+	CC	applications/system/find_my_flipper/findmy_startup.c
+	CC	applications/system/find_my_flipper/findmy_state.c
+	CC	applications/system/updater/cli/updater_cli.c
+	CC	applications/system/updater/scenes/updater_scene.c
+	CC	applications/system/updater/scenes/updater_scene_error.c
+	CC	applications/system/updater/scenes/updater_scene_loadcfg.c
+	CC	applications/system/updater/scenes/updater_scene_main.c
+	CC	applications/system/updater/util/update_task.c
+	CC	applications/system/updater/util/update_task_worker_backup.c
+	CC	applications/system/updater/util/update_task_worker_flasher.c
+	CC	applications/system/updater/views/updater_main.c
+	CC	applications/system/updater/updater.c
+	INSTALL	build/f7-firmware-C/firmware.json
+	LINK	build/f7-firmware-C/firmware.elf
+	INFO	
+Loaded 275 app definitions.
+[1;32mFirmware modules configuration:[0m
+[32mService:
+	[0m cli_vcp, bt, dialogs, dolphin, desktop, gui, input, loader, notification, power, storage
+[32mSystem:
+	[0m updater_app
+[32mApp:
+	[0m subghz
+[32mArchive:
+	[0m archive
+[32mSettings:
+	[0m power_settings, storage_settings, system_settings
+[32mStartupHook:
+	[0m cli, rpc_start, gps_start, network_start, crypto_start, bt_start, power_start, storage_start, locale, loader_start, updater_start, expansion_start, subghz_load_dangerous_settings, clock_settings_start, findmy_startup, namechanger_srv
+[32mExternal:
+	[0m js_app
+[32mMenuExternal:
+	[0m subghz_remote, lfrfid, nfc, infrared, gpio, ibutton, bad_usb, u2f, clock
+[32mExtSettings:
+	[0m about, bt_settings, clock_settings, desktop_settings, expansion_settings, input_settings, notification_settings, passport
+[32mPackage:
+	[0m extra_resources, settings_apps, system_apps, basic_services, main_apps_on_start, main_apps
+Firmware size
+.text         696036 (679.72 K)
+.rodata       171900 (167.87 K)
+.data            700 (  0.68 K)
+.bss            7576 (  7.40 K)
+.free_flash   179600 (175.39 K)
+	HEX	build/f7-firmware-C/firmware.hex
+	BIN	build/f7-firmware-C/firmware.bin
+[33mfirmware.bin:  213 flash pages (last page 15.23% full)[0m
+	DFU	build/f7-firmware-C/firmware.dfu
+	CDB	build/f7-firmware-C/compile_commands.json
+[32mLinking build/f7-firmware-C as latest built dir (./build/latest/)[0m
+	CC	build/f7-updater-C/applications/applications.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_button.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_circle.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_icon.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_line.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_rect.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_string.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_string_multiline.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_text_box.c
+	CC	applications/services/gui/modules/widget_elements/widget_element_text_scroll.c
+	CC	applications/services/gui/modules/button_menu.c
+	CC	applications/services/gui/modules/button_panel.c
+	CC	applications/services/gui/modules/byte_input.c
+	CC	applications/services/gui/modules/date_time_input.c
+	CC	applications/services/gui/modules/dialog_ex.c
+	CC	applications/services/gui/modules/empty_screen.c
+	CC	applications/services/gui/modules/file_browser.c
+	CC	applications/services/gui/modules/file_browser_worker.c
+	CC	applications/services/gui/modules/loading.c
+	CC	applications/services/gui/modules/menu.c
+	CC	applications/services/gui/modules/number_input.c
+	CC	applications/services/gui/modules/popup.c
+	CC	applications/services/gui/modules/submenu.c
+	CC	applications/services/gui/modules/text_box.c
+	CC	applications/services/gui/modules/text_input.c
+	CC	applications/services/gui/modules/validators.c
+	CC	applications/services/gui/modules/variable_item_list.c
+	CC	applications/services/gui/modules/widget.c
+	CC	applications/services/gui/canvas.c
+	CC	applications/services/gui/elements.c
+	CC	applications/services/gui/gui.c
+	CC	applications/services/gui/icon.c
+	CC	applications/services/gui/icon_animation.c
+	CC	applications/services/gui/scene_manager.c
+	CC	applications/services/gui/view.c
+	CC	applications/services/gui/view_dispatcher.c
+	CC	applications/services/gui/view_holder.c
+	CC	applications/services/gui/view_port.c
+	CC	applications/services/gui/view_stack.c
+	CC	applications/services/input/input.c
+	CC	applications/services/input/input_cli.c
+	CC	applications/services/input/input_settings.c
+	CC	applications/services/notification/notification_app.c
+	CC	applications/services/notification/notification_app_api.c
+	CC	applications/services/notification/notification_messages.c
+	CC	applications/services/notification/notification_messages_notes.c
+	CC	applications/services/storage/storages/sd_notify.c
+	CC	applications/services/storage/storages/storage_ext.c
+	CC	applications/services/storage/filesystem_api.c
+	CC	applications/services/storage/storage.c
+	CC	applications/services/storage/storage_cli.c
+	CC	applications/services/storage/storage_external_api.c
+	CC	applications/services/storage/storage_glue.c
+	CC	applications/services/storage/storage_internal_api.c
+	CC	applications/services/storage/storage_processing.c
+	CC	applications/services/storage/storage_sd_api.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_benchmark.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_benchmark_confirm.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_factory_reset.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_format_confirm.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_formatting.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_internal_info.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_sd_info.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_start.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_unmount_confirm.c
+	CC	applications/settings/storage_settings/scenes/storage_settings_scene_unmounted.c
+	CC	applications/settings/storage_settings/storage_settings.c
+	CC	applications/system/updater/cli/updater_cli.c
+	CC	applications/system/updater/scenes/updater_scene.c
+	CC	applications/system/updater/scenes/updater_scene_error.c
+	CC	applications/system/updater/scenes/updater_scene_loadcfg.c
+	CC	applications/system/updater/scenes/updater_scene_main.c
+	CC	applications/system/updater/util/update_task.c
+	CC	applications/system/updater/util/update_task_worker_backup.c
+	CC	applications/system/updater/util/update_task_worker_flasher.c
+	CC	applications/system/updater/views/updater_main.c
+	CC	applications/system/updater/updater.c
+	CC	lib/print/printf_tiny.c
+	CC	lib/print/wrappers.c
+	CC	targets/f7/ble_glue/furi_ble/event_dispatcher.c
+	CC	targets/f7/ble_glue/furi_ble/gatt.c
+	CC	targets/f7/ble_glue/profiles/serial_profile.c
+	CC	targets/f7/ble_glue/services/battery_service.c
+	CC	targets/f7/ble_glue/services/dev_info_service.c
+	CC	targets/f7/ble_glue/services/serial_service.c
+	CC	targets/f7/ble_glue/app_debug.c
+	CC	targets/f7/ble_glue/ble_app.c
+	CC	targets/f7/ble_glue/ble_event_thread.c
+	CC	targets/f7/ble_glue/ble_glue.c
+	CC	targets/f7/ble_glue/ble_tl_hooks.c
+	CC	targets/f7/ble_glue/extra_beacon.c
+	CC	targets/f7/ble_glue/gap.c
+	CC	targets/f7/ble_glue/hw_ipcc.c
+	CC	targets/f7/fatfs/fatfs.c
+	CC	targets/f7/fatfs/sector_cache.c
+	CC	targets/f7/fatfs/user_diskio.c
+	CC	targets/f7/furi_hal/furi_hal.c
+	CC	targets/f7/furi_hal/furi_hal_adc.c
+	CC	targets/f7/furi_hal/furi_hal_bt.c
+	CC	targets/f7/furi_hal/furi_hal_bus.c
+	CC	targets/f7/furi_hal/furi_hal_clock.c
+	CC	targets/f7/furi_hal/furi_hal_cortex.c
+	CC	targets/f7/furi_hal/furi_hal_crypto.c
+	CC	targets/f7/furi_hal/furi_hal_debug.c
+	CC	targets/f7/furi_hal/furi_hal_dma.c
+	CC	targets/f7/furi_hal/furi_hal_flash.c
+	CC	targets/f7/furi_hal/furi_hal_gpio.c
+	CC	targets/f7/furi_hal/furi_hal_i2c.c
+	CC	targets/f7/furi_hal/furi_hal_i2c_config.c
+	CC	targets/f7/furi_hal/furi_hal_ibutton.c
+	CC	targets/f7/furi_hal/furi_hal_info.c
+	CC	targets/f7/furi_hal/furi_hal_infrared.c
+	CC	targets/f7/furi_hal/furi_hal_interrupt.c
+	CC	targets/f7/furi_hal/furi_hal_light.c
+	CC	targets/f7/furi_hal/furi_hal_memory.c
+	CC	targets/f7/furi_hal/furi_hal_mpu.c
+	CC	targets/f7/furi_hal/furi_hal_nfc.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_event.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_felica.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_irq.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_iso14443a.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_iso14443b.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_iso15693.c
+	CC	targets/f7/furi_hal/furi_hal_nfc_timer.c
+	CC	targets/f7/furi_hal/furi_hal_os.c
+	CC	targets/f7/furi_hal/furi_hal_power.c
+	CC	targets/f7/furi_hal/furi_hal_power_config.c
+	CC	targets/f7/furi_hal/furi_hal_pwm.c
+	CC	targets/f7/furi_hal/furi_hal_random.c
+	CC	targets/f7/furi_hal/furi_hal_region.c
+	CC	targets/f7/furi_hal/furi_hal_resources.c
+	CC	targets/f7/furi_hal/furi_hal_rfid.c
+	CC	targets/f7/furi_hal/furi_hal_rtc.c
+	CC	targets/f7/furi_hal/furi_hal_sd.c
+	CC	targets/f7/furi_hal/furi_hal_serial.c
+	CC	targets/f7/furi_hal/furi_hal_serial_control.c
+	CC	targets/f7/furi_hal/furi_hal_speaker.c
+	CC	targets/f7/furi_hal/furi_hal_spi.c
+	CC	targets/f7/furi_hal/furi_hal_spi_config.c
+	CC	targets/f7/furi_hal/furi_hal_subghz.c
+	CC	targets/f7/furi_hal/furi_hal_usb.c
+	CC	targets/f7/furi_hal/furi_hal_usb_cdc.c
+	CC	targets/f7/furi_hal/furi_hal_usb_hid.c
+	CC	targets/f7/furi_hal/furi_hal_usb_u2f.c
+	CC	targets/f7/furi_hal/furi_hal_version.c
+	CC	targets/f7/furi_hal/furi_hal_version_device.c
+	CC	targets/f7/furi_hal/furi_hal_vibro.c
+	CC	targets/f7/platform_specific/cxx_virtual_stub.c
+	CC	targets/f7/src/dfu.c
+	CC	targets/f7/src/main.c
+	CC	targets/f7/src/recovery.c
+	CC	targets/f7/src/stm32wb55_startup.c
+	CC	targets/f7/src/update.c
+	CC	furi/core/check.c
+	CC	furi/core/critical.c
+	CC	furi/core/event_flag.c
+	CC	furi/core/event_loop.c
+	CC	furi/core/event_loop_tick.c
+	CC	furi/core/event_loop_timer.c
+	CC	furi/core/kernel.c
+	CC	furi/core/log.c
+	AR	build/f7-updater-C/targets/libflipper7.a
+	CC	furi/core/memmgr.c
+	RANLIB	build/f7-updater-C/targets/libflipper7.a
+	INSTALL	build/f7-updater-C/lib/libflipper7.a
+	CC	furi/core/memmgr_heap.c
+	CC	furi/core/message_queue.c
+	CC	furi/core/mutex.c
+	CC	furi/core/pubsub.c
+	CC	furi/core/record.c
+	CC	furi/core/semaphore.c
+	CC	furi/core/stream_buffer.c
+	CC	furi/core/string.c
+	CC	furi/core/thread.c
+	CC	furi/core/thread_list.c
+	CC	furi/core/timer.c
+	CC	furi/flipper.c
+	CC	furi/furi.c
+	CC	lib/FreeRTOS-Kernel/croutine.c
+	CC	lib/FreeRTOS-Kernel/event_groups.c
+	CC	lib/FreeRTOS-Kernel/list.c
+	CC	lib/FreeRTOS-Kernel/queue.c
+	CC	lib/FreeRTOS-Kernel/stream_buffer.c
+	CC	lib/FreeRTOS-Kernel/tasks.c
+	CC	lib/FreeRTOS-Kernel/timers.c
+	CC	lib/FreeRTOS-Kernel/portable/GCC/ARM_CM4F/port.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_adc.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_comp.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_crc.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_crs.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_dma.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_exti.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_gpio.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_i2c.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_lptim.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_lpuart.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_pka.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_pwr.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_rcc.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_rng.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_rtc.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_spi.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_tim.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_usart.c
+	CC	lib/stm32wb_hal/Src/stm32wbxx_ll_utils.c
+	CC	lib/stm32wb_copro/wpan/interface/patterns/ble_thread/shci/shci.c
+	CC	lib/stm32wb_copro/wpan/interface/patterns/ble_thread/tl/hci_tl.c
+	CC	lib/stm32wb_copro/wpan/interface/patterns/ble_thread/tl/shci_tl.c
+	CC	lib/stm32wb_copro/wpan/interface/patterns/ble_thread/tl/tl_mbox.c
+	CC	lib/stm32wb_copro/wpan/ble/core/auto/ble_gap_aci.c
+	CC	lib/stm32wb_copro/wpan/ble/core/auto/ble_gatt_aci.c
+	CC	lib/stm32wb_copro/wpan/ble/core/auto/ble_hal_aci.c
+	CC	lib/stm32wb_copro/wpan/ble/core/auto/ble_hci_le.c
+	CC	lib/stm32wb_copro/wpan/ble/core/auto/ble_l2cap_aci.c
+	CC	lib/stm32wb_copro/wpan/ble/core/template/osal.c
+	CC	lib/stm32wb_copro/wpan/utilities/dbg_trace.c
+	CC	lib/stm32wb_copro/wpan/utilities/stm_list.c
+	CC	lib/drivers/SK6805.c
+	CC	lib/drivers/bq25896.c
+	CC	lib/drivers/bq27220.c
+	CC	lib/drivers/cc1101.c
+	CC	lib/drivers/lp5562.c
+	CC	lib/drivers/st25r3916.c
+	CC	lib/drivers/st25r3916_reg.c
+	CC	lib/fatfs/option/unicode.c
+	CC	lib/fatfs/diskio.c
+	CC	lib/fatfs/ff.c
+	CC	lib/fatfs/ff_gen_drv.c
+	CC	lib/subghz/blocks/custom_btn.c
+	CC	lib/subghz/blocks/decoder.c
+	CC	lib/subghz/blocks/encoder.c
+	CC	lib/subghz/blocks/generic.c
+	CC	lib/subghz/blocks/math.c
+	CC	lib/subghz/devices/cc1101_int/cc1101_int_interconnect.c
+	CC	lib/subghz/devices/cc1101_configs.c
+	CC	lib/subghz/devices/devices.c
+	CC	lib/subghz/devices/registry.c
+	CC	lib/subghz/protocols/aes_common.c
+	CC	lib/subghz/protocols/allstar_firefly.c
+	CC	lib/subghz/protocols/alutech_at_4n.c
+	CC	lib/subghz/protocols/ansonic.c
+	CC	lib/subghz/protocols/base.c
+	CC	lib/subghz/protocols/beninca_arc.c
+	CC	lib/subghz/protocols/bett.c
+	CC	lib/subghz/protocols/bin_raw.c
+	CC	lib/subghz/protocols/came.c
+	CC	lib/subghz/protocols/came_atomo.c
+	CC	lib/subghz/protocols/came_twee.c
+	CC	lib/subghz/protocols/chamberlain_code.c
+	CC	lib/subghz/protocols/clemsa.c
+	CC	lib/subghz/protocols/common.c
+	CC	lib/subghz/protocols/dickert_mahs.c
+	CC	lib/subghz/protocols/ditec_gol4.c
+	CC	lib/subghz/protocols/doitrand.c
+	CC	lib/subghz/protocols/doorbell32.c
+	CC	lib/subghz/protocols/dooya.c
+	CC	lib/subghz/protocols/elplast.c
+	CC	lib/subghz/protocols/faac_slh.c
+	CC	lib/subghz/protocols/feron.c
+	CC	lib/subghz/protocols/gangqi.c
+	CC	lib/subghz/protocols/gate_tx.c
+	CC	lib/subghz/protocols/hay21.c
+	CC	lib/subghz/protocols/hollarm.c
+	CC	lib/subghz/protocols/holtek.c
+	CC	lib/subghz/protocols/holtek_ht12x.c
+	CC	lib/subghz/protocols/honeywell.c
+	CC	lib/subghz/protocols/honeywell_wdb.c
+	CC	lib/subghz/protocols/hormann.c
+	CC	lib/subghz/protocols/ido.c
+	CC	lib/subghz/protocols/intertechno_v3.c
+	CC	lib/subghz/protocols/jarolift.c
+	CC	lib/subghz/protocols/keeloq.c
+	CC	lib/subghz/protocols/keeloq_common.c
+	CC	lib/subghz/protocols/keyfinder.c
+	CC	lib/subghz/protocols/keyfinder2.c
+	CC	lib/subghz/protocols/kinggates_stylo_4k.c
+	CC	lib/subghz/protocols/legrand.c
+	CC	lib/subghz/protocols/linear.c
+	CC	lib/subghz/protocols/linear_delta3.c
+	CC	lib/subghz/protocols/magellan.c
+	CC	lib/subghz/protocols/marantec.c
+	CC	lib/subghz/protocols/marantec24.c
+	CC	lib/subghz/protocols/mastercode.c
+	CC	lib/subghz/protocols/megacode.c
+	CC	lib/subghz/protocols/nero_radio.c
+	CC	lib/subghz/protocols/nero_sketch.c
+	CC	lib/subghz/protocols/nice_flo.c
+	CC	lib/subghz/protocols/nice_flor_s.c
+	CC	lib/subghz/protocols/nord_ice.c
+	CC	lib/subghz/protocols/phoenix_v2.c
+	CC	lib/subghz/protocols/power_smart.c
+	CC	lib/subghz/protocols/prastel.c
+	CC	lib/subghz/protocols/princeton.c
+	CC	lib/subghz/protocols/protocol_items.c
+	CC	lib/subghz/protocols/raw.c
+	CC	lib/subghz/protocols/revers_rb2.c
+	CC	lib/subghz/protocols/roger.c
+	CC	lib/subghz/protocols/secplus_v1.c
+	CC	lib/subghz/protocols/secplus_v2.c
+	CC	lib/subghz/protocols/smc5326.c
+	CC	lib/subghz/protocols/somfy_keytis.c
+	CC	lib/subghz/protocols/somfy_telis.c
+	CC	lib/subghz/protocols/telcoma_edge.c
+	CC	lib/subghz/protocols/treadmill37.c
+	CC	lib/subghz/environment.c
+	CC	lib/subghz/receiver.c
+	CC	lib/subghz/registry.c
+	CC	lib/subghz/subghz_file_encoder_worker.c
+	CC	lib/subghz/subghz_keystore.c
+	CC	lib/subghz/subghz_setting.c
+	CC	lib/subghz/subghz_tx_rx_worker.c
+	CC	lib/subghz/subghz_worker.c
+	CC	lib/subghz/transmitter.c
+	CC	lib/toolbox/cli/shell/cli_shell.c
+	CC	lib/toolbox/cli/shell/cli_shell_completions.c
+	CC	lib/toolbox/cli/shell/cli_shell_line.c
+	CC	lib/toolbox/cli/cli_ansi.c
+	CC	lib/toolbox/cli/cli_command.c
+	CC	lib/toolbox/cli/cli_registry.c
+	CC	lib/toolbox/protocols/protocol_dict.c
+	CC	lib/toolbox/pulse_protocols/pulse_glue.c
+	CC	lib/toolbox/settings_helpers/submenu_based.c
+	CC	lib/toolbox/stream/buffered_file_stream.c
+	CC	lib/toolbox/stream/file_stream.c
+	CC	lib/toolbox/stream/stream.c
+	CC	lib/toolbox/stream/stream_cache.c
+	CC	lib/toolbox/stream/string_stream.c
+	CC	lib/toolbox/tar/tar_archive.c
+	CC	lib/toolbox/args.c
+	CC	lib/toolbox/bit_buffer.c
+	CC	lib/toolbox/buffer_stream.c
+	CC	lib/toolbox/compress.c
+	CC	lib/toolbox/crc32_calc.c
+	CC	lib/toolbox/dir_walk.c
+	CC	lib/toolbox/float_tools.c
+	CC	lib/toolbox/hex.c
+	CC	lib/toolbox/keys_dict.c
+	CC	lib/toolbox/manchester_decoder.c
+	CC	lib/toolbox/manchester_encoder.c
+	CC	lib/toolbox/md5_calc.c
+	CC	lib/toolbox/name_generator.c
+	CC	lib/toolbox/path.c
+	CC	lib/toolbox/pipe.c
+	CC	lib/toolbox/pretty_format.c
+	CC	lib/toolbox/profiler.c
+	CC	lib/toolbox/property.c
+	CC	lib/toolbox/pulse_joiner.c
+	CC	lib/toolbox/run_parallel.c
+	CC	lib/toolbox/saved_struct.c
+	CC	lib/toolbox/simple_array.c
+	CC	lib/toolbox/str_buffer.c
+	CC	lib/toolbox/strint.c
+	CC	lib/toolbox/value_index.c
+	CC	lib/toolbox/varint.c
+	VERSION	build/f7-updater-C/toolbox/version.inc.h
+	CC	lib/nfc/helpers/crypto1.c
+	CC	lib/nfc/helpers/felica_crc.c
+	CC	lib/nfc/helpers/iso13239_crc.c
+Version information updated
+	CC	lib/nfc/helpers/iso14443_4_layer.c
+	CC	lib/toolbox/version.c
+	CC	lib/nfc/helpers/iso14443_crc.c
+	CC	lib/nfc/helpers/nfc_data_generator.c
+	AR	build/f7-updater-C/toolbox/libtoolbox.a
+	RANLIB	build/f7-updater-C/toolbox/libtoolbox.a
+	CC	lib/nfc/helpers/nfc_util.c
+	INSTALL	build/f7-updater-C/lib/libtoolbox.a
+	CC	lib/nfc/helpers/nxp_native_command.c
+	CC	lib/nfc/protocols/emv/emv.c
+	CC	lib/nfc/protocols/emv/emv_poller.c
+	CC	lib/nfc/protocols/emv/emv_poller_i.c
+	CC	lib/nfc/protocols/felica/felica.c
+	CC	lib/nfc/protocols/felica/felica_i.c
+	CC	lib/nfc/protocols/felica/felica_listener.c
+	CC	lib/nfc/protocols/felica/felica_listener_i.c
+	CC	lib/nfc/protocols/felica/felica_poller.c
+	CC	lib/nfc/protocols/felica/felica_poller_i.c
+	CC	lib/nfc/protocols/felica/felica_poller_sync.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a_listener.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a_listener_i.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a_poller.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_i.c
+	CC	lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_sync.c
+	CC	lib/nfc/protocols/iso14443_3b/iso14443_3b.c
+	CC	lib/nfc/protocols/iso14443_3b/iso14443_3b_poller.c
+	CC	lib/nfc/protocols/iso14443_3b/iso14443_3b_poller_i.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a_i.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a_listener.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a_listener_i.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a_poller.c
+	CC	lib/nfc/protocols/iso14443_4a/iso14443_4a_poller_i.c
+	CC	lib/nfc/protocols/iso14443_4b/iso14443_4b.c
+	CC	lib/nfc/protocols/iso14443_4b/iso14443_4b_i.c
+	CC	lib/nfc/protocols/iso14443_4b/iso14443_4b_poller.c
+	CC	lib/nfc/protocols/iso14443_4b/iso14443_4b_poller_i.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3_i.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3_listener.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3_listener_i.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3_poller.c
+	CC	lib/nfc/protocols/iso15693_3/iso15693_3_poller_i.c
+	CC	lib/nfc/protocols/mf_classic/mf_classic.c
+	CC	lib/nfc/protocols/mf_classic/mf_classic_listener.c
+	CC	lib/nfc/protocols/mf_classic/mf_classic_poller.c
+	CC	lib/nfc/protocols/mf_classic/mf_classic_poller_i.c
+	CC	lib/nfc/protocols/mf_classic/mf_classic_poller_sync.c
+	CC	lib/nfc/protocols/mf_desfire/mf_desfire.c
+	CC	lib/nfc/protocols/mf_desfire/mf_desfire_i.c
+	CC	lib/nfc/protocols/mf_desfire/mf_desfire_poller.c
+	CC	lib/nfc/protocols/mf_desfire/mf_desfire_poller_i.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_crypto.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_i.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_listener.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_listener_i.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_poller.c
+	CC	lib/nfc/protocols/mf_plus/mf_plus_poller_i.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_aes_crypto.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_listener.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_listener_i.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_poller.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_poller_i.c
+	CC	lib/nfc/protocols/mf_ultralight/mf_ultralight_poller_sync.c
+	CC	lib/nfc/protocols/ntag4xx/ntag4xx.c
+	CC	lib/nfc/protocols/ntag4xx/ntag4xx_i.c
+	CC	lib/nfc/protocols/ntag4xx/ntag4xx_poller.c
+	CC	lib/nfc/protocols/ntag4xx/ntag4xx_poller_i.c
+	CC	lib/nfc/protocols/slix/slix.c
+	CC	lib/nfc/protocols/slix/slix_i.c
+	CC	lib/nfc/protocols/slix/slix_listener.c
+	CC	lib/nfc/protocols/slix/slix_listener_i.c
+	CC	lib/nfc/protocols/slix/slix_poller.c
+	CC	lib/nfc/protocols/slix/slix_poller_i.c
+	CC	lib/nfc/protocols/st25tb/st25tb.c
+	CC	lib/nfc/protocols/st25tb/st25tb_poller.c
+	CC	lib/nfc/protocols/st25tb/st25tb_poller_i.c
+	CC	lib/nfc/protocols/st25tb/st25tb_poller_sync.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag_i.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag_listener.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag_listener_i.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag_poller.c
+	CC	lib/nfc/protocols/type_4_tag/type_4_tag_poller_i.c
+	CC	lib/nfc/protocols/nfc_device_defs.c
+	CC	lib/nfc/protocols/nfc_listener_defs.c
+	CC	lib/nfc/protocols/nfc_poller_defs.c
+	CC	lib/nfc/protocols/nfc_protocol.c
+	CC	lib/nfc/nfc.c
+	CC	lib/nfc/nfc_device.c
+	CC	lib/nfc/nfc_device_i.c
+	CC	lib/nfc/nfc_listener.c
+	CC	lib/nfc/nfc_mock.c
+	CC	lib/nfc/nfc_poller.c
+	CC	lib/nfc/nfc_scanner.c
+	CC	lib/digital_signal/presets/nfc/iso14443_3a_signal.c
+	CC	lib/digital_signal/presets/nfc/iso15693_signal.c
+	CC	lib/digital_signal/digital_sequence.c
+	CC	lib/digital_signal/digital_signal.c
+	AR	build/f7-updater-C/nfc/libnfc.a
+	RANLIB	build/f7-updater-C/nfc/libnfc.a
+	INSTALL	build/f7-updater-C/lib/libnfc.a
+	CC	lib/pulse_reader/pulse_reader.c
+	CC	lib/signal_reader/parsers/iso15693/iso15693_parser.c
+	CC	lib/signal_reader/signal_reader.c
+	AR	build/f7-updater-C/digital_signal/libdigital_signal.a
+	RANLIB	build/f7-updater-C/digital_signal/libdigital_signal.a
+	INSTALL	build/f7-updater-C/lib/libdigital_signal.a
+	CC	lib/microtar/src/microtar.c
+	CC	lib/libusb_stm32/src/usbd_core.c
+	CC	lib/libusb_stm32/src/usbd_stm32wb55_devfs.c
+	AR	build/f7-updater-C/signal_reader/libsignal_reader.a
+	RANLIB	build/f7-updater-C/signal_reader/libsignal_reader.a
+	INSTALL	build/f7-updater-C/lib/libsignal_reader.a
+	CC	lib/infrared/encoder_decoder/common/infrared_common_decoder.c
+	CC	lib/infrared/encoder_decoder/common/infrared_common_encoder.c
+	CC	lib/infrared/encoder_decoder/kaseikyo/infrared_decoder_kaseikyo.c
+	CC	lib/infrared/encoder_decoder/kaseikyo/infrared_encoder_kaseikyo.c
+	CC	lib/infrared/encoder_decoder/kaseikyo/infrared_protocol_kaseikyo.c
+	CC	lib/infrared/encoder_decoder/nec/infrared_decoder_nec.c
+	CC	lib/infrared/encoder_decoder/nec/infrared_encoder_nec.c
+	CC	lib/infrared/encoder_decoder/nec/infrared_protocol_nec.c
+	CC	lib/infrared/encoder_decoder/pioneer/infrared_decoder_pioneer.c
+	CC	lib/infrared/encoder_decoder/pioneer/infrared_encoder_pioneer.c
+	CC	lib/infrared/encoder_decoder/pioneer/infrared_protocol_pioneer.c
+	CC	lib/infrared/encoder_decoder/rc5/infrared_decoder_rc5.c
+	CC	lib/infrared/encoder_decoder/rc5/infrared_encoder_rc5.c
+	CC	lib/infrared/encoder_decoder/rc5/infrared_protocol_rc5.c
+	CC	lib/infrared/encoder_decoder/rc6/infrared_decoder_rc6.c
+	CC	lib/infrared/encoder_decoder/rc6/infrared_encoder_rc6.c
+	CC	lib/infrared/encoder_decoder/rc6/infrared_protocol_rc6.c
+	CC	lib/infrared/encoder_decoder/rca/infrared_decoder_rca.c
+	CC	lib/infrared/encoder_decoder/rca/infrared_encoder_rca.c
+	CC	lib/infrared/encoder_decoder/rca/infrared_protocol_rca.c
+	CC	lib/infrared/encoder_decoder/samsung/infrared_decoder_samsung.c
+	CC	lib/infrared/encoder_decoder/samsung/infrared_encoder_samsung.c
+	CC	lib/infrared/encoder_decoder/samsung/infrared_protocol_samsung.c
+	CC	lib/infrared/encoder_decoder/sirc/infrared_decoder_sirc.c
+	CC	lib/infrared/encoder_decoder/sirc/infrared_encoder_sirc.c
+	CC	lib/infrared/encoder_decoder/sirc/infrared_protocol_sirc.c
+	CC	lib/infrared/encoder_decoder/infrared.c
+	CC	lib/infrared/signal/infrared_brute_force.c
+	CC	lib/infrared/signal/infrared_signal.c
+	CC	lib/infrared/worker/infrared_transmit.c
+	CC	lib/infrared/worker/infrared_worker.c
+	CC	build/f7-updater-C/assets/compiled/assets_icons.c
+	CC	build/f7-updater-C/assets/compiled/application.pb.c
+	CC	build/f7-updater-C/assets/compiled/desktop.pb.c
+	CC	build/f7-updater-C/assets/compiled/flipper.pb.c
+	CC	build/f7-updater-C/assets/compiled/gpio.pb.c
+	CC	build/f7-updater-C/assets/compiled/gps.pb.c
+	CC	build/f7-updater-C/assets/compiled/gui.pb.c
+	CC	build/f7-updater-C/assets/compiled/network.pb.c
+	CC	build/f7-updater-C/assets/compiled/property.pb.c
+	CC	build/f7-updater-C/assets/compiled/storage.pb.c
+	CC	build/f7-updater-C/assets/compiled/system.pb.c
+	CC	build/f7-updater-C/assets/compiled/assets_dolphin_blocking.c
+	CC	build/f7-updater-C/assets/compiled/assets_dolphin_internal.c
+	CC	lib/one_wire/maxim_crc.c
+	CC	lib/one_wire/one_wire_host.c
+	CC	lib/one_wire/one_wire_slave.c
+	CC	lib/ibutton/protocols/blanks/rw1990.c
+	CC	lib/ibutton/protocols/blanks/tm01x.c
+	CC	lib/ibutton/protocols/blanks/tm2004.c
+	CC	lib/ibutton/protocols/dallas/dallas_common.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds1420.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds1971.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds1990.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds1992.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds1996.c
+	CC	lib/ibutton/protocols/dallas/protocol_ds_generic.c
+	CC	lib/ibutton/protocols/dallas/protocol_group_dallas.c
+	CC	lib/ibutton/protocols/dallas/protocol_group_dallas_defs.c
+	CC	lib/ibutton/protocols/misc/protocol_cyfral.c
+	CC	lib/ibutton/protocols/misc/protocol_group_misc.c
+	CC	lib/ibutton/protocols/misc/protocol_group_misc_defs.c
+	CC	lib/ibutton/protocols/misc/protocol_metakom.c
+	CC	lib/ibutton/protocols/protocol_group_defs.c
+	CC	lib/ibutton/ibutton_key.c
+	CC	lib/ibutton/ibutton_protocols.c
+	CC	lib/ibutton/ibutton_settings.c
+	CC	lib/ibutton/ibutton_worker.c
+	CC	lib/ibutton/ibutton_worker_modes.c
+	CC	lib/ibutton/ibutton_write_targets.c
+	CC	lib/music_worker/music_worker.c
+	CC	lib/mjs/common/frozen/frozen.c
+	CC	lib/mjs/common/platforms/platform_flipper.c
+	CC	lib/mjs/common/cs_dbg.c
+	CC	lib/mjs/common/cs_dirent.c
+	CC	lib/mjs/common/cs_file.c
+	CC	lib/mjs/common/cs_time.c
+	CC	lib/mjs/common/cs_varint.c
+	CC	lib/mjs/common/mbuf.c
+	CC	lib/mjs/common/mg_str.c
+	CC	lib/mjs/common/str_util.c
+	CC	lib/mjs/ffi/ffi.c
+	CC	lib/mjs/mjs_array.c
+	CC	lib/mjs/mjs_array_buf.c
+	CC	lib/mjs/mjs_bcode.c
+	CC	lib/mjs/mjs_builtin.c
+	CC	lib/mjs/mjs_core.c
+	CC	lib/mjs/mjs_dataview.c
+	CC	lib/mjs/mjs_exec.c
+	CC	lib/mjs/mjs_ffi.c
+	CC	lib/mjs/mjs_gc.c
+	CC	lib/mjs/mjs_json.c
+	CC	lib/mjs/mjs_object.c
+	CC	lib/mjs/mjs_parser.c
+	CC	lib/mjs/mjs_primitive.c
+	CC	lib/mjs/mjs_string.c
+	CC	lib/mjs/mjs_tok.c
+	CC	lib/mjs/mjs_util.c
+	CC	lib/mbedtls/library/aes.c
+	CC	lib/mbedtls/library/bignum.c
+	CC	lib/mbedtls/library/bignum_core.c
+	CC	lib/mbedtls/library/ecdsa.c
+	CC	lib/mbedtls/library/ecp.c
+	CC	lib/mbedtls/library/ecp_curves.c
+	CC	lib/mbedtls/library/md.c
+	CC	lib/mbedtls/library/md5.c
+	CC	lib/mbedtls/library/platform_util.c
+	CC	lib/mbedtls/library/ripemd160.c
+	CC	lib/mbedtls/library/sha1.c
+	CC	lib/mbedtls/library/sha256.c
+	CC	lib/mbedtls/library/des.c
+	CC	lib/lfrfid/protocols/lfrfid_protocols.c
+	CC	lib/lfrfid/protocols/protocol_awid.c
+	CC	lib/lfrfid/protocols/protocol_electra.c
+	CC	lib/lfrfid/protocols/protocol_em4100.c
+	CC	lib/lfrfid/protocols/protocol_fdx_a.c
+	CC	lib/lfrfid/protocols/protocol_fdx_b.c
+	CC	lib/lfrfid/protocols/protocol_gallagher.c
+	CC	lib/lfrfid/protocols/protocol_gproxii.c
+	CC	lib/lfrfid/protocols/protocol_h10301.c
+	CC	lib/lfrfid/protocols/protocol_hid_ex_generic.c
+	CC	lib/lfrfid/protocols/protocol_hid_generic.c
+	CC	lib/lfrfid/protocols/protocol_idteck.c
+	CC	lib/lfrfid/protocols/protocol_indala224.c
+	CC	lib/lfrfid/protocols/protocol_indala26.c
+	CC	lib/lfrfid/protocols/protocol_io_prox_xsf.c
+	CC	lib/lfrfid/protocols/protocol_jablotron.c
+	CC	lib/lfrfid/protocols/protocol_keri.c
+	CC	lib/lfrfid/protocols/protocol_nexwatch.c
+	CC	lib/lfrfid/protocols/protocol_noralsy.c
+	CC	lib/lfrfid/protocols/protocol_pac_stanley.c
+	CC	lib/lfrfid/protocols/protocol_paradox.c
+	CC	lib/lfrfid/protocols/protocol_pyramid.c
+	CC	lib/lfrfid/protocols/protocol_securakey.c
+	CC	lib/lfrfid/protocols/protocol_viking.c
+	CC	lib/lfrfid/tools/em4305.c
+	CC	lib/lfrfid/tools/fsk_demod.c
+	CC	lib/lfrfid/tools/fsk_ocs.c
+	CC	lib/lfrfid/tools/hitagmicro.c
+	CC	lib/lfrfid/tools/hitags.c
+	CC	lib/lfrfid/tools/iso_3166.c
+	CC	lib/lfrfid/tools/t5577.c
+	CC	lib/lfrfid/tools/varint_pair.c
+	CC	lib/lfrfid/lfrfid_dict_file.c
+	CC	lib/lfrfid/lfrfid_raw_file.c
+	CC	lib/lfrfid/lfrfid_raw_worker.c
+	CC	lib/lfrfid/lfrfid_settings.c
+	CC	lib/lfrfid/lfrfid_worker.c
+	CC	lib/lfrfid/lfrfid_worker_modes.c
+	CC	lib/lfrfid/lfrfid_write_targets.c
+	CC	lib/flipper_application/elf/elf_file.c
+	CC	lib/flipper_application/plugins/composite_resolver.c
+	CC	lib/flipper_application/plugins/plugin_manager.c
+	CC	lib/flipper_application/application_assets.c
+	CC	lib/flipper_application/application_manifest.c
+	CC	lib/flipper_application/flipper_application.c
+	CPP	lib/flipper_application/api_hashtable/api_hashtable.cpp
+	CC	lib/u8g2/u8g2_bitmap.c
+	CC	lib/u8g2/u8g2_box.c
+	CC	lib/u8g2/u8g2_buffer.c
+	CC	lib/u8g2/u8g2_circle.c
+	CC	lib/u8g2/u8g2_d_memory.c
+	CC	lib/u8g2/u8g2_font.c
+	CC	lib/u8g2/u8g2_fonts.c
+	CC	lib/u8g2/u8g2_glue.c
+	CC	lib/u8g2/u8g2_hvline.c
+	CC	lib/u8g2/u8g2_intersection.c
+	CC	lib/u8g2/u8g2_line.c
+	CC	lib/u8g2/u8g2_ll_hvline.c
+	CC	lib/u8g2/u8g2_setup.c
+	CC	lib/u8g2/u8x8_8x8.c
+	CC	lib/u8g2/u8x8_byte.c
+	CC	lib/u8g2/u8x8_cad.c
+	CC	lib/u8g2/u8x8_display.c
+	CC	lib/u8g2/u8x8_gpio.c
+	CC	lib/u8g2/u8x8_setup.c
+	CC	lib/nanopb/pb_common.c
+	CC	lib/nanopb/pb_decode.c
+	CC	lib/nanopb/pb_encode.c
+	CC	lib/update_util/resources/manifest.c
+	CC	lib/update_util/dfu_file.c
+	CC	lib/update_util/int_backup.c
+	CC	lib/update_util/update_manifest.c
+	CC	lib/update_util/update_operation.c
+	CC	lib/heatshrink/heatshrink_decoder.c
+	CC	lib/heatshrink/heatshrink_encoder.c
+	CC	lib/flipper_format/flipper_format.c
+	CC	lib/flipper_format/flipper_format_stream.c
+	CC	lib/bit_lib/bit_lib.c
+	CC	lib/datetime/datetime.c
+	CC	lib/ieee754_parse_wrap/wrappers.c
+	INSTALL	build/f7-updater-C/updater.json
+	CC	applications/system/find_my_flipper/helpers/base64.c
+	CC	applications/system/find_my_flipper/scenes/findmy_scene.c
+	CC	applications/system/find_my_flipper/scenes/findmy_scene_config.c
+	CC	applications/system/find_my_flipper/scenes/findmy_scene_config_import.c
+	CC	applications/system/find_my_flipper/scenes/findmy_scene_config_import_result.c
+	CC	applications/system/find_my_flipper/scenes/findmy_scene_config_mac.c
+	CC	applications/system/find_my_flipper/scenes/findmy_scene_config_packet.c
+	CC	applications/system/find_my_flipper/scenes/findmy_scene_config_tagtype.c
+	CC	applications/system/find_my_flipper/scenes/findmy_scene_main.c
+	CC	applications/system/find_my_flipper/views/findmy_main.c
+	LINK	build/f7-updater-C/updater.elf
+	CC	applications/system/find_my_flipper/findmy.c
+	CC	applications/system/find_my_flipper/findmy_startup.c
+	CC	applications/system/find_my_flipper/findmy_state.c
+	CC	build/f7-firmware-C/.extapps/findmy/findmy_icons.c
+	INFO	
+Loaded 275 app definitions.
+[1;32mFirmware modules configuration:[0m
+[32mService:
+	[0m gui, input, notification, storage, updater
+[32mSettings:
+	[0m storage_settings
+[32mStartupHook:
+	[0m storage_start
+[32mExtSettings:
+	[0m input_settings, notification_settings
+Firmware size
+	CC	applications/system/hid_app/helpers/ble_hid_ext_profile.c
+	CC	applications/system/hid_app/scenes/hid_scene.c
+.text         101924 ( 99.54 K)
+.rodata        17092 ( 16.69 K)
+.data            204 (  0.20 K)
+.bss            4168 (  4.07 K)
+	CC	applications/system/hid_app/scenes/hid_scene_main.c
+	CC	applications/system/hid_app/scenes/hid_scene_rename.c
+	HEX	build/f7-updater-C/updater.hex
+	BIN	build/f7-updater-C/updater.bin
+	CC	applications/system/hid_app/scenes/hid_scene_start.c
+	CC	applications/system/hid_app/scenes/hid_scene_unpair.c
+[33mupdater.bin:   30 flash pages (last page 19.75% full)[0m
+	CC	applications/system/hid_app/views/hid_keyboard.c
+	DFU	build/f7-updater-C/updater.dfu
+	CC	applications/system/hid_app/views/hid_keynote.c
+	CC	applications/system/hid_app/views/hid_media.c
+	CC	applications/system/hid_app/views/hid_mouse.c
+	CC	applications/system/hid_app/views/hid_mouse_clicker.c
+	CC	applications/system/hid_app/views/hid_mouse_jiggler.c
+	CC	applications/system/hid_app/views/hid_mouse_jiggler_stealth.c
+	CC	applications/system/hid_app/views/hid_movie.c
+	CC	applications/system/hid_app/views/hid_music_macos.c
+	CC	applications/system/hid_app/views/hid_numpad.c
+	CC	applications/system/hid_app/views/hid_ptt.c
+	CC	applications/system/hid_app/views/hid_ptt_menu.c
+	CC	applications/system/hid_app/views/hid_tiktok.c
+	CC	applications/system/hid_app/hid.c
+	CC	applications/system/hid_app/transport_usb.c
+	CC	build/f7-firmware-C/.extapps/hid_usb/hid_icons.c
+	CC	applications/system/hid_app/helpers/ble_hid_ext_profile.c
+	CC	applications/system/hid_app/scenes/hid_scene.c
+	CC	applications/system/hid_app/scenes/hid_scene_main.c
+	CC	applications/system/hid_app/scenes/hid_scene_rename.c
+	CC	applications/system/hid_app/scenes/hid_scene_start.c
+	CC	applications/system/hid_app/scenes/hid_scene_unpair.c
+	CC	applications/system/hid_app/views/hid_keyboard.c
+	CC	applications/system/hid_app/views/hid_keynote.c
+	CC	applications/system/hid_app/views/hid_media.c
+	CC	applications/system/hid_app/views/hid_mouse.c
+	CC	applications/system/hid_app/views/hid_mouse_clicker.c
+	CC	applications/system/hid_app/views/hid_mouse_jiggler.c
+	CC	applications/system/hid_app/views/hid_mouse_jiggler_stealth.c
+	CC	applications/system/hid_app/views/hid_movie.c
+	CC	applications/system/hid_app/views/hid_music_macos.c
+	CC	applications/system/hid_app/views/hid_numpad.c
+	CC	applications/system/hid_app/views/hid_ptt.c
+	CC	applications/system/hid_app/views/hid_ptt_menu.c
+	CC	applications/system/hid_app/views/hid_tiktok.c
+	CC	applications/system/hid_app/hid.c
+	CC	applications/system/hid_app/transport_ble.c
+	CC	build/f7-firmware-C/.extapps/hid_ble/hid_icons.c
+	CC	applications/system/mfkey/crypto1.c
+	CC	applications/system/mfkey/init_plugin.c
+	CC	applications/system/mfkey/mfkey.c
+	CC	applications/system/mfkey/mfkey_attack.c
+	CC	applications/system/mfkey/mfkey_batch_prelude.c
+	CC	applications/system/mfkey/mfkey_bs_verify.c
+	CC	applications/system/mfkey/mfkey_recovery.c
+	CC	applications/system/mfkey/mfkey_state_expansion.c
+	CC	build/f7-firmware-C/.extapps/mfkey/mfkey_icons.c
+	CC	applications/system/mfkey/init_plugin.c
+	CC	applications/system/nice_o_code/nice_o_code.c
+	CC	applications/system/secplus_pin/secplus_pin.c
+	CC	applications/system/secplus_pin/secplus_pin_radio.c
+	CC	build/f7-firmware-C/.extapps/secplus_pin/secplus_pin_icons.c
+	CC	applications/system/seed_capturer/seed_capturer.c
+	CC	applications/system/js_app/js_app.c
+	CC	applications/system/js_app/js_modules.c
+	CC	applications/system/js_app/js_thread.c
+	CC	applications/system/js_app/js_value.c
+	CPP	applications/system/js_app/plugin_api/app_api_table.cpp
+	CC	applications/system/js_app/views/console_view.c
+	CC	applications/system/js_app/modules/js_flipper.c
+	CC	applications/system/js_app/modules/js_tests.c
+	CC	applications/system/snake_game/snake_game.c
+	CC	applications/services/cli/commands/hello_world.c
+	CC	applications/services/cli/commands/neofetch.c
+	CC	applications/services/cli/commands/subshell_demo.c
+	CC	applications/services/cli/commands/buzzer.c
+	CC	applications/main/ibutton/ibutton_cli.c
+	CC	applications/main/infrared/infrared_cli.c
+	CC	applications/main/lfrfid/lfrfid_cli.c
+	CC	applications/main/nfc/plugins/supported_cards/bambu.c
+	CC	applications/main/nfc/plugins/supported_cards/all_in_one.c
+	CC	applications/main/nfc/plugins/supported_cards/smartrider.c
+	CC	applications/main/nfc/plugins/supported_cards/microel.c
+	CC	applications/main/nfc/plugins/supported_cards/mizip.c
+	CC	applications/main/nfc/plugins/supported_cards/hi.c
+	CC	applications/main/nfc/plugins/supported_cards/opal.c
+	CC	applications/main/nfc/plugins/supported_cards/myki.c
+	CC	applications/main/nfc/plugins/supported_cards/troika.c
+	CC	applications/main/nfc/api/mosgortrans/mosgortrans_util.c
+	CC	applications/main/nfc/plugins/supported_cards/social_moscow.c
+	CC	applications/main/nfc/api/mosgortrans/mosgortrans_util.c
+	CC	applications/main/nfc/plugins/supported_cards/plantain.c
+	CC	applications/main/nfc/plugins/supported_cards/szppk_so.c
+	CC	applications/main/nfc/plugins/supported_cards/sk_tk.c
+	CC	applications/main/nfc/plugins/supported_cards/sevppk_tk.c
+	CC	applications/main/nfc/plugins/supported_cards/two_cities.c
+	CC	applications/main/nfc/plugins/supported_cards/umarsh.c
+	CC	applications/main/nfc/plugins/supported_cards/metromoney.c
+	CC	applications/main/nfc/plugins/supported_cards/charliecard.c
+	CC	applications/main/nfc/plugins/supported_cards/kazan.c
+	CC	applications/main/nfc/plugins/supported_cards/aime.c
+	CC	applications/main/nfc/plugins/supported_cards/bip.c
+	CC	applications/main/nfc/plugins/supported_cards/saflok.c
+	CC	applications/main/nfc/plugins/supported_cards/saflok.c
+	CC	applications/main/nfc/plugins/supported_cards/mykey.c
+	CC	applications/main/nfc/plugins/supported_cards/zolotaya_korona.c
+	CC	applications/main/nfc/plugins/supported_cards/zolotaya_korona_online.c
+	CC	applications/main/nfc/plugins/supported_cards/gallagher.c
+	CC	applications/main/nfc/api/gallagher/gallagher_util.c
+	CC	applications/main/nfc/plugins/supported_cards/clipper.c
+	CC	applications/main/nfc/plugins/supported_cards/hid.c
+	CC	applications/main/nfc/plugins/supported_cards/washcity.c
+	CC	applications/main/nfc/plugins/supported_cards/emv.c
+	CC	applications/main/nfc/helpers/nfc_emv_parser.c
+	CC	applications/main/nfc/plugins/supported_cards/ndef.c
+	CC	applications/main/nfc/plugins/supported_cards/ndef.c
+	CC	applications/main/nfc/plugins/supported_cards/ndef.c
+	CC	applications/main/nfc/plugins/supported_cards/ndef.c
+	CC	applications/main/nfc/plugins/supported_cards/itso.c
+	CC	applications/main/nfc/plugins/supported_cards/skylanders.c
+	CC	applications/main/nfc/plugins/supported_cards/hworld.c
+	CC	applications/main/nfc/plugins/supported_cards/trt.c
+	CC	applications/main/nfc/plugins/supported_cards/disney_infinity.c
+	CC	applications/main/nfc/plugins/supported_cards/sonicare.c
+	CC	applications/main/nfc/plugins/supported_cards/csc.c
+	CC	applications/main/nfc/plugins/supported_cards/ventra.c
+	CC	applications/main/nfc/helpers/mf_classic_key_cache.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_ultralight/mf_ultralight_render.c
+	CC	applications/main/nfc/cli/nfc_cli.c
+	CC	applications/main/nfc/cli/nfc_cli_commands.c
+	CC	applications/main/nfc/cli/nfc_cli_command_processor.c
+	CC	applications/main/nfc/cli/commands/helpers/nfc_cli_format.c
+	CC	applications/main/nfc/cli/commands/helpers/nfc_cli_scanner.c
+	CC	applications/main/nfc/cli/commands/helpers/nfc_cli_protocol_parser.c
+	CC	applications/main/nfc/cli/commands/raw/nfc_cli_command_raw.c
+	CC	applications/main/nfc/cli/commands/raw/protocol_handlers/iso14443_3a/nfc_cli_raw_iso14443_3a.c
+	CC	applications/main/nfc/cli/commands/raw/protocol_handlers/iso14443_3b/nfc_cli_raw_iso14443_3b.c
+	CC	applications/main/nfc/cli/commands/raw/protocol_handlers/iso15693_3/nfc_cli_raw_iso15693_3.c
+	CC	applications/main/nfc/cli/commands/raw/protocol_handlers/felica/nfc_cli_raw_felica.c
+	CC	applications/main/nfc/cli/commands/apdu/nfc_cli_command_apdu.c
+	CC	applications/main/nfc/cli/commands/apdu/protocol_handlers/iso14443_4a/nfc_cli_apdu_iso14443_4a.c
+	CC	applications/main/nfc/cli/commands/apdu/protocol_handlers/iso14443_4b/nfc_cli_apdu_iso14443_4b.c
+	CC	applications/main/nfc/cli/commands/apdu/protocol_handlers/iso15693_3/nfc_cli_apdu_iso15693_3.c
+	CC	applications/main/nfc/cli/commands/dump/nfc_cli_command_dump.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/iso14443_3a/nfc_cli_dump_iso14443_3a.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/iso14443_3b/nfc_cli_dump_iso14443_3b.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/iso14443_4a/nfc_cli_dump_iso14443_4a.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/iso14443_4b/nfc_cli_dump_iso14443_4b.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/iso15693_3/nfc_cli_dump_iso15693_3.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/felica/nfc_cli_dump_felica.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/mf_ultralight/nfc_cli_dump_mf_ultralight.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/mf_classic/nfc_cli_dump_mf_classic.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/mf_plus/nfc_cli_dump_mf_plus.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/mf_desfire/nfc_cli_dump_mf_desfire.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/slix/nfc_cli_dump_slix.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/st25tb/nfc_cli_dump_st25tb.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/ntag4xx/nfc_cli_dump_ntag4xx.c
+	CC	applications/main/nfc/cli/commands/dump/protocols/type_4_tag/nfc_cli_dump_type_4_tag.c
+	CC	applications/main/nfc/cli/commands/mfu/nfc_cli_command_mfu.c
+	CC	applications/main/nfc/cli/commands/mfu/nfc_cli_action_info.c
+	CC	applications/main/nfc/cli/commands/mfu/nfc_cli_action_rdbl.c
+	CC	applications/main/nfc/cli/commands/mfu/nfc_cli_action_wrbl.c
+	CC	applications/main/nfc/cli/commands/nfc_cli_command_emulate.c
+	CC	applications/main/nfc/cli/commands/nfc_cli_command_scanner.c
+	CC	applications/main/nfc/cli/commands/nfc_cli_command_field.c
+	CC	applications/main/nfc/plugins/supported_cards/banapass.c
+	CC	applications/main/nfc/plugins/supported_cards/aic.c
+	CC	applications/main/onewire/onewire_cli.c
+	CC	applications/main/subghz/subghz_cli.c
+	CC	applications/main/subghz/helpers/subghz_chat.c
+	CC	applications/main/subghz/plugins/add_manually/subghz_add_manually_plugin.c
+	CC	applications/main/subghz/plugins/add_manually/subghz_gen_info.c
+	CC	applications/main/subghz/plugins/add_manually/subghz_scene_set_button.c
+	CC	applications/main/subghz/plugins/add_manually/subghz_scene_set_counter.c
+	CC	applications/main/subghz/plugins/add_manually/subghz_scene_set_key.c
+	CC	applications/main/subghz/plugins/add_manually/subghz_scene_set_seed.c
+	CC	applications/main/subghz/plugins/add_manually/subghz_scene_set_serial.c
+	CC	applications/main/subghz/plugins/add_manually/subghz_scene_set_type.c
+	CC	applications/main/subghz/plugins/add_manually/subghz_txrx_create_protocol_key.c
+	CC	applications/main/subghz/plugins/frequency_analyzer/subghz_frequency_analyzer.c
+	CC	applications/main/subghz/plugins/frequency_analyzer/subghz_frequency_analyzer_plugin.c
+	CC	applications/main/subghz/plugins/frequency_analyzer/subghz_frequency_analyzer_worker.c
+	CC	applications/system/js_app/js_app.c
+	CC	applications/system/js_app/js_modules.c
+	CC	applications/system/js_app/js_thread.c
+	CC	applications/system/js_app/js_value.c
+	CPP	applications/system/js_app/plugin_api/app_api_table.cpp
+	CC	applications/system/js_app/modules/js_flipper.c
+	CC	applications/system/js_app/modules/js_tests.c
+	CC	applications/system/js_app/modules/js_event_loop/js_event_loop.c
+	CPP	applications/system/js_app/modules/js_event_loop/js_event_loop_api_table.cpp
+	CC	applications/system/js_app/modules/js_gui/js_gui.c
+	CPP	applications/system/js_app/modules/js_gui/js_gui_api_table.cpp
+	CC	applications/system/js_app/modules/js_gui/loading.c
+	CC	applications/system/js_app/modules/js_gui/empty_screen.c
+	CC	applications/system/js_app/modules/js_gui/submenu.c
+	CC	applications/system/js_app/modules/js_gui/text_input.c
+	CC	applications/system/js_app/modules/js_gui/number_input.c
+	CC	applications/system/js_app/modules/js_gui/button_panel.c
+	CC	applications/system/js_app/modules/js_gui/popup.c
+	CC	applications/system/js_app/modules/js_gui/button_menu.c
+	CC	applications/system/js_app/modules/js_gui/menu.c
+	CC	applications/system/js_app/modules/js_gui/vi_list.c
+	CC	applications/system/js_app/modules/js_gui/byte_input.c
+	CC	applications/system/js_app/modules/js_gui/text_box.c
+	CC	applications/system/js_app/modules/js_gui/dialog.c
+	CC	applications/system/js_app/modules/js_gui/file_picker.c
+	CC	applications/system/js_app/modules/js_gui/widget.c
+	CC	applications/system/js_app/modules/js_gui/icon.c
+	CC	applications/system/js_app/modules/js_notification.c
+	CC	applications/system/js_app/modules/js_badusb.c
+	CC	applications/system/js_app/modules/js_serial.c
+	CC	applications/system/js_app/modules/js_gpio.c
+	CC	applications/system/js_app/modules/js_math.c
+	CC	applications/system/js_app/modules/js_storage.c
+	CC	applications/system/js_app/modules/js_vgm/imu.c
+	CC	applications/system/js_app/modules/js_vgm/js_vgm.c
+	CC	applications/system/js_app/modules/js_vgm/ICM42688P/ICM42688P.c
+	CC	applications/system/js_app/modules/js_subghz/js_subghz.c
+	CC	applications/system/js_app/modules/js_subghz/radio_device_loader.c
+	CC	applications/system/js_app/modules/js_infrared/js_infrared.c
+	CC	applications/system/js_app/modules/js_blebeacon.c
+	CC	applications/system/js_app/modules/js_usbdisk/js_usbdisk.c
+	CC	applications/system/js_app/modules/js_usbdisk/mass_storage_scsi.c
+	CC	applications/system/js_app/modules/js_usbdisk/mass_storage_usb.c
+	CC	applications/system/js_app/modules/js_i2c.c
+	CC	applications/system/js_app/modules/js_spi.c
+	CC	applications/system/menu_styles/ps4.c
+	CC	applications/system/menu_styles/wii.c
+	CC	applications/system/menu_styles/dsi.c
+	CC	applications/system/menu_styles/c64.c
+	CC	applications/system/menu_styles/compact.c
+	CC	applications/system/menu_styles/coverflow.c
+	CC	applications/system/menu_styles/vertical.c
+	CC	applications/system/menu_styles/grid.c
+	CC	applications/system/menu_styles/macintosh.c
+	CC	applications/system/menu_styles/three_d.c
+	CC	applications/debug/unit_tests/tests/common/common.c
+	CC	applications/debug/unit_tests/tests/js/js_test.c
+	CC	applications/drivers/subghz/cc1101_ext/cc1101_ext.c
+	CC	applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.c
+	CC	applications/main/subghz_remote/helpers/txrx/subghz_txrx.c
+	CC	applications/main/subghz_remote/helpers/subrem_presets.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene_edit_label.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene_edit_menu.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene_edit_preview.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene_edit_submenu.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene_enter_new_name.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene_fw_warning.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene_open_map_file.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene_open_sub_file.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene_remote.c
+	CC	applications/main/subghz_remote/scenes/subrem_scene_start.c
+	CC	applications/main/subghz_remote/views/edit_menu.c
+	CC	applications/main/subghz_remote/views/remote.c
+	CC	applications/main/subghz_remote/subghz_remote_app.c
+	CC	applications/main/subghz_remote/subghz_remote_app_i.c
+	CC	build/f7-firmware-C/.extapps/subghz_remote/subghz_remote_icons.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_clear_t5577.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_clear_t5577_confirm.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_delete_confirm.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_delete_success.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_emulate.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_enter_password.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_exit_confirm.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_extra_actions.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_raw_emulate.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_raw_info.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_raw_name.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_raw_read.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_raw_success.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_read.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_read_key_menu.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_read_success.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_retry_confirm.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_rpc.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_save_data.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_save_fields.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_save_method.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_save_name.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_save_success.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_save_type.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_saved_info.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_saved_key_menu.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_select_key.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_select_raw_key.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_settings.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_settings_write_targets.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_start.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_wipe_t5577.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_wipe_t5577_confirm.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_write.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_write_and_set_pass.c
+	CC	applications/main/lfrfid/scenes/lfrfid_scene_write_success.c
+	CC	applications/main/lfrfid/views/lfrfid_view_read.c
+	CC	applications/main/lfrfid/lfrfid.c
+	CC	applications/main/lfrfid/lfrfid_casi_format.c
+	CC	applications/main/lfrfid/lfrfid_cli.c
+	CC	applications/main/lfrfid/lfrfid_hid_format.c
+	CC	applications/main/lfrfid/lfrfid_manual_format.c
+	CC	applications/main/lfrfid/plugins/settings/lfrfid_settings_write_targets.c
+	CPP	applications/main/nfc/api/nfc_app_api_table.cpp
+	CC	applications/main/nfc/helpers/protocol_support/emv/emv.c
+	CC	applications/main/nfc/helpers/protocol_support/emv/emv_render.c
+	CC	applications/main/nfc/helpers/protocol_support/felica/felica.c
+	CC	applications/main/nfc/helpers/protocol_support/felica/felica_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3b/iso14443_3b.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3b/iso14443_3b_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4b/iso14443_4b.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4b/iso14443_4b_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso15693_3/iso15693_3.c
+	CC	applications/main/nfc/helpers/protocol_support/iso15693_3/iso15693_3_render.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_classic/mf_classic.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_classic/mf_classic_render.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_desfire/mf_desfire.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_desfire/mf_desfire_render.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_plus/mf_plus.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_plus/mf_plus_render.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_ultralight/mf_ultralight.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_ultralight/mf_ultralight_render.c
+	CC	applications/main/nfc/helpers/protocol_support/ntag4xx/ntag4xx.c
+	CC	applications/main/nfc/helpers/protocol_support/ntag4xx/ntag4xx_render.c
+	CC	applications/main/nfc/helpers/protocol_support/slix/slix.c
+	CC	applications/main/nfc/helpers/protocol_support/slix/slix_render.c
+	CC	applications/main/nfc/helpers/protocol_support/st25tb/st25tb.c
+	CC	applications/main/nfc/helpers/protocol_support/st25tb/st25tb_render.c
+	CC	applications/main/nfc/helpers/protocol_support/type_4_tag/type_4_tag.c
+	CC	applications/main/nfc/helpers/protocol_support/type_4_tag/type_4_tag_render.c
+	CC	applications/main/nfc/helpers/protocol_support/nfc_protocol_support.c
+	CC	applications/main/nfc/helpers/protocol_support/nfc_protocol_support_gui_common.c
+	CC	applications/main/nfc/helpers/protocol_support/nfc_protocol_support_unlock_helper.c
+	CC	applications/main/nfc/helpers/felica_auth.c
+	CC	applications/main/nfc/helpers/mf_classic_key_cache.c
+	CC	applications/main/nfc/helpers/mf_plus_key_cache.c
+	CC	applications/main/nfc/helpers/mf_ultralight_auth.c
+	CC	applications/main/nfc/helpers/mfkey32_logger.c
+	CC	applications/main/nfc/helpers/nfc_detected_protocols.c
+	CC	applications/main/nfc/helpers/nfc_key_dict.c
+	CC	applications/main/nfc/helpers/nfc_supported_cards.c
+	CC	applications/main/nfc/helpers/slix_unlock.c
+	CC	applications/main/nfc/scenes/nfc_scene.c
+	CC	applications/main/nfc/scenes/nfc_scene_debug.c
+	CC	applications/main/nfc/scenes/nfc_scene_delete.c
+	CC	applications/main/nfc/scenes/nfc_scene_delete_success.c
+	CC	applications/main/nfc/scenes/nfc_scene_des_auth_key_input.c
+	CC	applications/main/nfc/scenes/nfc_scene_des_auth_unlock_warn.c
+	CC	applications/main/nfc/scenes/nfc_scene_detect.c
+	CC	applications/main/nfc/scenes/nfc_scene_emulate.c
+	CC	applications/main/nfc/scenes/nfc_scene_emv_transactions.c
+	CC	applications/main/nfc/scenes/nfc_scene_exit_confirm.c
+	CC	applications/main/nfc/scenes/nfc_scene_extra_actions.c
+	CC	applications/main/nfc/scenes/nfc_scene_felica_more_info.c
+	CC	applications/main/nfc/scenes/nfc_scene_felica_system.c
+	CC	applications/main/nfc/scenes/nfc_scene_field.c
+	CC	applications/main/nfc/scenes/nfc_scene_file_select.c
+	CC	applications/main/nfc/scenes/nfc_scene_generate_info.c
+	CC	applications/main/nfc/scenes/nfc_scene_info.c
+	CC	applications/main/nfc/scenes/nfc_scene_key_dict.c
+	CC	applications/main/nfc/scenes/nfc_scene_key_dict_add.c
+	CC	applications/main/nfc/scenes/nfc_scene_key_dict_delete.c
+	CC	applications/main/nfc/scenes/nfc_scene_key_dict_import.c
+	CC	applications/main/nfc/scenes/nfc_scene_key_dict_list.c
+	CC	applications/main/nfc/scenes/nfc_scene_key_dict_warn_duplicate.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_classic_detect_reader.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_classic_dict_attack.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_classic_mfkey_complete.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_classic_mfkey_nonces_info.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_classic_show_keys.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_classic_update_initial.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_desfire_app.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_desfire_more_info.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_plus_dict_attack.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_plus_iso4_info.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_plus_more_info.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_plus_show_keys.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_plus_update_initial.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_plus_version.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_ultralight_aes_dict_attack.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_ultralight_aes_dict_attack_warn.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_ultralight_c_dict_attack.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_ultralight_capture_pass.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_ultralight_key_input.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_ultralight_unlock_menu.c
+	CC	applications/main/nfc/scenes/nfc_scene_mf_ultralight_unlock_warn.c
+	CC	applications/main/nfc/scenes/nfc_scene_more_info.c
+	CC	applications/main/nfc/scenes/nfc_scene_read.c
+	CC	applications/main/nfc/scenes/nfc_scene_read_menu.c
+	CC	applications/main/nfc/scenes/nfc_scene_read_success.c
+	CC	applications/main/nfc/scenes/nfc_scene_restore_original.c
+	CC	applications/main/nfc/scenes/nfc_scene_restore_original_confirm.c
+	CC	applications/main/nfc/scenes/nfc_scene_retry_confirm.c
+	CC	applications/main/nfc/scenes/nfc_scene_rpc.c
+	CC	applications/main/nfc/scenes/nfc_scene_save_confirm.c
+	CC	applications/main/nfc/scenes/nfc_scene_save_name.c
+	CC	applications/main/nfc/scenes/nfc_scene_save_success.c
+	CC	applications/main/nfc/scenes/nfc_scene_saved_menu.c
+	CC	applications/main/nfc/scenes/nfc_scene_select_protocol.c
+	CC	applications/main/nfc/scenes/nfc_scene_set_atqa.c
+	CC	applications/main/nfc/scenes/nfc_scene_set_sak.c
+	CC	applications/main/nfc/scenes/nfc_scene_set_type.c
+	CC	applications/main/nfc/scenes/nfc_scene_set_uid.c
+	CC	applications/main/nfc/scenes/nfc_scene_slix_key_input.c
+	CC	applications/main/nfc/scenes/nfc_scene_slix_unlock.c
+	CC	applications/main/nfc/scenes/nfc_scene_slix_unlock_menu.c
+	CC	applications/main/nfc/scenes/nfc_scene_slix_unlock_success.c
+	CC	applications/main/nfc/scenes/nfc_scene_start.c
+	CC	applications/main/nfc/scenes/nfc_scene_supported_card.c
+	CC	applications/main/nfc/scenes/nfc_scene_update_initial_success.c
+	CC	applications/main/nfc/scenes/nfc_scene_update_initial_wrong_card.c
+	CC	applications/main/nfc/scenes/nfc_scene_write.c
+	CC	applications/main/nfc/views/detect_reader.c
+	CC	applications/main/nfc/views/dict_attack.c
+	CC	applications/main/nfc/nfc_app.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3b/iso14443_3b.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3b/iso14443_3b_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4b/iso14443_4b.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4b/iso14443_4b_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3b/iso14443_3b.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3b/iso14443_3b_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso15693_3/iso15693_3.c
+	CC	applications/main/nfc/helpers/protocol_support/iso15693_3/iso15693_3_render.c
+	CC	applications/main/nfc/helpers/protocol_support/felica/felica.c
+	CC	applications/main/nfc/helpers/protocol_support/felica/felica_extra_scenes.c
+	CC	applications/main/nfc/helpers/protocol_support/felica/felica_render.c
+	CC	applications/main/nfc/helpers/felica_auth.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_ultralight/mf_ultralight.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_ultralight/mf_ultralight_extra_scenes.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_ultralight/mf_ultralight_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a_render.c
+	CC	applications/main/nfc/helpers/mf_ultralight_auth.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_classic/mf_classic.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_classic/mf_classic_extra_scenes.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_classic/mf_classic_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a_render.c
+	CC	applications/main/nfc/helpers/mf_classic_key_cache.c
+	CC	applications/main/nfc/helpers/mfkey32_logger.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_plus/mf_plus.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_plus/mf_plus_extra_scenes.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_plus/mf_plus_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a_render.c
+	CC	applications/main/nfc/helpers/mf_plus_key_cache.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_desfire/mf_desfire.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_desfire/mf_desfire_extra_scenes.c
+	CC	applications/main/nfc/helpers/protocol_support/mf_desfire/mf_desfire_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/slix/slix.c
+	CC	applications/main/nfc/helpers/protocol_support/slix/slix_extra_scenes.c
+	CC	applications/main/nfc/helpers/protocol_support/slix/slix_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso15693_3/iso15693_3.c
+	CC	applications/main/nfc/helpers/protocol_support/iso15693_3/iso15693_3_render.c
+	CC	applications/main/nfc/helpers/slix_unlock.c
+	CC	applications/main/nfc/helpers/protocol_support/st25tb/st25tb.c
+	CC	applications/main/nfc/helpers/protocol_support/st25tb/st25tb_render.c
+	CC	applications/main/nfc/helpers/protocol_support/ntag4xx/ntag4xx.c
+	CC	applications/main/nfc/helpers/protocol_support/ntag4xx/ntag4xx_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/type_4_tag/type_4_tag.c
+	CC	applications/main/nfc/helpers/protocol_support/type_4_tag/type_4_tag_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_4a/iso14443_4a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a.c
+	CC	applications/main/nfc/helpers/protocol_support/iso14443_3a/iso14443_3a_render.c
+	CC	applications/main/nfc/helpers/protocol_support/emv/emv.c
+	CC	applications/main/nfc/helpers/protocol_support/emv/emv_extra_scenes.c
+	CC	applications/main/nfc/helpers/protocol_support/emv/emv_render.c
+	CC	applications/main/nfc/helpers/nfc_emv_parser.c
+	CC	applications/main/infrared/scenes/common/infrared_scene_universal_common.c
+	CC	applications/main/infrared/scenes/infrared_scene.c
+	CC	applications/main/infrared/scenes/infrared_scene_ask_back.c
+	CC	applications/main/infrared/scenes/infrared_scene_ask_retry.c
+	CC	applications/main/infrared/scenes/infrared_scene_debug.c
+	CC	applications/main/infrared/scenes/infrared_scene_edit.c
+	CC	applications/main/infrared/scenes/infrared_scene_edit_button_select.c
+	CC	applications/main/infrared/scenes/infrared_scene_edit_delete.c
+	CC	applications/main/infrared/scenes/infrared_scene_edit_delete_done.c
+	CC	applications/main/infrared/scenes/infrared_scene_edit_move.c
+	CC	applications/main/infrared/scenes/infrared_scene_edit_rename.c
+	CC	applications/main/infrared/scenes/infrared_scene_edit_rename_done.c
+	CC	applications/main/infrared/scenes/infrared_scene_error_databases.c
+	CC	applications/main/infrared/scenes/infrared_scene_gpio_settings.c
+	CC	applications/main/infrared/scenes/infrared_scene_learn.c
+	CC	applications/main/infrared/scenes/infrared_scene_learn_done.c
+	CC	applications/main/infrared/scenes/infrared_scene_learn_enter_name.c
+	CC	applications/main/infrared/scenes/infrared_scene_learn_success.c
+	CC	applications/main/infrared/scenes/infrared_scene_remote.c
+	CC	applications/main/infrared/scenes/infrared_scene_remote_list.c
+	CC	applications/main/infrared/scenes/infrared_scene_rpc.c
+	CC	applications/main/infrared/scenes/infrared_scene_start.c
+	CC	applications/main/infrared/scenes/infrared_scene_universal.c
+	CC	applications/main/infrared/scenes/infrared_scene_universal_ac.c
+	CC	applications/main/infrared/scenes/infrared_scene_universal_audio.c
+	CC	applications/main/infrared/scenes/infrared_scene_universal_fan.c
+	CC	applications/main/infrared/scenes/infrared_scene_universal_leds.c
+	CC	applications/main/infrared/scenes/infrared_scene_universal_projector.c
+	CC	applications/main/infrared/scenes/infrared_scene_universal_save.c
+	CC	applications/main/infrared/scenes/infrared_scene_universal_save_done.c
+	CC	applications/main/infrared/scenes/infrared_scene_universal_save_name.c
+	CC	applications/main/infrared/scenes/infrared_scene_universal_tv.c
+	CC	applications/main/infrared/views/infrared_debug_view.c
+	CC	applications/main/infrared/views/infrared_move_view.c
+	CC	applications/main/infrared/views/infrared_progress_view.c
+	CC	applications/main/infrared/infrared_app.c
+	CC	applications/main/infrared/infrared_remote.c
+	CC	applications/main/gpio/scenes/gpio_scene.c
+	CC	applications/main/gpio/scenes/gpio_scene_start.c
+	CC	applications/main/gpio/scenes/gpio_scene_test.c
+	CC	applications/main/gpio/scenes/gpio_scene_usb_uart.c
+	CC	applications/main/gpio/scenes/gpio_scene_usb_uart_close_rpc.c
+	CC	applications/main/gpio/scenes/gpio_scene_usb_uart_config.c
+	CC	applications/main/gpio/views/gpio_test.c
+	CC	applications/main/gpio/views/gpio_usb_uart.c
+	CC	applications/main/gpio/gpio_app.c
+	CC	applications/main/gpio/gpio_items.c
+	CC	applications/main/gpio/usb_uart_bridge.c
+	CC	applications/main/ibutton/scenes/ibutton_scene.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_add_type.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_add_value.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_delete_confirm.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_delete_success.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_emulate.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_exit_confirm.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_info.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_read.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_read_error.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_read_key_menu.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_read_success.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_retry_confirm.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_rpc.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_save_name.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_save_success.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_saved_key_menu.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_select_key.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_settings.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_settings_write_targets.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_start.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_view_data.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_write.c
+	CC	applications/main/ibutton/scenes/ibutton_scene_write_success.c
+	CC	applications/main/ibutton/ibutton.c
+	CC	applications/main/ibutton/ibutton_cli.c
+	CC	applications/main/ibutton/plugins/settings/ibutton_settings_write_targets.c
+	CC	applications/main/bad_usb/helpers/bad_usb_hid.c
+	CC	applications/main/bad_usb/helpers/ble_hid_ext_profile.c
+	CC	applications/main/bad_usb/helpers/ducky_script.c
+	CC	applications/main/bad_usb/helpers/ducky_script_commands.c
+	CC	applications/main/bad_usb/helpers/ducky_script_keycodes.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_config.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_config_ble_mac.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_config_ble_name.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_config_layout.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_config_usb_name.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_config_usb_vidpid.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_confirm_unpair.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_done.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_error.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_file_select.c
+	CC	applications/main/bad_usb/scenes/bad_usb_scene_work.c
+	CC	applications/main/bad_usb/views/bad_usb_view.c
+	CC	applications/main/bad_usb/bad_usb_app.c
+	CC	applications/main/u2f/scenes/u2f_scene.c
+	CC	applications/main/u2f/scenes/u2f_scene_error.c
+	CC	applications/main/u2f/scenes/u2f_scene_main.c
+	CC	applications/main/u2f/views/u2f_view.c
+	CC	applications/main/u2f/u2f.c
+	CC	applications/main/u2f/u2f_app.c
+	CC	applications/main/u2f/u2f_data.c
+	CC	applications/main/u2f/u2f_hid.c
+	CC	applications/main/clock_app/clock_app.c
+	CC	applications/settings/about/about.c
+	CC	applications/settings/bt_settings_app/scenes/bt_settings_scene.c
+	CC	applications/settings/bt_settings_app/scenes/bt_settings_scene_forget_dev_confirm.c
+	CC	applications/settings/bt_settings_app/scenes/bt_settings_scene_forget_dev_success.c
+	CC	applications/settings/bt_settings_app/scenes/bt_settings_scene_start.c
+	CC	applications/settings/bt_settings_app/bt_settings_app.c
+	CC	applications/settings/clock_settings/scenes/clock_settings_scene.c
+	CC	applications/settings/clock_settings/scenes/clock_settings_scene_start.c
+	CC	applications/settings/clock_settings/views/clock_settings_module.c
+	CC	applications/settings/clock_settings/clock_settings.c
+	CC	applications/settings/clock_settings/clock_settings_alarm.c
+	CC	applications/settings/desktop_settings/helpers/pin_code.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_change_name.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_favorite.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_happy_mode.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_name_popup.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_auth.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_disable.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_error.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_menu.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_setup.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_setup_done.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_setup_howto.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_setup_howto2.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_start.c
+	CC	applications/settings/desktop_settings/views/desktop_settings_view_pin_setup_howto.c
+	CC	applications/settings/desktop_settings/views/desktop_settings_view_pin_setup_howto2.c
+	CC	applications/settings/desktop_settings/views/desktop_view_pin_input.c
+	CC	applications/settings/desktop_settings/desktop_settings_app.c
+	CC	applications/settings/expansion_settings_app/expansion_settings_app.c
+	CC	applications/settings/input_settings_app/input_settings_app.c
+	CC	applications/settings/notification_settings/notification_settings_app.c
+	CC	applications/settings/dolphin_passport/passport.c
+	RESDIST	build/f7-firmware-C/resources
+	MANIFST	build/f7-firmware-C/resources/Manifest
+2026-10-11 23:41:11,769 [INFO] Creating temporary Manifest for directory "build/f7-firmware-C/resources"[0m
+2026-10-11 23:41:11,822 [INFO] Comparing new manifest with existing[0m
+2026-10-11 23:41:11,828 [INFO] Manifest updated (1274 new, 0 removed, 0 changed)[0m
+2026-10-11 23:41:11,829 [INFO] Complete[0m
+	DIST	dist_updater_package
+2026-10-11 23:41:11,933 [INFO] [1;32mFirmware binaries can be found at:
+	dist/f7-C[0m
+2026-10-11 23:41:11,934 [INFO] Using guessed radio address 0x080D7000, verify with Release_Notes or specify --radioaddr[0m
+2026-10-11 23:41:13,908 [INFO] Resources compression ratio: 44.14%[0m
+2026-10-11 23:41:13,961 [INFO] [1;32mUse this directory to self-update your Flipper:
+	dist/f7-C/f7-update-local[0m
+2026-10-11 23:41:14,129 [INFO] Bundling SDK[0m
+2026-10-11 23:41:16,988 [INFO] [1;32mSDK bundle can be found at:
+	dist/f7-C/flipper-z-f7-sdk-local.zip[0m
+python3 scripts/selfupdate.py -p /dev/serial/by-id/usb-Flipper_Devices_Inc._Flipper_E17ana_flip_E17ana-if00 dist/f7-C/f7-update-local/update.fuf
+2026-10-11 23:41:17,078 [INFO] Installing "f7-update-local" from /ext/update/f7-update-local[0m
+2026-10-11 23:41:19,495 [INFO] Sending "/opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/dist/f7-C/f7-update-local/firmware.dfu" to "/ext/update/f7-update-local/firmware.dfu"[0m
+<  1%, chunk  1 of 107 @ 61.98 kb/s<  2%, chunk  2 of 107 @ 70.01 kb/s<  3%, chunk  3 of 107 @ 69.51 kb/s<  4%, chunk  4 of 107 @ 75.68 kb/s<  5%, chunk  5 of 107 @ 77.71 kb/s<  6%, chunk  6 of 107 @ 79.37 kb/s<  7%, chunk  7 of 107 @ 81.85 kb/s<  8%, chunk  8 of 107 @ 83.08 kb/s<  9%, chunk  9 of 107 @ 81.25 kb/s< 10%, chunk 10 of 107 @ 82.51 kb/s< 11%, chunk 11 of 107 @ 83.91 kb/s< 12%, chunk 12 of 107 @ 84.49 kb/s< 13%, chunk 13 of 107 @ 84.75 kb/s< 14%, chunk 14 of 107 @ 84.08 kb/s< 15%, chunk 15 of 107 @ 84.83 kb/s< 16%, chunk 16 of 107 @ 84.56 kb/s< 17%, chunk 17 of 107 @ 84.85 kb/s< 17%, chunk 18 of 107 @ 85.64 kb/s< 18%, chunk 19 of 107 @ 85.86 kb/s< 19%, chunk 20 of 107 @ 84.66 kb/s< 20%, chunk 21 of 107 @ 85.34 kb/s< 21%, chunk 22 of 107 @ 85.86 kb/s< 22%, chunk 23 of 107 @ 86.06 kb/s< 23%, chunk 24 of 107 @ 86.58 kb/s< 24%, chunk 25 of 107 @ 85.82 kb/s< 25%, chunk 26 of 107 @ 86.02 kb/s< 26%, chunk 27 of 107 @ 85.89 kb/s< 27%, chunk 28 of 107 @ 86.42 kb/s< 28%, chunk 29 of 107 @ 86.75 kb/s< 29%, chunk 30 of 107 @ 86.70 kb/s< 30%, chunk 31 of 107 @ 86.15 kb/s< 31%, chunk 32 of 107 @ 86.55 kb/s< 32%, chunk 33 of 107 @ 86.67 kb/s< 33%, chunk 34 of 107 @ 86.86 kb/s< 33%, chunk 35 of 107 @ 87.21 kb/s< 34%, chunk 36 of 107 @ 86.62 kb/s< 35%, chunk 37 of 107 @ 86.71 kb/s< 36%, chunk 38 of 107 @ 86.84 kb/s< 37%, chunk 39 of 107 @ 87.12 kb/s< 38%, chunk 40 of 107 @ 87.20 kb/s< 39%, chunk 41 of 107 @ 87.38 kb/s< 40%, chunk 42 of 107 @ 86.96 kb/s< 41%, chunk 43 of 107 @ 87.19 kb/s< 42%, chunk 44 of 107 @ 87.21 kb/s< 43%, chunk 45 of 107 @ 87.49 kb/s< 44%, chunk 46 of 107 @ 87.73 kb/s< 45%, chunk 47 of 107 @ 87.22 kb/s< 46%, chunk 48 of 107 @ 87.42 kb/s< 47%, chunk 49 of 107 @ 87.54 kb/s< 48%, chunk 50 of 107 @ 87.56 kb/s< 49%, chunk 51 of 107 @ 87.58 kb/s< 50%, chunk 52 of 107 @ 87.86 kb/s< 50%, chunk 53 of 107 @ 87.56 kb/s< 51%, chunk 54 of 107 @ 87.61 kb/s< 52%, chunk 55 of 107 @ 87.73 kb/s< 53%, chunk 56 of 107 @ 87.93 kb/s< 54%, chunk 57 of 107 @ 88.07 kb/s< 55%, chunk 58 of 107 @ 88.03 kb/s< 56%, chunk 59 of 107 @ 87.83 kb/s< 57%, chunk 60 of 107 @ 87.96 kb/s< 58%, chunk 61 of 107 @ 87.84 kb/s< 59%, chunk 62 of 107 @ 88.02 kb/s< 60%, chunk 63 of 107 @ 88.20 kb/s< 61%, chunk 64 of 107 @ 87.88 kb/s< 62%, chunk 65 of 107 @ 87.79 kb/s< 63%, chunk 66 of 107 @ 88.03 kb/s< 64%, chunk 67 of 107 @ 88.16 kb/s< 65%, chunk 68 of 107 @ 88.20 kb/s< 66%, chunk 69 of 107 @ 88.30 kb/s< 66%, chunk 70 of 107 @ 88.00 kb/s< 67%, chunk 71 of 107 @ 88.10 kb/s< 68%, chunk 72 of 107 @ 88.04 kb/s< 69%, chunk 73 of 107 @ 88.21 kb/s< 70%, chunk 74 of 107 @ 88.30 kb/s< 71%, chunk 75 of 107 @ 87.92 kb/s< 72%, chunk 76 of 107 @ 88.09 kb/s< 73%, chunk 77 of 107 @ 88.24 kb/s< 74%, chunk 78 of 107 @ 88.31 kb/s< 75%, chunk 79 of 107 @ 88.36 kb/s< 76%, chunk 80 of 107 @ 88.52 kb/s< 77%, chunk 81 of 107 @ 88.22 kb/s< 78%, chunk 82 of 107 @ 88.25 kb/s< 79%, chunk 83 of 107 @ 88.12 kb/s< 80%, chunk 84 of 107 @ 88.23 kb/s< 81%, chunk 85 of 107 @ 88.35 kb/s< 82%, chunk 86 of 107 @ 88.04 kb/s< 82%, chunk 87 of 107 @ 88.09 kb/s< 83%, chunk 88 of 107 @ 88.23 kb/s< 84%, chunk 89 of 107 @ 88.33 kb/s< 85%, chunk 90 of 107 @ 88.34 kb/s< 86%, chunk 91 of 107 @ 88.48 kb/s< 87%, chunk 92 of 107 @ 88.25 kb/s< 88%, chunk 93 of 107 @ 88.27 kb/s< 89%, chunk 94 of 107 @ 88.23 kb/s< 90%, chunk 95 of 107 @ 88.36 kb/s< 91%, chunk 96 of 107 @ 88.45 kb/s< 92%, chunk 97 of 107 @ 88.37 kb/s< 93%, chunk 98 of 107 @ 88.24 kb/s< 94%, chunk 99 of 107 @ 88.35 kb/s< 95%, chunk 100 of 107 @ 88.39 kb/s< 96%, chunk 101 of 107 @ 88.46 kb/s< 97%, chunk 102 of 107 @ 88.57 kb/s< 98%, chunk 103 of 107 @ 88.33 kb/s< 99%, chunk 104 of 107 @ 88.33 kb/s< 99%, chunk 105 of 107 @ 88.37 kb/s<100%, chunk 106 of 107 @ 88.47 kb/s<100%, chunk 107 of 107 @ 88.34 kb/s
+2026-10-11 23:41:33,841 [INFO] Sending "/opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/dist/f7-C/f7-update-local/resources.ths" to "/ext/update/f7-update-local/resources.ths"[0m
+<  1%, chunk  1 of 260 @ 87.19 kb/s<  1%, chunk  2 of 260 @ 84.09 kb/s<  2%, chunk  3 of 260 @ 88.45 kb/s<  2%, chunk  4 of 260 @ 91.48 kb/s<  2%, chunk  5 of 260 @ 85.64 kb/s<  3%, chunk  6 of 260 @ 86.09 kb/s<  3%, chunk  7 of 260 @ 88.35 kb/s<  4%, chunk  8 of 260 @ 89.54 kb/s<  4%, chunk  9 of 260 @ 89.65 kb/s<  4%, chunk 10 of 260 @ 90.57 kb/s<  5%, chunk 11 of 260 @ 88.29 kb/s<  5%, chunk 12 of 260 @ 88.55 kb/s<  6%, chunk 13 of 260 @ 88.14 kb/s<  6%, chunk 14 of 260 @ 89.11 kb/s<  6%, chunk 15 of 260 @ 89.64 kb/s<  7%, chunk 16 of 260 @ 89.21 kb/s<  7%, chunk 17 of 260 @ 87.39 kb/s<  7%, chunk 18 of 260 @ 88.07 kb/s<  8%, chunk 19 of 260 @ 88.36 kb/s<  8%, chunk 20 of 260 @ 88.36 kb/s<  9%, chunk 21 of 260 @ 89.04 kb/s<  9%, chunk 22 of 260 @ 87.94 kb/s<  9%, chunk 23 of 260 @ 87.97 kb/s< 10%, chunk 24 of 260 @ 87.95 kb/s< 10%, chunk 25 of 260 @ 88.34 kb/s< 11%, chunk 26 of 260 @ 88.58 kb/s< 11%, chunk 27 of 260 @ 87.60 kb/s< 11%, chunk 28 of 260 @ 88.12 kb/s< 12%, chunk 29 of 260 @ 88.43 kb/s< 12%, chunk 30 of 260 @ 88.48 kb/s< 12%, chunk 31 of 260 @ 88.73 kb/s< 13%, chunk 32 of 260 @ 89.05 kb/s< 13%, chunk 33 of 260 @ 88.11 kb/s< 14%, chunk 34 of 260 @ 88.01 kb/s< 14%, chunk 35 of 260 @ 88.11 kb/s< 14%, chunk 36 of 260 @ 88.35 kb/s< 15%, chunk 37 of 260 @ 88.34 kb/s< 15%, chunk 38 of 260 @ 88.05 kb/s< 16%, chunk 39 of 260 @ 88.06 kb/s< 16%, chunk 40 of 260 @ 88.14 kb/s< 16%, chunk 41 of 260 @ 88.09 kb/s< 17%, chunk 42 of 260 @ 88.48 kb/s< 17%, chunk 43 of 260 @ 88.60 kb/s< 17%, chunk 44 of 260 @ 87.99 kb/s< 18%, chunk 45 of 260 @ 88.20 kb/s< 18%, chunk 46 of 260 @ 88.15 kb/s< 19%, chunk 47 of 260 @ 88.26 kb/s< 19%, chunk 48 of 260 @ 88.35 kb/s< 19%, chunk 49 of 260 @ 87.88 kb/s< 20%, chunk 50 of 260 @ 88.00 kb/s< 20%, chunk 51 of 260 @ 87.99 kb/s< 21%, chunk 52 of 260 @ 88.15 kb/s< 21%, chunk 53 of 260 @ 88.36 kb/s< 21%, chunk 54 of 260 @ 88.42 kb/s< 22%, chunk 55 of 260 @ 87.85 kb/s< 22%, chunk 56 of 260 @ 88.14 kb/s< 22%, chunk 57 of 260 @ 88.06 kb/s< 23%, chunk 58 of 260 @ 87.83 kb/s< 23%, chunk 59 of 260 @ 87.98 kb/s< 24%, chunk 60 of 260 @ 87.59 kb/s< 24%, chunk 61 of 260 @ 87.69 kb/s< 24%, chunk 62 of 260 @ 87.97 kb/s< 25%, chunk 63 of 260 @ 88.19 kb/s< 25%, chunk 64 of 260 @ 88.44 kb/s< 26%, chunk 65 of 260 @ 88.57 kb/s< 26%, chunk 66 of 260 @ 88.26 kb/s< 26%, chunk 67 of 260 @ 88.48 kb/s< 27%, chunk 68 of 260 @ 88.63 kb/s< 27%, chunk 69 of 260 @ 88.76 kb/s< 27%, chunk 70 of 260 @ 89.00 kb/s< 28%, chunk 71 of 260 @ 89.24 kb/s< 28%, chunk 72 of 260 @ 88.96 kb/s< 29%, chunk 73 of 260 @ 89.18 kb/s< 29%, chunk 74 of 260 @ 89.41 kb/s< 29%, chunk 75 of 260 @ 89.58 kb/s< 30%, chunk 76 of 260 @ 89.56 kb/s< 30%, chunk 77 of 260 @ 89.74 kb/s< 31%, chunk 78 of 260 @ 89.50 kb/s< 31%, chunk 79 of 260 @ 89.70 kb/s< 31%, chunk 80 of 260 @ 89.92 kb/s< 32%, chunk 81 of 260 @ 89.89 kb/s< 32%, chunk 82 of 260 @ 90.07 kb/s< 32%, chunk 83 of 260 @ 90.23 kb/s< 33%, chunk 84 of 260 @ 89.83 kb/s< 33%, chunk 85 of 260 @ 89.99 kb/s< 34%, chunk 86 of 260 @ 90.05 kb/s< 34%, chunk 87 of 260 @ 90.08 kb/s< 34%, chunk 88 of 260 @ 90.15 kb/s< 35%, chunk 89 of 260 @ 90.23 kb/s< 35%, chunk 90 of 260 @ 89.94 kb/s< 36%, chunk 91 of 260 @ 89.91 kb/s< 36%, chunk 92 of 260 @ 89.92 kb/s< 36%, chunk 93 of 260 @ 90.00 kb/s< 37%, chunk 94 of 260 @ 90.00 kb/s< 37%, chunk 95 of 260 @ 89.72 kb/s< 37%, chunk 96 of 260 @ 89.82 kb/s< 38%, chunk 97 of 260 @ 89.82 kb/s< 38%, chunk 98 of 260 @ 89.76 kb/s< 39%, chunk 99 of 260 @ 89.89 kb/s< 39%, chunk 100 of 260 @ 89.98 kb/s< 39%, chunk 101 of 260 @ 89.62 kb/s< 40%, chunk 102 of 260 @ 89.69 kb/s< 40%, chunk 103 of 260 @ 89.70 kb/s< 41%, chunk 104 of 260 @ 89.71 kb/s< 41%, chunk 105 of 260 @ 89.69 kb/s< 41%, chunk 106 of 260 @ 89.53 kb/s< 42%, chunk 107 of 260 @ 89.54 kb/s< 42%, chunk 108 of 260 @ 89.55 kb/s< 42%, chunk 109 of 260 @ 89.63 kb/s< 43%, chunk 110 of 260 @ 89.69 kb/s< 43%, chunk 111 of 260 @ 89.72 kb/s< 44%, chunk 112 of 260 @ 89.47 kb/s< 44%, chunk 113 of 260 @ 89.47 kb/s< 44%, chunk 114 of 260 @ 89.44 kb/s< 45%, chunk 115 of 260 @ 89.43 kb/s< 45%, chunk 116 of 260 @ 89.50 kb/s< 46%, chunk 117 of 260 @ 89.30 kb/s< 46%, chunk 118 of 260 @ 89.33 kb/s< 46%, chunk 119 of 260 @ 89.31 kb/s< 47%, chunk 120 of 260 @ 89.43 kb/s< 47%, chunk 121 of 260 @ 89.47 kb/s< 47%, chunk 122 of 260 @ 89.49 kb/s< 48%, chunk 123 of 260 @ 89.27 kb/s< 48%, chunk 124 of 260 @ 89.33 kb/s< 49%, chunk 125 of 260 @ 89.30 kb/s< 49%, chunk 126 of 260 @ 89.32 kb/s< 49%, chunk 127 of 260 @ 89.39 kb/s< 50%, chunk 128 of 260 @ 89.21 kb/s< 50%, chunk 129 of 260 @ 89.17 kb/s< 51%, chunk 130 of 260 @ 89.21 kb/s< 51%, chunk 131 of 260 @ 89.28 kb/s< 51%, chunk 132 of 260 @ 89.33 kb/s< 52%, chunk 133 of 260 @ 89.29 kb/s< 52%, chunk 134 of 260 @ 89.15 kb/s< 52%, chunk 135 of 260 @ 89.21 kb/s< 53%, chunk 136 of 260 @ 89.12 kb/s< 53%, chunk 137 of 260 @ 89.20 kb/s< 54%, chunk 138 of 260 @ 89.28 kb/s< 54%, chunk 139 of 260 @ 89.05 kb/s< 54%, chunk 140 of 260 @ 89.08 kb/s< 55%, chunk 141 of 260 @ 89.17 kb/s< 55%, chunk 142 of 260 @ 89.20 kb/s< 56%, chunk 143 of 260 @ 89.20 kb/s< 56%, chunk 144 of 260 @ 89.29 kb/s< 56%, chunk 145 of 260 @ 89.07 kb/s< 57%, chunk 146 of 260 @ 89.10 kb/s< 57%, chunk 147 of 260 @ 89.01 kb/s< 57%, chunk 148 of 260 @ 89.11 kb/s< 58%, chunk 149 of 260 @ 89.17 kb/s< 58%, chunk 150 of 260 @ 88.94 kb/s< 59%, chunk 151 of 260 @ 89.01 kb/s< 59%, chunk 152 of 260 @ 89.07 kb/s< 59%, chunk 153 of 260 @ 89.09 kb/s< 60%, chunk 154 of 260 @ 89.11 kb/s< 60%, chunk 155 of 260 @ 89.19 kb/s< 61%, chunk 156 of 260 @ 89.00 kb/s< 61%, chunk 157 of 260 @ 89.00 kb/s< 61%, chunk 158 of 260 @ 89.01 kb/s< 62%, chunk 159 of 260 @ 89.06 kb/s< 62%, chunk 160 of 260 @ 89.08 kb/s< 62%, chunk 161 of 260 @ 88.84 kb/s< 63%, chunk 162 of 260 @ 88.91 kb/s< 63%, chunk 163 of 260 @ 88.96 kb/s< 64%, chunk 164 of 260 @ 88.97 kb/s< 64%, chunk 165 of 260 @ 89.01 kb/s< 64%, chunk 166 of 260 @ 89.07 kb/s< 65%, chunk 167 of 260 @ 88.89 kb/s< 65%, chunk 168 of 260 @ 88.89 kb/s< 66%, chunk 169 of 260 @ 88.91 kb/s< 66%, chunk 170 of 260 @ 88.95 kb/s< 66%, chunk 171 of 260 @ 88.93 kb/s< 67%, chunk 172 of 260 @ 88.82 kb/s< 67%, chunk 173 of 260 @ 88.88 kb/s< 67%, chunk 174 of 260 @ 88.87 kb/s< 68%, chunk 175 of 260 @ 88.90 kb/s< 68%, chunk 176 of 260 @ 88.97 kb/s< 69%, chunk 177 of 260 @ 88.93 kb/s< 69%, chunk 178 of 260 @ 88.77 kb/s< 69%, chunk 179 of 260 @ 88.81 kb/s< 70%, chunk 180 of 260 @ 88.80 kb/s< 70%, chunk 181 of 260 @ 88.82 kb/s< 71%, chunk 182 of 260 @ 88.83 kb/s< 71%, chunk 183 of 260 @ 88.72 kb/s< 71%, chunk 184 of 260 @ 88.76 kb/s< 72%, chunk 185 of 260 @ 88.75 kb/s< 72%, chunk 186 of 260 @ 88.81 kb/s< 72%, chunk 187 of 260 @ 88.86 kb/s< 73%, chunk 188 of 260 @ 88.75 kb/s< 73%, chunk 189 of 260 @ 88.72 kb/s< 74%, chunk 190 of 260 @ 88.78 kb/s< 74%, chunk 191 of 260 @ 88.76 kb/s< 74%, chunk 192 of 260 @ 88.75 kb/s< 75%, chunk 193 of 260 @ 88.78 kb/s< 75%, chunk 194 of 260 @ 88.65 kb/s< 76%, chunk 195 of 260 @ 88.68 kb/s< 76%, chunk 196 of 260 @ 88.70 kb/s< 76%, chunk 197 of 260 @ 88.75 kb/s< 77%, chunk 198 of 260 @ 88.78 kb/s< 77%, chunk 199 of 260 @ 88.69 kb/s< 77%, chunk 200 of 260 @ 88.68 kb/s< 78%, chunk 201 of 260 @ 88.73 kb/s< 78%, chunk 202 of 260 @ 88.70 kb/s< 79%, chunk 203 of 260 @ 88.71 kb/s< 79%, chunk 204 of 260 @ 88.77 kb/s< 79%, chunk 205 of 260 @ 88.68 kb/s< 80%, chunk 206 of 260 @ 88.66 kb/s< 80%, chunk 207 of 260 @ 88.72 kb/s< 81%, chunk 208 of 260 @ 88.77 kb/s< 81%, chunk 209 of 260 @ 88.74 kb/s< 81%, chunk 210 of 260 @ 88.74 kb/s< 82%, chunk 211 of 260 @ 88.66 kb/s< 82%, chunk 212 of 260 @ 88.70 kb/s< 82%, chunk 213 of 260 @ 88.64 kb/s< 83%, chunk 214 of 260 @ 88.67 kb/s< 83%, chunk 215 of 260 @ 88.71 kb/s< 84%, chunk 216 of 260 @ 88.56 kb/s< 84%, chunk 217 of 260 @ 88.57 kb/s< 84%, chunk 218 of 260 @ 88.62 kb/s< 85%, chunk 219 of 260 @ 88.65 kb/s< 85%, chunk 220 of 260 @ 88.64 kb/s< 86%, chunk 221 of 260 @ 88.59 kb/s< 86%, chunk 222 of 260 @ 88.60 kb/s< 86%, chunk 223 of 260 @ 88.55 kb/s< 87%, chunk 224 of 260 @ 88.59 kb/s< 87%, chunk 225 of 260 @ 88.60 kb/s< 87%, chunk 226 of 260 @ 88.62 kb/s< 88%, chunk 227 of 260 @ 88.47 kb/s< 88%, chunk 228 of 260 @ 88.52 kb/s< 89%, chunk 229 of 260 @ 88.55 kb/s< 89%, chunk 230 of 260 @ 88.57 kb/s< 89%, chunk 231 of 260 @ 88.60 kb/s< 90%, chunk 232 of 260 @ 88.50 kb/s< 90%, chunk 233 of 260 @ 88.53 kb/s< 91%, chunk 234 of 260 @ 88.50 kb/s< 91%, chunk 235 of 260 @ 88.54 kb/s< 91%, chunk 236 of 260 @ 88.58 kb/s< 92%, chunk 237 of 260 @ 88.59 kb/s< 92%, chunk 238 of 260 @ 88.47 kb/s< 92%, chunk 239 of 260 @ 88.52 kb/s< 93%, chunk 240 of 260 @ 88.54 kb/s< 93%, chunk 241 of 260 @ 88.51 kb/s< 94%, chunk 242 of 260 @ 88.56 kb/s< 94%, chunk 243 of 260 @ 88.45 kb/s< 94%, chunk 244 of 260 @ 88.47 kb/s< 95%, chunk 245 of 260 @ 88.45 kb/s< 95%, chunk 246 of 260 @ 88.49 kb/s< 96%, chunk 247 of 260 @ 88.47 kb/s< 96%, chunk 248 of 260 @ 88.45 kb/s< 96%, chunk 249 of 260 @ 88.40 kb/s< 97%, chunk 250 of 260 @ 88.43 kb/s< 97%, chunk 251 of 260 @ 88.44 kb/s< 97%, chunk 252 of 260 @ 88.47 kb/s< 98%, chunk 253 of 260 @ 88.51 kb/s< 98%, chunk 254 of 260 @ 88.42 kb/s< 99%, chunk 255 of 260 @ 88.41 kb/s< 99%, chunk 256 of 260 @ 88.43 kb/s< 99%, chunk 257 of 260 @ 88.43 kb/s<100%, chunk 258 of 260 @ 88.44 kb/s<100%, chunk 259 of 260 @ 88.45 kb/s<100%, chunk 260 of 260 @ 88.37 kb/s
+2026-10-11 23:41:57,448 [INFO] Sending "/opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/dist/f7-C/f7-update-local/update.fuf" to "/ext/update/f7-update-local/update.fuf"[0m
+<100%, chunk  1 of  1 @ 32.77 kb/s
+2026-10-11 23:41:57,772 [INFO] Sending "/opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/dist/f7-C/f7-update-local/updater.bin" to "/ext/update/f7-update-local/updater.bin"[0m
+<  7%, chunk  1 of 15 @ 66.29 kb/s< 14%, chunk  2 of 15 @ 73.99 kb/s< 21%, chunk  3 of 15 @ 79.50 kb/s< 28%, chunk  4 of 15 @ 81.13 kb/s< 35%, chunk  5 of 15 @ 81.47 kb/s< 42%, chunk  6 of 15 @ 80.32 kb/s< 48%, chunk  7 of 15 @ 81.60 kb/s< 55%, chunk  8 of 15 @ 82.07 kb/s< 62%, chunk  9 of 15 @ 82.62 kb/s< 69%, chunk 10 of 15 @ 83.49 kb/s< 76%, chunk 11 of 15 @ 81.71 kb/s< 83%, chunk 12 of 15 @ 81.91 kb/s< 90%, chunk 13 of 15 @ 81.74 kb/s< 96%, chunk 14 of 15 @ 82.48 kb/s<100%, chunk 15 of 15 @ 82.12 kb/s
+Touch("build/usbinstall.flag")

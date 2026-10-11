@@ -1,0 +1,69 @@
+log info
+Current log level: info
+Use <log ?> to list available log levels
+Press CTRL+C to stop...
+31313 [0;32m[I][FuriHalIso15693] [0m[TICKS] 12B periods=1663 ticks=243993
+31317 [0;32m[I][Nfc] [0m[PROBE] 12B eof2rx=4134 tx_enter=17027 prepared=17469 fdt_end=17517 seq_tx=17778 dma=20160 (fdt_after_prep=0) us:dma-fdt=41
+31874 [0;32m[I][FuriHalIso15693] [0m[TICKS] 7B periods=1023 ticks=147332
+31877 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4129 tx_enter=16875 prepared=17273 fdt_end=17321 seq_tx=17571 dma=19959 (fdt_after_prep=0) us:dma-fdt=41
+33538 [0;32m[I][FuriHalIso15693] [0m[TICKS] 7B periods=1023 ticks=147332
+33541 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4368 tx_enter=16685 prepared=17083 fdt_end=17131 seq_tx=17385 dma=19763 (fdt_after_prep=0) us:dma-fdt=41
+35210 [0;32m[I][FuriHalIso15693] [0m[TICKS] 7B periods=1023 ticks=147332
+35213 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4130 tx_enter=16685 prepared=17083 fdt_end=17131 seq_tx=17385 dma=19769 (fdt_after_prep=0) us:dma-fdt=41
+36883 [0;32m[I][FuriHalIso15693] [0m[TICKS] 35B periods=4607 ticks=688632
+36886 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4717 tx_enter=17286 prepared=18006 fdt_end=18054 seq_tx=18315 dma=20703 (fdt_after_prep=0) us:dma-fdt=41
+38554 [0;32m[I][FuriHalIso15693] [0m[TICKS] 35B periods=4607 ticks=688632
+38557 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=5106 tx_enter=17626 prepared=18346 fdt_end=18394 seq_tx=18651 dma=21045 (fdt_after_prep=0) us:dma-fdt=41
+40245 [0;32m[I][FuriHalIso15693] [0m[TICKS] 35B periods=4607 ticks=688632
+40248 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4317 tx_enter=17286 prepared=18006 fdt_end=18054 seq_tx=18311 dma=20699 (fdt_after_prep=0) us:dma-fdt=41
+41925 [0;32m[I][FuriHalIso15693] [0m[TICKS] 131B periods=16895 ticks=2544518
+41928 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4338 tx_enter=19443 prepared=21267 fdt_end=21315 seq_tx=21576 dma=23975 (fdt_after_prep=0) us:dma-fdt=41
+43595 [0;32m[I][FuriHalIso15693] [0m[TICKS] 131B periods=16895 ticks=2544518
+43599 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4338 tx_enter=19443 prepared=21267 fdt_end=21315 seq_tx=21576 dma=23975 (fdt_after_prep=0) us:dma-fdt=41
+45267 [0;32m[I][FuriHalIso15693] [0m[TICKS] 131B periods=16895 ticks=2544518
+45270 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4339 tx_enter=19443 prepared=21267 fdt_end=21315 seq_tx=21572 dma=23971 (fdt_after_prep=0) us:dma-fdt=41
+46941 [0;32m[I][FuriHalIso15693] [0m[TICKS] 259B periods=33279 ticks=5019032
+46944 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4346 tx_enter=22270 prepared=25566 fdt_end=25614 seq_tx=25871 dma=28259 (fdt_after_prep=0) us:dma-fdt=41
+48613 [0;32m[I][FuriHalIso15693] [0m[TICKS] 259B periods=33279 ticks=5019032
+48616 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4346 tx_enter=22640 prepared=25936 fdt_end=25984 seq_tx=26241 dma=28625 (fdt_after_prep=0) us:dma-fdt=41
+50280 [0;32m[I][FuriHalIso15693] [0m[TICKS] 259B periods=33279 ticks=5019032
+50283 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4346 tx_enter=22522 prepared=25818 fdt_end=25866 seq_tx=26123 dma=28507 (fdt_after_prep=0) us:dma-fdt=41
+51953 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6256289
+51956 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4361 tx_enter=23887 prepared=27919 fdt_end=27967 seq_tx=28224 dma=30606 (fdt_after_prep=0) us:dma-fdt=41
+53630 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6256289
+53633 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4593 tx_enter=23692 prepared=27724 fdt_end=27772 seq_tx=28029 dma=30417 (fdt_after_prep=0) us:dma-fdt=41
+54706 [0;32m[I][Dolphin] [0mFlush stats
+54707 [0;32m[I][SavedStruct] [0mSaving "/int/.dolphin.state"
+54749 [0;32m[I][DolphinState] [0mState saved
+55305 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6256289
+55308 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4360 tx_enter=23703 prepared=27735 fdt_end=27783 seq_tx=28040 dma=30432 (fdt_after_prep=0) us:dma-fdt=41
+56972 [0;32m[I][FuriHalIso15693] [0m[TICKS] 131B periods=16895 ticks=2544518
+56975 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4345 tx_enter=19443 prepared=21267 fdt_end=21315 seq_tx=21572 dma=23971 (fdt_after_prep=0) us:dma-fdt=41
+58640 [0;32m[I][FuriHalIso15693] [0m[TICKS] 131B periods=16895 ticks=2544518
+58643 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4338 tx_enter=19443 prepared=21267 fdt_end=21315 seq_tx=21572 dma=23971 (fdt_after_prep=0) us:dma-fdt=41
+60334 [0;32m[I][FuriHalIso15693] [0m[TICKS] 131B periods=16895 ticks=2544518
+60337 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4338 tx_enter=19443 prepared=21267 fdt_end=21315 seq_tx=21576 dma=23975 (fdt_after_prep=0) us:dma-fdt=41
+62011 [0;32m[I][FuriHalIso15693] [0m[TICKS] 131B periods=16895 ticks=2544518
+62014 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4295 tx_enter=19636 prepared=21460 fdt_end=21508 seq_tx=21769 dma=24158 (fdt_after_prep=0) us:dma-fdt=41
+63713 [0;32m[I][FuriHalIso15693] [0m[TICKS] 131B periods=16895 ticks=2544518
+63716 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4344 tx_enter=19443 prepared=21267 fdt_end=21315 seq_tx=21572 dma=23971 (fdt_after_prep=0) us:dma-fdt=41
+65387 [0;32m[I][FuriHalIso15693] [0m[TICKS] 259B periods=33279 ticks=5019032
+65390 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4346 tx_enter=22640 prepared=25936 fdt_end=25984 seq_tx=26241 dma=28625 (fdt_after_prep=0) us:dma-fdt=41
+67071 [0;32m[I][FuriHalIso15693] [0m[TICKS] 259B periods=33279 ticks=5019032
+67074 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4319 tx_enter=22270 prepared=25774 fdt_end=25822 seq_tx=26083 dma=28471 (fdt_after_prep=0) us:dma-fdt=41
+68749 [0;32m[I][FuriHalIso15693] [0m[TICKS] 259B periods=33279 ticks=5019032
+68752 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4346 tx_enter=22641 prepared=25937 fdt_end=25985 seq_tx=26242 dma=28626 (fdt_after_prep=0) us:dma-fdt=41
+70428 [0;32m[I][FuriHalIso15693] [0m[TICKS] 259B periods=33279 ticks=5019032
+70431 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4317 tx_enter=22270 prepared=25566 fdt_end=25614 seq_tx=25871 dma=28259 (fdt_after_prep=0) us:dma-fdt=41
+72112 [0;32m[I][FuriHalIso15693] [0m[TICKS] 259B periods=33279 ticks=5019032
+72115 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4346 tx_enter=22709 prepared=26005 fdt_end=26053 seq_tx=26314 dma=28702 (fdt_after_prep=0) us:dma-fdt=41
+73799 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6256289
+73803 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4366 tx_enter=24256 prepared=28288 fdt_end=28336 seq_tx=28597 dma=30987 (fdt_after_prep=0) us:dma-fdt=41
+75449 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6256289
+75452 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4360 tx_enter=24261 prepared=28293 fdt_end=28341 seq_tx=28602 dma=30990 (fdt_after_prep=0) us:dma-fdt=41
+77100 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6256289
+77104 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4360 tx_enter=23955 prepared=28192 fdt_end=28240 seq_tx=28501 dma=30891 (fdt_after_prep=0) us:dma-fdt=41
+78790 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6256289
+78793 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4366 tx_enter=23704 prepared=27736 fdt_end=27784 seq_tx=28041 dma=30433 (fdt_after_prep=0) us:dma-fdt=41
+80484 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6256289
+80488 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4360 tx_enter=23952 prepared=27984 fdt_end=28032 seq_tx=28289 dma=30671 (fdt_after_prep=0) us:dma-fdt=41

@@ -1,0 +1,37 @@
+| trace | request | resp | ok | end-start fc | nominal fc | diff | sof_delay us |
+|---|---|---|---|---|---|---|---|
+| pre_rd1_1 | 20 00 | (7) | OK | 32768 | 32768 | 0 | 368.1 |
+| pre_rd1_2 | 20 00 | (7) | OK | 32768 | 32768 | 0 | 377.6 |
+| pre_rd1_3 | 20 00 | (7) | OK | 32768 | 32768 | 0 | 372.9 |
+| pre_rdm32_1 | 23 00 1F | (131) | OK | 540672 | 540672 | 0 | 443.7 |
+| pre_rdm32_2 | 23 00 1F | (131) | OK | 540672 | 540672 | 0 | 438.9 |
+| pre_rdm32_3 | 23 00 1F | (131) | OK | 540672 | 540672 | 0 | 438.9 |
+| pre_rdm64_1 | 23 00 3F | silence | FAIL | | | | |
+| pre_rdm64_2 | 23 00 3F | silence | FAIL | | | | |
+| pre_rdm64_3 | 23 00 3F | silence | FAIL | | | | |
+| pre_rdm80_1 | 23 00 4F | silence | FAIL | | | | |
+| pre_rdm80_2 | 23 00 4F | silence | FAIL | | | | |
+| pre_rdm80_3 | 23 00 4F | silence | FAIL | | | | |
+| pre_rdm8_1 | 23 00 07 | (35) | OK | 147456 | 147456 | 0 | 391.7 |
+| pre_rdm8_2 | 23 00 07 | (35) | OK | 147456 | 147456 | 0 | 382.3 |
+| pre_rdm8_3 | 23 00 07 | (35) | OK | 147456 | 147456 | 0 | 387.0 |
+| pre_s32_1 | 23 00 1F | (131) | OK | 540672 | 540672 | 0 | 443.7 |
+| pre_s32_2 | 23 00 1F | silence | FAIL | | | | |
+| pre_s32_3 | 23 00 1F | (131) | OK | 540672 | 540672 | 0 | 438.9 |
+| pre_s32_4 | 23 00 1F | (131) | OK | 540672 | 540672 | 0 | 443.7 |
+| pre_s32_5 | 23 00 1F | (131) | OK | 540672 | 540672 | 0 | 443.7 |
+| pre_s80_1 | 23 00 4F | silence | FAIL | | | | |
+| pre_s80_2 | 23 00 4F | silence | FAIL | | | | |
+| pre_s80_3 | 23 00 4F | silence | FAIL | | | | |
+| pre_s80_4 | 23 00 4F | silence | FAIL | | | | |
+| pre_s80_5 | 23 00 4F | silence | FAIL | | | | |
+
+| series | expected | decoded = dump | failures | sof_delay us (ok) |
+|---|---|---|---|---|
+| pre_rd1 | (7) | 3/3 | - | 368.1..377.6 |
+| pre_rdm32 | (131) | 3/3 | - | 438.9..443.7 |
+| pre_rdm64 | (259) | 0/3 | 3x silence | - |
+| pre_rdm80 | (323) | 0/3 | 3x silence | - |
+| pre_rdm8 | (35) | 3/3 | - | 382.3..391.7 |
+| pre_s32 | (131) | 4/5 | 1x silence | 438.9..443.7 |
+| pre_s80 | (323) | 0/5 | 5x silence | - |

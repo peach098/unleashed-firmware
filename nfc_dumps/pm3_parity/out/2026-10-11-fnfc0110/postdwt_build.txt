@@ -1,0 +1,5 @@
+== postdwt (cb843e93f36c4a66817aa982b0cb26aa137d7a54) probes: dwt defines: --extra-define=NFC_LISTENER_TX_LATENCY_PROBE
+ lib/digital_signal/digital_sequence.c              | 13 +++++++
+ lib/nfc/nfc.c                                      | 45 ++++++++++++++++++++++
+ .../parsers/iso15693/iso15693_parser.c             | 12 ++++++
+ 3 files changed, 70 insertions(+)

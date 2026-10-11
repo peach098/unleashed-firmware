@@ -1,0 +1,6 @@
+== post (cb843e93f36c4a66817aa982b0cb26aa137d7a54) probes: dwt,ticks defines: --extra-define=NFC_LISTENER_TX_LATENCY_PROBE --extra-define=DIGITAL_SEQUENCE_TICK_PROBE
+ lib/digital_signal/digital_sequence.c              | 27 +++++++++++++
+ lib/nfc/nfc.c                                      | 45 ++++++++++++++++++++++
+ .../parsers/iso15693/iso15693_parser.c             | 12 ++++++
+ targets/f7/furi_hal/furi_hal_nfc_iso15693.c        | 11 ++++++
+ 4 files changed, 95 insertions(+)

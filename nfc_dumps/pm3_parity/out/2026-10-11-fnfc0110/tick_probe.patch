@@ -1,0 +1,64 @@
+FNFC-01.10 tick probe (temporary, NOT for commit). Applies on 402c24f50 (before) and on the fix,
+together with nfc_dumps/pm3_parity/out/2026-10-11-fnfc013/latency_probe_v2_rebased.patch.
+Build: ./fbt DEBUG=0 --extra-define=DIGITAL_SEQUENCE_TICK_PROBE [--extra-define=NFC_LISTENER_TX_LATENCY_PROBE] flash_usb_full
+Output (Info level, `log info`), one line per ISO15693 listener transmit:
+  [TICKS] <N>B periods=<entries put into the DMA ring> ticks=<sum of (ARR + 1) of those entries>
+i.e. the exact length in 64 MHz timer ticks of what the MCU programmed for the frame (SOF..EOF,
+without the final held level). Compare with tools/ticks_table.py (host prediction and ideal).
+
+diff --git a/lib/digital_signal/digital_sequence.c b/lib/digital_signal/digital_sequence.c
+index 0090dab20..202cc0c97 100644
+--- a/lib/digital_signal/digital_sequence.c
++++ b/lib/digital_signal/digital_sequence.c
+@@ -289,8 +289,18 @@ static inline void digital_sequence_finish(DigitalSequence* sequence) {
+     digital_sequence_stop_dma();
+ }
+ 
++#ifdef DIGITAL_SEQUENCE_TICK_PROBE
++// Tick probe (FNFC-01.10): periods and sum of (ARR + 1) put into the DMA ring by the last transmit
++volatile uint32_t digital_sequence_probe_periods = 0;
++volatile uint32_t digital_sequence_probe_ticks = 0;
++#endif
++
+ static inline void digital_sequence_enqueue_period(DigitalSequence* sequence, uint32_t length) {
+     DigitalSequenceRingBuffer* dma_buffer = &sequence->timer_buf;
++#ifdef DIGITAL_SEQUENCE_TICK_PROBE
++    digital_sequence_probe_periods += 1;
++    digital_sequence_probe_ticks += length + 1;
++#endif
+ 
+     if(sequence->state == DigitalSequenceStateActive) {
+         const uint32_t prev_timer = DWT->CYCCNT;
+@@ -360,6 +370,10 @@ void digital_sequence_transmit(DigitalSequence* sequence) {
+     const DigitalSignal* signal_current = sequence->signals[sequence->data[0]];
+ 
+     digital_sequence_init_gpio_buffer(sequence, signal_current);
++#ifdef DIGITAL_SEQUENCE_TICK_PROBE
++    digital_sequence_probe_periods = 0;
++    digital_sequence_probe_ticks = 0;
++#endif
+ 
+     int32_t remainder_ticks = 0;
+     uint32_t reload_value_carry = 0;
+diff --git a/targets/f7/furi_hal/furi_hal_nfc_iso15693.c b/targets/f7/furi_hal/furi_hal_nfc_iso15693.c
+index b7bd07bbb..87dbced46 100644
+--- a/targets/f7/furi_hal/furi_hal_nfc_iso15693.c
++++ b/targets/f7/furi_hal/furi_hal_nfc_iso15693.c
+@@ -429,6 +429,17 @@ static FuriHalNfcError furi_hal_nfc_iso15693_listener_tx(
+     }
+ 
+     iso15693_signal_transmit(instance->signal);
++#ifdef DIGITAL_SEQUENCE_TICK_PROBE
++    // FURI_LOG_I, not _D: debug logs are compiled out of release builds
++    extern volatile uint32_t digital_sequence_probe_periods;
++    extern volatile uint32_t digital_sequence_probe_ticks;
++    FURI_LOG_I(
++        TAG,
++        "[TICKS] %uB periods=%lu ticks=%lu",
++        (unsigned)(tx_bits / BITS_IN_BYTE),
++        digital_sequence_probe_periods,
++        digital_sequence_probe_ticks);
++#endif
+ 
+     return FuriHalNfcErrorNone;
+ }

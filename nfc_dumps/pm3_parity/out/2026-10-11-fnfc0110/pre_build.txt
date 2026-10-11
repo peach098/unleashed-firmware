@@ -1,0 +1,6 @@
+== pre (402c24f50a57627bad2d78198f8c3acd92ec7d02) probes: dwt,ticks defines: --extra-define=NFC_LISTENER_TX_LATENCY_PROBE --extra-define=DIGITAL_SEQUENCE_TICK_PROBE
+ lib/digital_signal/digital_sequence.c              | 27 +++++++++++++
+ lib/nfc/nfc.c                                      | 45 ++++++++++++++++++++++
+ .../parsers/iso15693/iso15693_parser.c             | 12 ++++++
+ targets/f7/furi_hal/furi_hal_nfc_iso15693.c        | 11 ++++++
+ 4 files changed, 95 insertions(+)

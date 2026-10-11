@@ -1,0 +1,43 @@
+FNFC-01.10 bias probe (temporary, NOT for commit): stretch/shrink every ISO15693 listener frame by a
+known amount to find the edges of the PM3 reader's decode window (see report.md, "decode window").
+Build: ./fbt DEBUG=0 --extra-define=ISO15693_SIGNAL_BIAS_PPM=<ppm> ... flash_usb_full
+Without the define the code is unchanged (factor 1.0).
+
+diff --git a/lib/digital_signal/presets/nfc/iso15693_signal.c b/lib/digital_signal/presets/nfc/iso15693_signal.c
+index 7a95a8fa6..b03e898a9 100644
+--- a/lib/digital_signal/presets/nfc/iso15693_signal.c
++++ b/lib/digital_signal/presets/nfc/iso15693_signal.c
+@@ -29,6 +29,13 @@
+ #define ISO15693_SIGNAL_FC_256 (256.0e11 / ISO15693_SIGNAL_FC)
+ #define ISO15693_SIGNAL_FC_768 (768.0e11 / ISO15693_SIGNAL_FC)
+ 
++// FNFC-01.10 bias probe: scale every subcarrier/silence duration by (1 + ISO15693_SIGNAL_BIAS_PPM / 1e6)
++#ifdef ISO15693_SIGNAL_BIAS_PPM
++#define ISO15693_SIGNAL_BIAS (1.0 + (ISO15693_SIGNAL_BIAS_PPM) * 1e-6)
++#else
++#define ISO15693_SIGNAL_BIAS (1.0)
++#endif
++
+ typedef enum {
+     Iso15693SignalIndexSof,
+     Iso15693SignalIndexEof,
+@@ -50,7 +57,8 @@ struct Iso15693Signal {
+ static void iso15693_add_silence(DigitalSignal* signal, Iso15693SignalDataRate data_rate) {
+     const uint32_t k = data_rate == Iso15693SignalDataRateHi ? ISO15693_SIGNAL_COEFF_HI :
+                                                                ISO15693_SIGNAL_COEFF_LO;
+-    digital_signal_add_period_with_level(signal, ISO15693_SIGNAL_FC_256 * k, false);
++    digital_signal_add_period_with_level(
++        signal, ISO15693_SIGNAL_FC_256 * k * ISO15693_SIGNAL_BIAS, false);
+ }
+ 
+ // Add 8 * k subcarrier pulses of Fc / 16 (where k = 1 or 4)
+@@ -58,7 +66,8 @@ static void iso15693_add_subcarrier(DigitalSignal* signal, Iso15693SignalDataRat
+     const uint32_t k = data_rate == Iso15693SignalDataRateHi ? ISO15693_SIGNAL_COEFF_HI :
+                                                                ISO15693_SIGNAL_COEFF_LO;
+     for(uint32_t i = 0; i < ISO15693_SIGNAL_ZERO_EDGES * k; ++i) {
+-        digital_signal_add_period_with_level(signal, ISO15693_SIGNAL_FC_16, !(i % 2));
++        digital_signal_add_period_with_level(
++            signal, ISO15693_SIGNAL_FC_16 * ISO15693_SIGNAL_BIAS, !(i % 2));
+     }
+ }
+ 

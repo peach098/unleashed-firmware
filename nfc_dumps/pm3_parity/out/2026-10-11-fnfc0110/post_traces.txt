@@ -1,0 +1,43 @@
+| trace | request | resp | ok | end-start fc | nominal fc | diff | sof_delay us |
+|---|---|---|---|---|---|---|---|
+| post_rd1_1 | 20 00 | (7) | OK | 32768 | 32768 | 0 | 372.9 |
+| post_rd1_2 | 20 00 | (7) | OK | 32768 | 32768 | 0 | 368.1 |
+| post_rd1_3 | 20 00 | (7) | OK | 32768 | 32768 | 0 | 372.9 |
+| post_rdm32_1 | 23 00 1F | (131) | OK | 540672 | 540672 | 0 | 434.2 |
+| post_rdm32_2 | 23 00 1F | (131) | OK | 540672 | 540672 | 0 | 434.2 |
+| post_rdm32_3 | 23 00 1F | (131) | OK | 540672 | 540672 | 0 | 438.9 |
+| post_rdm64_1 | 23 00 3F | (259) | OK | 1064960 | 1064960 | 0 | 505.0 |
+| post_rdm64_2 | 23 00 3F | (259) | OK | 1064960 | 1064960 | 0 | 509.7 |
+| post_rdm64_3 | 23 00 3F | (259) | OK | 1064960 | 1064960 | 0 | 509.7 |
+| post_rdm80_1 | 23 00 4F | (323) | OK | 1327104 | 1327104 | 0 | 542.8 |
+| post_rdm80_2 | 23 00 4F | (323) | OK | 1327104 | 1327104 | 0 | 542.8 |
+| post_rdm80_3 | 23 00 4F | silence | FAIL | | | | |
+| post_rdm8_1 | 23 00 07 | (35) | OK | 147456 | 147456 | 0 | 391.7 |
+| post_rdm8_2 | 23 00 07 | (35) | OK | 147456 | 147456 | 0 | 405.9 |
+| post_rdm8_3 | 23 00 07 | (35) | OK | 147456 | 147456 | 0 | 387.0 |
+| post_s32_1 | 23 00 1F | silence | FAIL | | | | |
+| post_s32_2 | 23 00 1F | silence | FAIL | | | | |
+| post_s32_3 | 23 00 1F | silence | FAIL | | | | |
+| post_s32_4 | 23 00 1F | silence | FAIL | | | | |
+| post_s32_5 | 23 00 1F | silence | FAIL | | | | |
+| post_s64_1 | 23 00 1F | silence | FAIL | | | | |
+| post_s64_2 | 23 00 1F | silence | FAIL | | | | |
+| post_s64_3 | 23 00 1F | silence | FAIL | | | | |
+| post_s64_4 | 23 00 1F | silence | FAIL | | | | |
+| post_s64_5 | 23 00 1F | silence | FAIL | | | | |
+| post_s80_1 | 23 00 1F | silence | FAIL | | | | |
+| post_s80_2 | 23 00 1F | silence | FAIL | | | | |
+| post_s80_3 | 23 00 1F | silence | FAIL | | | | |
+| post_s80_4 | 23 00 1F | silence | FAIL | | | | |
+| post_s80_5 | 23 00 1F | silence | FAIL | | | | |
+
+| series | expected | decoded = dump | failures | sof_delay us (ok) |
+|---|---|---|---|---|
+| post_rd1 | (7) | 3/3 | - | 368.1..372.9 |
+| post_rdm32 | (131) | 3/3 | - | 434.2..438.9 |
+| post_rdm64 | (259) | 3/3 | - | 505.0..509.7 |
+| post_rdm80 | (323) | 2/3 | 1x silence | 542.8..542.8 |
+| post_rdm8 | (35) | 3/3 | - | 387.0..405.9 |
+| post_s32 | (131) | 0/5 | 5x silence | - |
+| post_s64 | (131) | 0/5 | 5x silence | - |
+| post_s80 | (131) | 0/5 | 5x silence | - |
