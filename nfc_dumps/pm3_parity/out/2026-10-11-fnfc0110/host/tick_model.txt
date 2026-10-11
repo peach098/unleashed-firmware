@@ -1,0 +1,36 @@
+merge: periods 4 (expected 4), ticks 24 (expected 24: 4+4+(4+6)+6)
+add_period(3907): reload 3, ideal 2.5005, err +0.4995 ticks
+add_period(117994): reload 76, ideal 75.5162, err +0.4838 ticks
+add_period(1887905): reload 1208, ideal 1208.2592, err -0.2592 ticks
+add_period(7551622): reload 4833, ideal 4833.0381, err -0.0381 ticks
+add_period(530928): reload 340, ideal 339.7939, err +0.2061 ticks
+add_period(100000000): reload 64000, ideal 64000.0000, err +0.0000 ticks
+add_period(2147483647): reload 1374390, ideal 1374389.5341, err +0.4659 ticks
+add_period(4000000000): reload 2560000, ideal 2560000.0000, err +0.0000 ticks
+add_period(4294967295): reload 2748779, ideal 2748779.0688, err -0.0688 ticks
+iso15693 rate=hi bytes=0    periods=127/127 ticks=12007 ideal=12007.071 err=-0.071 ticks (-5.9 ppm) max_edge_err=0.780
+iso15693 rate=hi bytes=1    periods=255/255 ticks=31339 ideal=31339.213 err=-0.213 ticks (-6.8 ppm) max_edge_err=0.922
+iso15693 rate=hi bytes=7    periods=1023/1023 ticks=147332 ideal=147332.065 err=-0.065 ticks (-0.4 ppm) max_edge_err=0.972
+iso15693 rate=hi bytes=12   periods=1663/1663 ticks=243993 ideal=243992.776 err=+0.224 ticks (+0.9 ppm) max_edge_err=0.972
+iso15693 rate=hi bytes=35   periods=4607/4607 ticks=688632 ideal=688632.044 err=-0.044 ticks (-0.1 ppm) max_edge_err=0.981
+iso15693 rate=hi bytes=131  periods=16895/16895 ticks=2544518 ideal=2544517.683 err=+0.317 ticks (+0.1 ppm) max_edge_err=0.984
+iso15693 rate=hi bytes=259  periods=33279/33279 ticks=5019032 ideal=5019031.869 err=+0.131 ticks (+0.0 ppm) max_edge_err=0.984
+iso15693 rate=hi bytes=323  periods=41471/41471 ticks=6256289 ideal=6256288.963 err=+0.037 ticks (+0.0 ppm) max_edge_err=0.984
+iso15693 rate=hi bytes=1027 periods=131583/131583 ticks=19866117 ideal=19866116.987 err=+0.013 ticks (+0.0 ppm) max_edge_err=0.985
+iso15693 rate=lo bytes=0    periods=511/511 ticks=48255 ideal=48254.834 err=+0.166 ticks (+3.4 ppm) max_edge_err=0.672
+iso15693 rate=lo bytes=1    periods=1023/1023 ticks=125584 ideal=125583.412 err=+0.588 ticks (+4.7 ppm) max_edge_err=0.950
+iso15693 rate=lo bytes=7    periods=4095/4095 ticks=589555 ideal=589554.884 err=+0.116 ticks (+0.2 ppm) max_edge_err=0.981
+iso15693 rate=lo bytes=12   periods=6655/6655 ticks=976198 ideal=976197.777 err=+0.223 ticks (+0.2 ppm) max_edge_err=0.981
+iso15693 rate=lo bytes=35   periods=18431/18431 ticks=2754755 ideal=2754755.084 err=-0.084 ticks (-0.0 ppm) max_edge_err=0.981
+iso15693 rate=lo bytes=131  periods=67583/67583 ticks=10178299 ideal=10178298.625 err=+0.375 ticks (+0.0 ppm) max_edge_err=0.989
+iso15693 rate=lo bytes=259  periods=133119/133119 ticks=20076357 ideal=20076356.681 err=+0.319 ticks (+0.0 ppm) max_edge_err=0.989
+iso15693 rate=lo bytes=323  periods=165887/165887 ticks=25025386 ideal=25025385.709 err=+0.291 ticks (+0.0 ppm) max_edge_err=0.989
+iso15693 rate=lo bytes=1027 periods=526335/526335 ticks=79464705 ideal=79464705.015 err=-0.015 ticks (-0.0 ppm) max_edge_err=0.991
+iso15693: 2018 frames, worst frame error +0.840 ticks (246 B, rate lo), worst edge error 0.992 ticks
+iso14443a bits=5   periods=47 ticks=3284 ideal=3284.675 err=-0.675 max_edge_err=0.675
+iso14443a bits=24  periods=223 ticks=16574 ideal=16574.392 err=-0.392 max_edge_err=0.944
+iso14443a bits=80  periods=727 ticks=54933 ideal=54933.350 err=-0.350 max_edge_err=0.962
+iso14443a: 2000 frames, worst frame error -0.792 ticks, worst edge error 0.980 ticks
+random: 300 sequences, worst frame error +0.947 ticks, worst edge error 0.999 ticks
+floor: periods 127/127, min ARR 1, frame error +6.110 ticks (deferred corrections)
+PASSED: 0 failed check(s)

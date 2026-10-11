@@ -384,9 +384,11 @@ void digital_sequence_transmit(DigitalSequence* sequence) {
                     const bool end_level = signal_current->start_level ^
                                            ((signal_current->size % 2) == 0);
 
-                    /* If the adjacent levels are equal, carry the current period duration over to the next signal. */
+                    /* If the adjacent levels are equal, carry the current period duration over to the next signal.
+                     * reload_value is the period minus one tick (timer ARR), as is the next signal's first value:
+                     * add the tick back so that the merged period is the sum of both. */
                     if(end_level == signal_next->start_level) {
-                        reload_value_carry = reload_value;
+                        reload_value_carry = reload_value + 1;
                     }
                 } else {
                     /** Special case: during the last period of the last signal, hold the output level indefinitely.
@@ -420,11 +422,19 @@ void digital_sequence_transmit(DigitalSequence* sequence) {
         /* Exit the loop here when no further signals are available */
         if(signal_next == NULL) break;
 
-        /* Prevent the rounding error from accumulating by distributing it across multiple periods. */
+        /* Prevent the rounding error from accumulating by distributing it across multiple periods:
+         * add a tick to the first period of the next signal when the edges fall behind by more than half a tick,
+         * remove one when they run ahead by more than half a tick. A tick is not removed if the period would get
+         * shorter than 2 ticks (the digital_signal_add_period() minimum); the correction is then deferred. */
         remainder_ticks += signal_current->remainder;
-        if(remainder_ticks >= DIGITAL_SIGNAL_T_TIM_DIV2) {
+        if(remainder_ticks > DIGITAL_SIGNAL_T_TIM_DIV2) {
             remainder_ticks -= DIGITAL_SIGNAL_T_TIM;
             reload_value_carry += 1;
+        } else if(
+            remainder_ticks < -DIGITAL_SIGNAL_T_TIM_DIV2 &&
+            signal_next->data[0] + reload_value_carry > 1) {
+            remainder_ticks += DIGITAL_SIGNAL_T_TIM;
+            reload_value_carry -= 1;
         }
 
         signal_current = signal_next;
