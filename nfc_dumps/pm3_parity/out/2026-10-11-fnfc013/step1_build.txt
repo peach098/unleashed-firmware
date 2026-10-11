@@ -1,0 +1,5 @@
+== step1 (2cc4be797) probe latency_probe_v2_rebased.patch -C2
+ lib/digital_signal/digital_sequence.c              | 13 +++++++
+ lib/nfc/nfc.c                                      | 45 ++++++++++++++++++++++
+ .../parsers/iso15693/iso15693_parser.c             | 12 ++++++
+ 3 files changed, 70 insertions(+)

@@ -1,0 +1,16 @@
+[=] Output will be flushed after every print.
+
+[=] No preferences file will be loaded
+[+] execute command from commandline: hf 15 reader
+
+[+] Using UART port /dev/serial/by-id/usb-proxmark.org_proxmark3_iceman-if00
+[+] Communicating with PM3 over USB-CDC
+[+] Max frame size: 624 bytes
+[+] Emulator memory: 8192 bytes
+[=] No history will be recorded
+[usb|script] pm3 --> hf 15 reader
+
+[+] UID.... E0 04 01 09 01 9A 83 AC
+[+] DSFID.. 01
+[+] TYPE MATCH NXP (Philips); IC SL2 ICS2602 ( SLIX2 )
+

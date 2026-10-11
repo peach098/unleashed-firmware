@@ -28,10 +28,14 @@ finish() {
   echo "results copied to $OUT (temp: $TMP)"
 }
 trap finish EXIT
+# resolve every ref (HEAD, branch names) before the first detached checkout moves HEAD
+declare -A HASH
+for spec in "$@"; do r=${spec#*=}; r=${r%:v3}; HASH[$r]=$(git rev-parse --verify "$r^{commit}") || exit 1; done
 trap 'exit 130' INT TERM
 for spec in "$@"; do
   L=${spec%%=*}; REF=${spec#*=}; KIND=v2; XDEF=""
   case "$REF" in *:v3) REF=${REF%:v3}; KIND=v3; XDEF="--extra-define=NFC_LISTENER_TX_LATENCY_PROBE_V3";; esac
+  REF=${HASH[$REF]:-$REF}
   git checkout -q --detach "$REF" || exit 1
   if [ $KIND = v3 ]; then
     git apply "$TMP/latency_probe_v3.patch" || exit 1; P=latency_probe_v3.patch

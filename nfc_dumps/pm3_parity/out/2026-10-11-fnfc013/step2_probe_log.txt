@@ -1,0 +1,23 @@
+log info
+Current log level: info
+Use <log ?> to list available log levels
+Press CTRL+C to stop...
+30886 [0;32m[I][Nfc] [0m[PROBE] 12B eof2rx=4170 tx_enter=17119 prepared=17557 fdt_end=17602 seq_tx=17868 dma=23470 (fdt_after_prep=0) us:dma-fdt=91
+31448 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4155 tx_enter=17224 prepared=17622 fdt_end=17667 seq_tx=17937 dma=23539 (fdt_after_prep=0) us:dma-fdt=91
+33047 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4154 tx_enter=17227 prepared=17625 fdt_end=17670 seq_tx=17940 dma=23542 (fdt_after_prep=0) us:dma-fdt=91
+34641 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4158 tx_enter=17102 prepared=17500 fdt_end=17545 seq_tx=17815 dma=23417 (fdt_after_prep=0) us:dma-fdt=91
+36244 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4368 tx_enter=17721 prepared=18441 fdt_end=18486 seq_tx=18764 dma=24366 (fdt_after_prep=0) us:dma-fdt=91
+37842 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4365 tx_enter=17492 prepared=18212 fdt_end=18257 seq_tx=18535 dma=24137 (fdt_after_prep=0) us:dma-fdt=91
+39439 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4365 tx_enter=17289 prepared=18009 fdt_end=18054 seq_tx=18332 dma=23934 (fdt_after_prep=0) us:dma-fdt=91
+41031 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4364 tx_enter=19652 prepared=21476 fdt_end=21521 seq_tx=21799 dma=27401 (fdt_after_prep=0) us:dma-fdt=91
+42639 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4627 tx_enter=19425 prepared=21249 fdt_end=21294 seq_tx=21572 dma=27174 (fdt_after_prep=0) us:dma-fdt=91
+44240 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4363 tx_enter=19624 prepared=21448 fdt_end=21493 seq_tx=21771 dma=27373 (fdt_after_prep=0) us:dma-fdt=91
+45832 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4563 tx_enter=22633 prepared=25929 fdt_end=25974 seq_tx=26252 dma=31854 (fdt_after_prep=0) us:dma-fdt=91
+47395 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4373 tx_enter=22425 prepared=25721 fdt_end=25766 seq_tx=26044 dma=31652 (fdt_after_prep=0) us:dma-fdt=91
+48959 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4374 tx_enter=22702 prepared=25998 fdt_end=26043 seq_tx=26321 dma=31929 (fdt_after_prep=0) us:dma-fdt=91
+50516 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4745 tx_enter=23616 prepared=27648 fdt_end=27693 seq_tx=27971 dma=33579 (fdt_after_prep=0) us:dma-fdt=91
+52071 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4395 tx_enter=23613 prepared=27645 fdt_end=27690 seq_tx=27968 dma=33576 (fdt_after_prep=0) us:dma-fdt=91
+53624 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4390 tx_enter=23625 prepared=27657 fdt_end=27702 seq_tx=27980 dma=33588 (fdt_after_prep=0) us:dma-fdt=91
+54276 [0;32m[I][Dolphin] [0mFlush stats
+54277 [0;32m[I][SavedStruct] [0mSaving "/int/.dolphin.state"
+54309 [0;32m[I][DolphinState] [0mState saved

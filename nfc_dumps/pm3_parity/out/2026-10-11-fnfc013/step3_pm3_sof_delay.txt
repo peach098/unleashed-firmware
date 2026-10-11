@@ -1,0 +1,15 @@
+rd1 #1: frames=109 resp_len=7 OK crc=True data=EQUAL sof_delay_us=372.9
+rd1 #2: frames=111 resp_len=7 OK crc=True data=EQUAL sof_delay_us=368.1
+rd1 #3: frames=113 resp_len=7 OK crc=True data=EQUAL sof_delay_us=368.1
+rdm8 #1: frames=115 resp_len=35 OK crc=True data=EQUAL sof_delay_us=377.6
+rdm8 #2: frames=117 resp_len=35 OK crc=True data=EQUAL sof_delay_us=382.3
+rdm8 #3: frames=119 resp_len=35 OK crc=True data=EQUAL sof_delay_us=382.3
+rdm32 #1: frames=121 resp_len=131 OK crc=True data=EQUAL sof_delay_us=429.5
+rdm32 #2: frames=123 resp_len=131 OK crc=True data=EQUAL sof_delay_us=448.4
+rdm32 #3: frames=125 resp_len=131 OK crc=True data=EQUAL sof_delay_us=434.2
+rdm64 #1: frames=126 silence
+rdm64 #2: frames=127 silence
+rdm64 #3: frames=128 silence
+rdm80 #1: frames=129 silence
+rdm80 #2: frames=130 silence
+rdm80 #3: frames=131 silence

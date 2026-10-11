@@ -1,0 +1,7 @@
+== step4 (HEAD) probe latency_probe_v3.patch
+ lib/digital_signal/digital_sequence.c              | 13 ++++
+ lib/nfc/nfc.c                                      | 70 ++++++++++++++++++++++
+ lib/nfc/protocols/iso15693_3/iso15693_3_listener.c | 10 ++++
+ .../protocols/iso15693_3/iso15693_3_listener_i.c   | 11 ++++
+ .../parsers/iso15693/iso15693_parser.c             | 12 ++++
+ 5 files changed, 116 insertions(+)
