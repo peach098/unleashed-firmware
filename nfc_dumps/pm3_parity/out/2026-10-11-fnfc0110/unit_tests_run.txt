@@ -1,0 +1,14 @@
+flash rc=0
+firmware.commit.hash          : f5e110ca
+firmware.commit.dirty         : false
+done -> /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-11-fnfc0110/unit_tests_nfc_run1.log
+Consumed: 17636 ms
+Leaked: 0
+Status: PASSED
+
+>: done -> /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-11-fnfc0110/unit_tests_nfc_run2.log
+Consumed: 17563 ms
+Leaked: 0
+Status: PASSED
+
+>: 
