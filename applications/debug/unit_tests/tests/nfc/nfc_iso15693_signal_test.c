@@ -147,3 +147,48 @@ void nfc_iso15693_signal_encode_equivalence_test(void) {
 
     mu_assert(failure == NULL, failure);
 }
+
+// FNFC-01.10: the periods of every ISO15693 signal must add up exactly to the requested durations.
+// One 64 MHz timer tick is 3125 units of 5 ps (DIGITAL_SIGNAL_T_TIM), the public API takes 10 ps,
+// so for each signal: sum(period ticks) * T_TIM + remainder == 2 * requested, |remainder| <= T_TIM / 2.
+// (The joints between signals are handled in digital_sequence_transmit(), see the host test
+// nfc_dumps/pm3_parity/out/2026-10-11-fnfc0110/host.)
+void nfc_iso15693_signal_tick_exact_test(void) {
+    Iso15693Signal* signal = iso15693_signal_alloc(&gpio_ext_pa7);
+    const char* failure = NULL;
+
+    for(uint32_t rate = 0; rate < Iso15693SignalDataRateNum; ++rate) {
+        const uint32_t k = rate == Iso15693SignalDataRateHi ? ISO15693_SIGNAL_COEFF_HI :
+                                                              ISO15693_SIGNAL_COEFF_LO;
+        // Durations exactly as iso15693_signal_bank_fill() requests them (10 ps units)
+        const uint64_t subcarrier = (uint32_t)ISO15693_SIGNAL_FC_16;
+        const uint64_t silence = (uint32_t)(ISO15693_SIGNAL_FC_256 * k);
+        const uint64_t bit = silence + ISO15693_SIGNAL_ZERO_EDGES * k * subcarrier;
+        const uint64_t frame_edge = 3 * ISO15693_SIGNAL_ZERO_EDGES * k * subcarrier + bit;
+        const uint64_t requested[Iso15693SignalIndexNum] = {
+            [Iso15693SignalIndexSof] = frame_edge,
+            [Iso15693SignalIndexEof] = frame_edge,
+            [Iso15693SignalIndexOne] = bit,
+            [Iso15693SignalIndexZero] = bit,
+        };
+
+        for(uint32_t i = 0; i < Iso15693SignalIndexNum; ++i) {
+            const DigitalSignal* s = signal->banks[rate][i];
+            uint64_t ticks = 0;
+            for(uint32_t j = 0; j < s->size; ++j) {
+                ticks += (uint64_t)s->data[j] + 1;
+            }
+            const int64_t units = (int64_t)(ticks * DIGITAL_SIGNAL_T_TIM) + s->remainder;
+            if(!failure && units != (int64_t)(2 * requested[i]))
+                failure = "signal ticks != request";
+            if(!failure && (s->remainder > DIGITAL_SIGNAL_T_TIM_DIV2 ||
+                            s->remainder < -DIGITAL_SIGNAL_T_TIM_DIV2)) {
+                failure = "remainder exceeds half a tick";
+            }
+        }
+    }
+
+    iso15693_signal_free(signal);
+
+    mu_assert(failure == NULL, failure);
+}

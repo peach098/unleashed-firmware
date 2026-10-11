@@ -42,6 +42,7 @@
 
 // nfc_iso15693_signal_test.c
 void nfc_iso15693_signal_encode_equivalence_test(void);
+void nfc_iso15693_signal_tick_exact_test(void);
 
 typedef enum {
     NfcTestMfClassicSendFrameTestStateAuth,
@@ -1482,6 +1483,10 @@ MU_TEST(iso15693_signal_encode_equivalence) {
     nfc_iso15693_signal_encode_equivalence_test();
 }
 
+MU_TEST(iso15693_signal_tick_exact) {
+    nfc_iso15693_signal_tick_exact_test();
+}
+
 MU_TEST_SUITE(nfc) {
     nfc_test_alloc();
 
@@ -1537,6 +1542,7 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(slix_set_password_access_all_passwords_cap);
 
     MU_RUN_TEST(iso15693_signal_encode_equivalence);
+    MU_RUN_TEST(iso15693_signal_tick_exact);
     MU_RUN_TEST(iso13239_crc_table_test);
     MU_RUN_TEST(iso15693_3_listener_read_multi_blocks_test);
     MU_RUN_TEST(iso15693_3_listener_read_multi_blocks_read_protected_test);
