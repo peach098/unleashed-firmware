@@ -109,7 +109,7 @@ void nfc_iso15693_signal_encode_equivalence_test(void) {
 
     for(uint32_t i = 0; i < NFC_ISO15693_SIGNAL_TEST_RANDOM_FRAMES; ++i) {
         const size_t data_size = furi_hal_random_get() % (ISO15693_3_LISTENER_BUFFER_SIZE + 1);
-        furi_hal_random_fill_buf(data, data_size);
+        if(data_size) furi_hal_random_fill_buf(data, data_size); // fill_buf rejects 0 bytes
         NFC_ISO15693_SIGNAL_TEST_CHECK(
             nfc_iso15693_signal_test_compare(
                 signal,

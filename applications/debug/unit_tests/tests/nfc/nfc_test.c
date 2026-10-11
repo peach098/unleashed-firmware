@@ -1253,7 +1253,7 @@ MU_TEST(iso13239_crc_table_test) {
                                        (furi_hal_random_get() % ISO15693_3_LISTENER_TEST_CRC_MAX);
         const bool picopass = i & 1U;
         const Iso13239CrcType type = picopass ? Iso13239CrcTypePicopass : Iso13239CrcTypeDefault;
-        furi_hal_random_fill_buf(data, size);
+        if(size) furi_hal_random_fill_buf(data, size); // fill_buf rejects 0 bytes
 
         bit_buffer_copy_bytes(buf, data, size);
         iso13239_crc_append(type, buf);
