@@ -1,0 +1,5 @@
+== bp145 (a5719e94959a5830c421a900f88373e5ba2dec52) probes: ticks,bias145 defines: --extra-define=DIGITAL_SEQUENCE_TICK_PROBE --extra-define=ISO15693_SIGNAL_BIAS_PPM=145
+ lib/digital_signal/digital_sequence.c            | 14 ++++++++++++++
+ lib/digital_signal/presets/nfc/iso15693_signal.c | 13 +++++++++++--
+ targets/f7/furi_hal/furi_hal_nfc_iso15693.c      | 11 +++++++++++
+ 3 files changed, 36 insertions(+), 2 deletions(-)

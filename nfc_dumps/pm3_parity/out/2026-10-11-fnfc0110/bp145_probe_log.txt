@@ -1,0 +1,15 @@
+log info
+Current log level: info
+Use <log ?> to list available log levels
+Press CTRL+C to stop...
+31549 [0;32m[I][FuriHalIso15693] [0m[TICKS] 12B periods=1663 ticks=244028
+32114 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6257194
+33694 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6257194
+35290 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6257194
+36875 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6257194
+38456 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6257194
+40034 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6257194
+41609 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6257194
+43208 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6257194
+44802 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6257194
+46374 [0;32m[I][FuriHalIso15693] [0m[TICKS] 323B periods=41471 ticks=6257194
