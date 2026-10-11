@@ -126,8 +126,8 @@ nfc_dumps/ contains no MIFARE Classic dump. The test used `/ext/nfc/MFC_1K_2026-
 | criterion | status | evidence / note |
 |---|---|---|
 | 01.3 branch completed with artifacts and pushed; new commits pushed | **met** | One extra commit `402c24f50` for the tool files the picked commits depend on |
-| ppm table before/after from PM3 traces, 32 and 80 blocks, 5 repeats, against card and ideal | **met in substance, by another method** | 5 × 001F and 5 × 004F traces were taken before and after (`pre_s*`, `post_s*`, `final_s*`). They cannot yield ppm (End−Start ≡ nominal, End derived from SOF). The ppm table above comes from the device tick count; the card is 0 ppm by construction |
-| Flipper 323 B frame within ±50 ppm of the card | **not directly measurable with the PM3; met by indirect estimate** | Programmed: −0.6 ppm against 1/fc (exact). PM3 time base: ≈ −20 ppm (decode-window fit, model-dependent, 95 % −23..−13) |
+| ppm table before/after from PM3 traces, 32 and 80 blocks, 5 repeats, against card and ideal | **not met as written: the method is infeasible** (needs a human decision) | 5 × 001F and 5 × 004F traces were taken before and after (`pre_s*`, `post_s*`, `final_s*`). They cannot yield ppm (End−Start ≡ nominal, End derived from SOF). The ppm table above comes from the device tick count; the card is 0 ppm by construction |
+| Flipper 323 B frame within ±50 ppm of the card | **not measured: impossible with PM3 reader traces**; indirect estimate only | Programmed: −0.6 ppm against 1/fc (exact). PM3 time base: ≈ −20 ppm (decode-window fit, model-dependent, 95 % −23..−13) |
 | `004F` → `(323)` = dump, CRC `24 9E` ≥ 9/10; `003F` ≥ 9/10 | **met** (clean firmware) | 10/10 and 9/10. The probe build gave 6/8 at 80 blocks; see the decode window |
 | host tick model ≤ 1 tick per frame 1–323 B; joint test; equivalence test updated and passing | **met** | `host/tick_model.txt`. The equivalence test needed no change (index sequences) and passes on the device |
 | `test_nfc` on device; ISO14443-A emulation read by PM3 3/3 | **met** | 55/55 (the card said 54; +1 new test); `hf 14a info` 3/3 + `rdbl`/`rdsc` |
@@ -184,3 +184,10 @@ DWT=0 N32=0 N80=10 bash $O/tools/measure.sh $O bm20=HEAD:ticks,bias-20 bp145=HEA
 python3 $O/tools/ticks_table.py nfc_dumps/SLIX2_2026-02-27_16,08,34.nfc lib $O/post_probe_log.txt
 python3 $O/tools/bias_table.py $O bm45:-45 bm20:-20 final:0 post:0 postdwt:0 bp120:120 bp145:145
 ```
+
+## Review notes (2026-10-12)
+A two-axis review (repo standards and the card's spec) found no arithmetic defects in `lib/digital_signal`. Open points:
+- **Requirement 5, the 2-tick floor.** When a tick cannot be removed, the correction is deferred to the next signal joint, not the next period, and at most one tick is corrected per joint. A sequence whose signals all start at the floor can drift; the host floor test shows +6.1 ticks and does not assert the 1-tick limit. No in-tree user comes close.
+- **Requirement 6 is checked against the requested 10 ps durations, not against 1/fc.** Against 1/fc the 323 B frame is −3.6 ticks (−0.6 ppm), because the ISO15693 constants are truncated to 10 ps.
+- **Commit `402c24f50` on `fnfc-01.3-fast-response` goes beyond the requested cherry-pick.** It adds tools and the harness the cherry-picked commits depend on.
+- **Standards, judgement calls only.** `digital_signal_ticks_to_reload()` takes a duration in 10 ps, not ticks, and returns ticks, not an ARR value; a rename is worth considering. `DIGITAL_SIGNAL_T_TIM_DIV2` is a literal rather than `(T_TIM - 1) / 2`. The 2-tick minimum is encoded in two places. The on-device tick test re-derives the ISO15693 durations by hand. The host scripts compile with `-w`.
