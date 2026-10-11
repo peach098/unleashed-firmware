@@ -1204,16 +1204,16 @@ static void nfc_test_read_multi(bool read_protected_low) {
     nfc_listener_stop(slix_listener);
     nfc_listener_free(slix_listener);
 
+    slix_free(slix_data);
+    nfc_device_free(nfc_device);
+    nfc_free(listener);
+    nfc_free(poller);
+
     if(ctx.failed_case >= 0) {
         FURI_LOG_E(TAG, "ReadMultipleBlocks case %d differs", ctx.failed_case);
     }
     mu_assert(ctx.failed_case < 0, "ReadMultipleBlocks response differs\r\n");
     mu_assert(ctx.cases_passed == COUNT_OF(cases), "Poller did not run all cases\r\n");
-
-    slix_free(slix_data);
-    nfc_device_free(nfc_device);
-    nfc_free(listener);
-    nfc_free(poller);
 }
 
 MU_TEST(iso15693_3_listener_read_multi_blocks_test) {
