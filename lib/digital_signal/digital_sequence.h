@@ -128,6 +128,19 @@ void digital_sequence_add_bytes(
     size_t data_size);
 
 /**
+ * @brief Set how many DMA ring buffer entries are filled before the transmission starts.
+ *
+ * By default the whole ring buffer is filled first. A smaller value reduces the delay between
+ * calling digital_sequence_transmit() and the first edge. It is only safe when the
+ * periods at the start of the sequence give the CPU enough time to keep the ring
+ * buffer ahead of the DMA.
+ *
+ * @param[in,out] sequence pointer to the instance to be modified.
+ * @param[in] prefill_size number of entries, clamped to the ring buffer capacity (must not be 0).
+ */
+void digital_sequence_set_prefill_size(DigitalSequence* sequence, uint32_t prefill_size);
+
+/**
  * @brief Transmit the sequence contained in the DigitalSequence instance.
  *
  * Must contain at least one registered signal and one signal index.

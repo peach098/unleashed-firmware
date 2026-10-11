@@ -33,9 +33,13 @@
 #define DIGITAL_SEQUENCE_GPIO_BUFFER_SIZE 2
 
 /* Maximum capacity of the DMA ring buffer. */
-#define DIGITAL_SEQUENCE_RING_BUFFER_SIZE 128
+#define DIGITAL_SEQUENCE_RING_BUFFER_SIZE 128U
 
-#define DIGITAL_SEQUENCE_RING_BUFFER_MIN_FREE_SIZE 2
+#define DIGITAL_SEQUENCE_RING_BUFFER_MIN_FREE_SIZE 2U
+
+/* Default number of DMA ring buffer entries filled before the transmission starts: all of them. */
+#define DIGITAL_SEQUENCE_RING_BUFFER_PREFILL_SIZE_MAX \
+    (DIGITAL_SEQUENCE_RING_BUFFER_SIZE - DIGITAL_SEQUENCE_RING_BUFFER_MIN_FREE_SIZE)
 
 #define DIGITAL_SEQUENCE_BITS_IN_BYTE   (8U)
 #define DIGITAL_SEQUENCE_BITS_IN_NIBBLE (4U)
@@ -63,6 +67,7 @@ struct DigitalSequence {
 
     uint32_t size;
     uint32_t max_size;
+    uint32_t prefill_size;
 
     LL_DMA_InitTypeDef dma_config_gpio;
     LL_DMA_InitTypeDef dma_config_timer;
@@ -83,6 +88,7 @@ DigitalSequence* digital_sequence_alloc(uint32_t size, const GpioPin* gpio) {
 
     sequence->gpio = gpio;
     sequence->max_size = size;
+    sequence->prefill_size = DIGITAL_SEQUENCE_RING_BUFFER_PREFILL_SIZE_MAX;
 
     sequence->dma_config_gpio.PeriphOrM2MSrcAddress = (uint32_t)&gpio->port->BSRR;
     sequence->dma_config_gpio.MemoryOrM2MDstAddress = (uint32_t)sequence->gpio_buf;
@@ -180,6 +186,13 @@ void digital_sequence_add_bytes(
     }
 
     sequence->size += data_size * DIGITAL_SEQUENCE_BITS_IN_BYTE;
+}
+
+void digital_sequence_set_prefill_size(DigitalSequence* sequence, uint32_t prefill_size) {
+    furi_check(sequence);
+    furi_check(prefill_size);
+
+    sequence->prefill_size = MIN(prefill_size, DIGITAL_SEQUENCE_RING_BUFFER_PREFILL_SIZE_MAX);
 }
 
 static inline void digital_sequence_start_dma(DigitalSequence* sequence) {
@@ -393,8 +406,7 @@ void digital_sequence_transmit(DigitalSequence* sequence) {
 
             if(sequence->state == DigitalSequenceStateIdle) {
                 const bool is_buffer_filled = sequence->timer_buf.write_pos >=
-                                              (DIGITAL_SEQUENCE_RING_BUFFER_SIZE -
-                                               DIGITAL_SEQUENCE_RING_BUFFER_MIN_FREE_SIZE);
+                                              sequence->prefill_size;
                 const bool is_end_of_data = (signal_next == NULL) && is_last_value;
 
                 if(is_buffer_filled || is_end_of_data) {
