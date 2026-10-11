@@ -1,0 +1,49 @@
+merge: periods 4 (expected 4), ticks 23 (expected 24: 4+4+(4+6)+6)
+FAIL: merge: merged period != sum of both
+add_period(3907): reload 3, ideal 2.5005, err +0.4995 ticks
+add_period(117994): reload 76, ideal 75.5162, err +0.4838 ticks
+add_period(1887905): reload 1209, ideal 1208.2592, err +0.7408 ticks
+FAIL: add_period: rounding error > 1/2 tick
+add_period(7551622): reload 4835, ideal 4833.0381, err +1.9619 ticks
+FAIL: add_period: rounding error > 1/2 tick
+add_period(530928): reload 340, ideal 339.7939, err +0.2061 ticks
+add_period(100000000): reload 64020, ideal 64000.0000, err +20.0000 ticks
+FAIL: add_period: rounding error > 1/2 tick
+add_period(2147483647): reload 1374829, ideal 1374389.5341, err +439.4659 ticks
+FAIL: add_period: rounding error > 1/2 tick
+add_period(4000000000): reload 2560819, ideal 2560000.0000, err +819.0000 ticks
+FAIL: add_period: rounding error > 1/2 tick
+add_period(4294967295): reload 2749659, ideal 2748779.0688, err +879.9312 ticks
+FAIL: add_period: rounding error > 1/2 tick
+iso15693 rate=hi bytes=0    periods=127/127 ticks=12011 ideal=12007.071 err=+3.929 ticks (+327.2 ppm) max_edge_err=3.994
+iso15693 rate=hi bytes=1    periods=255/255 ticks=31347 ideal=31339.213 err=+7.787 ticks (+248.5 ppm) max_edge_err=7.852
+iso15693 rate=hi bytes=7    periods=1023/1023 ticks=147352 ideal=147332.065 err=+19.935 ticks (+135.3 ppm) max_edge_err=19.999
+iso15693 rate=hi bytes=12   periods=1663/1663 ticks=244024 ideal=243992.776 err=+31.224 ticks (+128.0 ppm) max_edge_err=31.289
+iso15693 rate=hi bytes=35   periods=4607/4607 ticks=688714 ideal=688632.044 err=+81.956 ticks (+119.0 ppm) max_edge_err=82.021
+iso15693 rate=hi bytes=131  periods=16895/16895 ticks=2544810 ideal=2544517.683 err=+292.317 ticks (+114.9 ppm) max_edge_err=292.381
+iso15693 rate=hi bytes=259  periods=33279/33279 ticks=5019606 ideal=5019031.869 err=+574.131 ticks (+114.4 ppm) max_edge_err=574.195
+iso15693 rate=hi bytes=323  periods=41471/41471 ticks=6257001 ideal=6256288.963 err=+712.037 ticks (+113.8 ppm) max_edge_err=712.102
+iso15693 rate=hi bytes=1027 periods=131583/131583 ticks=19868371 ideal=19866116.987 err=+2254.013 ticks (+113.5 ppm) max_edge_err=2254.078
+iso15693 rate=lo bytes=0    periods=511/511 ticks=48270 ideal=48254.834 err=+15.166 ticks (+314.3 ppm) max_edge_err=15.812
+iso15693 rate=lo bytes=1    periods=1023/1023 ticks=125620 ideal=125583.412 err=+36.588 ticks (+291.3 ppm) max_edge_err=37.233
+iso15693 rate=lo bytes=7    periods=4095/4095 ticks=589715 ideal=589554.884 err=+160.116 ticks (+271.6 ppm) max_edge_err=160.762
+iso15693 rate=lo bytes=12   periods=6655/6655 ticks=976463 ideal=976197.777 err=+265.223 ticks (+271.7 ppm) max_edge_err=265.869
+iso15693 rate=lo bytes=35   periods=18431/18431 ticks=2755498 ideal=2754755.084 err=+742.916 ticks (+269.7 ppm) max_edge_err=743.562
+iso15693 rate=lo bytes=131  periods=67583/67583 ticks=10181033 ideal=10178298.625 err=+2734.375 ticks (+268.6 ppm) max_edge_err=2735.020
+iso15693 rate=lo bytes=259  periods=133119/133119 ticks=20081750 ideal=20076356.681 err=+5393.319 ticks (+268.6 ppm) max_edge_err=5393.964
+iso15693 rate=lo bytes=323  periods=165887/165887 ticks=25032105 ideal=25025385.709 err=+6719.291 ticks (+268.5 ppm) max_edge_err=6719.937
+iso15693 rate=lo bytes=1027 periods=526335/526335 ticks=79486036 ideal=79464705.015 err=+21330.985 ticks (+268.4 ppm) max_edge_err=21331.630
+iso15693: 2018 frames, worst frame error +21330.985 ticks (1027 B, rate lo), worst edge error 21331.630 ticks
+FAIL: iso15693: frame error > 1 tick
+FAIL: iso15693: edge error > 1 tick
+iso14443a bits=5   periods=47 ticks=3284 ideal=3284.675 err=-0.675 max_edge_err=1.334
+iso14443a bits=24  periods=223 ticks=16566 ideal=16574.392 err=-8.392 max_edge_err=8.392
+iso14443a bits=80  periods=727 ticks=54898 ideal=54933.350 err=-35.350 max_edge_err=36.331
+iso14443a: 2000 frames, worst frame error -64.972 ticks, worst edge error 65.953 ticks
+FAIL: iso14443a: frame error > 1 tick
+FAIL: iso14443a: edge error > 1 tick
+random: 300 sequences, worst frame error +150.648 ticks, worst edge error 150.796 ticks
+FAIL: random: frame error > 1 tick
+FAIL: random: edge error > 1 tick
+floor: periods 127/127, min ARR 1, frame error +6.110 ticks (deferred corrections)
+FAILED: 13 failed check(s)
