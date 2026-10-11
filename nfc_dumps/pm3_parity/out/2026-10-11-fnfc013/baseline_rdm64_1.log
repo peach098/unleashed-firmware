@@ -1,0 +1,120 @@
+[=] Output will be flushed after every print.
+
+[=] No preferences file will be loaded
+[+] execute command from commandline: trace clear; hf 15 raw -a -c -d 2223AC839A01090104E0003F; trace list -t 15; trace save -f /opt/ai-team/projects/flipper-nfc/.claude/worktrees/bridge-cse_01VZQG1Yv8AtTrZaPQV4hNnw/nfc_dumps/pm3_parity/out/2026-10-11-fnfc013/baseline_rdm64_1
+
+[+] Using UART port /dev/serial/by-id/usb-proxmark.org_proxmark3_iceman-if00
+[+] Communicating with PM3 over USB-CDC
+[+] Max frame size: 624 bytes
+[+] Emulator memory: 8192 bytes
+[=] No history will be recorded
+[usb|script] pm3 --> trace clear
+[=] Trace buffer is already empty
+[usb|script] pm3 --> hf 15 raw -a -c -d 2223AC839A01090104E0003F
+[!] command failed
+[usb|script] pm3 --> trace list -t 15
+[+] Recorded activity ( 2022 bytes )
+[=] start = start of start frame. end = end of frame. src = source of transfer.
+[=] ISO15693 / iCLASS - all times are in carrier periods (1/13.56MHz)
+
+      Start |        End | Src | Data (! denotes parity error)                                           | CRC | Annotation
+------------+------------+-----+-------------------------------------------------------------------------+-----+--------------------
+          0 |      22016 | Rdr |26  01  00  F6  0A                                                       |  ok | INVENTORY
+      27008 |      80256 | Tag |00  01  AC  83  9A  01  09  01  04  E0  0F  00                           |  ok | 
+          0 |      22016 | Rdr |26  01  00  F6  0A                                                       |  ok | INVENTORY
+      28736 |      81984 | Tag |00  01  AC  83  9A  01  09  01  04  E0  0F  00                           |  ok | 
+        384 |      55168 | Rdr |22  20  AC  83  9A  01  09  01  04  E0  00  B5  C1                       |  ok | READBLOCK(0)
+      61568 |      94336 | Tag |00  00  00  00  00  77  CF                                               |  ok | 
+        384 |      55168 | Rdr |22  20  AC  83  9A  01  09  01  04  E0  00  B5  C1                       |  ok | READBLOCK(0)
+      61440 |      94208 | Tag |00  00  00  00  00  77  CF                                               |  ok | 
+        384 |      55168 | Rdr |22  20  AC  83  9A  01  09  01  04  E0  00  B5  C1                       |  ok | READBLOCK(0)
+      61568 |      94336 | Tag |00  00  00  00  00  77  CF                                               |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  07  93  98                   |  ok | READ_MULTI_BLOCK(0-7)
+      68160 |     215616 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  62  FD       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  07  93  98                   |  ok | READ_MULTI_BLOCK(0-7)
+      68224 |     215680 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  62  FD       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  07  93  98                   |  ok | READ_MULTI_BLOCK(0-7)
+      68224 |     215680 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  62  FD       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  1F  5A  04                   |  ok | READ_MULTI_BLOCK(0-31)
+      76992 |     617664 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  5B  D8  15   |     | 
+            |            |     |BB  68  F5  83  E1  FF  58  40  DF  BE  E7  F2  90  BE  02  19  5C  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  3F  AF                                                       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  1F  5A  04                   |  ok | READ_MULTI_BLOCK(0-31)
+      77056 |     617728 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  5B  D8  15   |     | 
+            |            |     |BB  68  F5  83  E1  FF  58  40  DF  BE  E7  F2  90  BE  02  19  5C  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  3F  AF                                                       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  1F  5A  04                   |  ok | READ_MULTI_BLOCK(0-31)
+      77120 |     617792 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  5B  D8  15   |     | 
+            |            |     |BB  68  F5  83  E1  FF  58  40  DF  BE  E7  F2  90  BE  02  19  5C  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  3F  AF                                                       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  3F  58  25                   |  ok | READ_MULTI_BLOCK(0-63)
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  3F  58  25                   |  ok | READ_MULTI_BLOCK(0-63)
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  3F  58  25                   |  ok | READ_MULTI_BLOCK(0-63)
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  4F  DF  56                   |  ok | READ_MULTI_BLOCK(0-79)
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  4F  DF  56                   |  ok | READ_MULTI_BLOCK(0-79)
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  4F  DF  56                   |  ok | READ_MULTI_BLOCK(0-79)
+          0 |      22016 | Rdr |26  01  00  F6  0A                                                       |  ok | INVENTORY
+      28608 |      81856 | Tag |00  01  AC  83  9A  01  09  01  04  E0  0F  00                           |  ok | 
+        384 |      55168 | Rdr |22  20  AC  83  9A  01  09  01  04  E0  00  B5  C1                       |  ok | READBLOCK(0)
+      61440 |      94208 | Tag |00  00  00  00  00  77  CF                                               |  ok | 
+        384 |      55168 | Rdr |22  20  AC  83  9A  01  09  01  04  E0  00  B5  C1                       |  ok | READBLOCK(0)
+      61440 |      94208 | Tag |00  00  00  00  00  77  CF                                               |  ok | 
+        384 |      55168 | Rdr |22  20  AC  83  9A  01  09  01  04  E0  00  B5  C1                       |  ok | READBLOCK(0)
+      61440 |      94208 | Tag |00  00  00  00  00  77  CF                                               |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  07  93  98                   |  ok | READ_MULTI_BLOCK(0-7)
+      68288 |     215744 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  62  FD       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  07  93  98                   |  ok | READ_MULTI_BLOCK(0-7)
+      68160 |     215616 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  62  FD       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  07  93  98                   |  ok | READ_MULTI_BLOCK(0-7)
+      68160 |     215616 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  62  FD       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  1F  5A  04                   |  ok | READ_MULTI_BLOCK(0-31)
+      76864 |     617536 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  5B  D8  15   |     | 
+            |            |     |BB  68  F5  83  E1  FF  58  40  DF  BE  E7  F2  90  BE  02  19  5C  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  3F  AF                                                       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  1F  5A  04                   |  ok | READ_MULTI_BLOCK(0-31)
+      77376 |     618048 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  5B  D8  15   |     | 
+            |            |     |BB  68  F5  83  E1  FF  58  40  DF  BE  E7  F2  90  BE  02  19  5C  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  3F  AF                                                       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  1F  5A  04                   |  ok | READ_MULTI_BLOCK(0-31)
+      76864 |     617536 | Tag |00  00  00  00  00  00  00  00  00  00  00  00  00  02  5A  50  05  00   |     | 
+            |            |     |00  00  20  E4  E2  C5  D7  8F  65  CC  F7  0E  40  3A  D1  5B  D8  15   |     | 
+            |            |     |BB  68  F5  83  E1  FF  58  40  DF  BE  E7  F2  90  BE  02  19  5C  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   |     | 
+            |            |     |00  00  00  3F  AF                                                       |  ok | 
+        384 |      59264 | Rdr |22  23  AC  83  9A  01  09  01  04  E0  00  3F  58  25                   |  ok | READ_MULTI_BLOCK(0-63)
+[usb|script] pm3 --> trace save -f /opt/ai-team/projects/flipper-nfc/.claude/worktrees/bridge-cse_01VZQG1Yv8AtTrZaPQV4hNnw/nfc_dumps/pm3_parity/out/2026-10-11-fnfc013/baseline_rdm64_1
+[+] Saved 2022 bytes to binary file `/opt/ai-team/projects/flipper-nfc/.claude/worktrees/bridge-cse_01VZQG1Yv8AtTrZaPQV4hNnw/nfc_dumps/pm3_parity/out/2026-10-11-fnfc013/baseline_rdm64_1.trace`
