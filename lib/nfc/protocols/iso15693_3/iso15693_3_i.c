@@ -246,6 +246,21 @@ void iso15693_3_append_block(const Iso15693_3Data* data, uint8_t block_num, BitB
     bit_buffer_append_bytes(buf, block_data, data->system_info.block_size);
 }
 
+void iso15693_3_append_blocks(
+    const Iso15693_3Data* data,
+    uint8_t block_num,
+    uint32_t block_count,
+    BitBuffer* buf) {
+    furi_check(block_num + block_count <= data->system_info.block_count);
+    if(block_count == 0) return;
+
+    // Block data is stored contiguously, so the blocks are copied with a single append
+    const uint32_t block_offset = block_num * data->system_info.block_size;
+    const uint8_t* block_data = simple_array_cget(data->block_data, block_offset);
+
+    bit_buffer_append_bytes(buf, block_data, block_count * data->system_info.block_size);
+}
+
 void iso15693_3_set_block_locked(Iso15693_3Data* data, uint8_t block_index, bool locked) {
     furi_assert(data);
     furi_assert(block_index < data->system_info.block_count);
