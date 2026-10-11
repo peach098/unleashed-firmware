@@ -17,6 +17,13 @@
 #define ISO15693_SIGNAL_SOF_EDGES  (ISO15693_SIGNAL_EOF_EDGES + 1U)
 #define ISO15693_SIGNAL_EDGES      (1350U)
 
+// DMA ring buffer entries filled before the first edge, instead of the whole 126-entry ring
+// (~44 CPU cycles per entry, so ~65 us less delay before SOF). Every frame starts with SOF
+// subcarrier periods of fc/16 (~75 CPU cycles each), and the CPU refills the ring at
+// ~55-60 cycles per entry, so the ring keeps growing after the DMA starts. 32 entries keep
+// it from running empty even if refilling were ~90 cycles per entry.
+#define ISO15693_SIGNAL_PREFILL_SIZE (32U)
+
 #define ISO15693_SIGNAL_FC     (13.56e6)
 #define ISO15693_SIGNAL_FC_16  (16.0e11 / ISO15693_SIGNAL_FC)
 #define ISO15693_SIGNAL_FC_256 (256.0e11 / ISO15693_SIGNAL_FC)
@@ -152,6 +159,7 @@ Iso15693Signal* iso15693_signal_alloc(const GpioPin* pin) {
     Iso15693Signal* instance = malloc(sizeof(Iso15693Signal));
 
     instance->tx_sequence = digital_sequence_alloc(ISO15693_SIGNAL_BUFFER_SIZE, pin);
+    digital_sequence_set_prefill_size(instance->tx_sequence, ISO15693_SIGNAL_PREFILL_SIZE);
 
     for(uint32_t i = 0; i < Iso15693SignalDataRateNum; ++i) {
         iso15693_signal_bank_fill(instance, i);

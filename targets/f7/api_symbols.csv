@@ -1076,6 +1076,7 @@ Function,-,digital_sequence_bit_table_init,void,"DigitalSequenceBitTable*, uint8
 Function,-,digital_sequence_clear,void,DigitalSequence*
 Function,-,digital_sequence_free,void,DigitalSequence*
 Function,+,digital_sequence_register_signal,void,"DigitalSequence*, uint8_t, const DigitalSignal*"
+Function,-,digital_sequence_set_prefill_size,void,"DigitalSequence*, uint32_t"
 Function,+,digital_sequence_transmit,void,DigitalSequence*
 Function,+,digital_signal_add_period,void,"DigitalSignal*, uint32_t"
 Function,+,digital_signal_add_period_with_level,void,"DigitalSignal*, uint32_t, _Bool"
