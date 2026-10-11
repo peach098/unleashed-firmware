@@ -1,0 +1,20 @@
+diff --git a/lib/digital_signal/presets/nfc/iso15693_signal.c b/lib/digital_signal/presets/nfc/iso15693_signal.c
+index 7a95a8fa6..c288d859e 100644
+--- a/lib/digital_signal/presets/nfc/iso15693_signal.c
++++ b/lib/digital_signal/presets/nfc/iso15693_signal.c
+@@ -25,9 +25,12 @@
+ #define ISO15693_SIGNAL_PREFILL_SIZE (32U)
+ 
+ #define ISO15693_SIGNAL_FC     (13.56e6)
+-#define ISO15693_SIGNAL_FC_16  (16.0e11 / ISO15693_SIGNAL_FC)
+-#define ISO15693_SIGNAL_FC_256 (256.0e11 / ISO15693_SIGNAL_FC)
+-#define ISO15693_SIGNAL_FC_768 (768.0e11 / ISO15693_SIGNAL_FC)
++// EXPERIMENT: DIGITAL_SIGNAL_T_TIM is 1562 (x0.01 ns) but the 64 MHz tick is 1562.5, so every period
++// comes out 320 ppm long; pre-scale the durations so ticks = duration / 1562.5
++#define ISO15693_SIGNAL_T_TIM_FIX (1562.0 / 1562.5)
++#define ISO15693_SIGNAL_FC_16  (16.0e11 / ISO15693_SIGNAL_FC * ISO15693_SIGNAL_T_TIM_FIX)
++#define ISO15693_SIGNAL_FC_256 (256.0e11 / ISO15693_SIGNAL_FC * ISO15693_SIGNAL_T_TIM_FIX)
++#define ISO15693_SIGNAL_FC_768 (768.0e11 / ISO15693_SIGNAL_FC * ISO15693_SIGNAL_T_TIM_FIX)
+ 
+ typedef enum {
+     Iso15693SignalIndexSof,

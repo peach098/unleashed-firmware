@@ -1,0 +1,5 @@
+log debug
+Current log level: debug
+Use <log ?> to list available log levels
+Press CTRL+C to stop...
+74215 [0;31m[E][Gauge] [0mbq27220_read_word failed
