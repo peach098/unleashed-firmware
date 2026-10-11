@@ -1,0 +1,2 @@
+inventory CRC bytes: 0F 00
+crc frames ok=20000 bad=0

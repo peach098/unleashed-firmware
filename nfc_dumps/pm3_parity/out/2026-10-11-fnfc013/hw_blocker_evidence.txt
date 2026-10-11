@@ -1,0 +1,14 @@
+=== 2026-10-11T19:55:48+03:00 ls -l /dev/serial/by-id
+total 0
+lrwxrwxrwx 1 root root 13 Oct 11 16:39 usb-Flipper_Devices_Inc._Flipper_E17ana_flip_E17ana-if00 -> ../../ttyACM1
+lrwxrwxrwx 1 root root 13 Oct 11 16:14 usb-proxmark.org_proxmark3_iceman-if00 -> ../../ttyACM0
+=== Flipper CLI: open 230400, write CRLF (write_timeout=2 s)
+    raise SerialTimeoutException('Write timeout')
+serial.serialutil.SerialTimeoutException: Write timeout
+=== Flipper DTR toggle (SET_CONTROL_LINE_STATE)
+OSError: [Errno 71] Protocol error
+=== PM3: hf 15 reader (Flipper on the antenna, expected UID E0 04 01 09 01 9A 83 AC if it were emulating)
+[+] Max frame size: 624 bytes
+[+] Emulator memory: 8192 bytes
+[=] No history will be recorded
+[usb|script] pm3 --> hf 15 reader

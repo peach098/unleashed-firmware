@@ -1,0 +1,273 @@
+FNFC-01.3 latency probe v3 (temporary, NOT for commit). Superset of latency_probe_v2_rebased.patch.
+Adds stamps inside the fixed "handler" window (RxEnd -> nfc_listener_tx) to localise the ~263 us (step 4).
+Apply on top of FNFC-01.3 (instead of v2, not in addition):
+  git apply nfc_dumps/pm3_parity/out/2026-10-11-fnfc013/latency_probe_v3.patch
+  ./fbt DEBUG=0 --extra-define=NFC_LISTENER_TX_LATENCY_PROBE --extra-define=NFC_LISTENER_TX_LATENCY_PROBE_V3 FLIP_PORT=... flash_usb_full
+Output (CLI `log info`): the v2 [PROBE] line, plus one [PROBE3] line per listener TX, DWT cycles @64 MHz relative to RxEnd:
+  rx       = after furi_hal_nfc_listener_rx (parser data copy)                       [nfc.c]
+  copy     = after bit_buffer_copy_bits into the event buffer                         [nfc.c]
+  run      = iso15693_3_listener_run entry (nfc_listener dispatch)                    [iso15693_3_listener.c]
+  crc      = after iso13239_crc_check + trim of the request                          [iso15693_3_listener.c]
+  handler  = right before the command handler (flags/addressing/UID checks done)     [iso15693_3_listener_i.c]
+  send     = iso15693_3_listener_send_frame entry (handler + extension done)          [iso15693_3_listener_i.c]
+  crc_app  = after the response CRC append                                           [iso15693_3_listener_i.c]
+  tx_enter = nfc_listener_tx entry (same as v2)
+Remove with: git apply -R .../latency_probe_v3.patch
+
+diff --git a/lib/digital_signal/digital_sequence.c b/lib/digital_signal/digital_sequence.c
+index 2f4a355f5..4d9a9818b 100644
+--- a/lib/digital_signal/digital_sequence.c
++++ b/lib/digital_signal/digital_sequence.c
+@@ -195,8 +195,18 @@ void digital_sequence_set_prefill_size(DigitalSequence* sequence, uint32_t prefi
+     sequence->prefill_size = MIN(prefill_size, DIGITAL_SEQUENCE_RING_BUFFER_PREFILL_SIZE_MAX);
+ }
+ 
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++// Latency probe (FNFC-01.2): DWT->CYCCNT at the moment the first DMA transfer is started
++volatile uint32_t digital_sequence_probe_dma_start_cyc = 0;
++// v2: DWT->CYCCNT at digital_sequence_transmit() entry (encode done, before GPIO init + DMA prefill)
++volatile uint32_t digital_sequence_probe_tx_start_cyc = 0;
++#endif
++
+ static inline void digital_sequence_start_dma(DigitalSequence* sequence) {
+     furi_assert(sequence);
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++    digital_sequence_probe_dma_start_cyc = DWT->CYCCNT;
++#endif
+ 
+     LL_DMA_Init(DMA1, LL_DMA_CHANNEL_1, &sequence->dma_config_gpio);
+     LL_DMA_Init(DMA1, LL_DMA_CHANNEL_2, &sequence->dma_config_timer);
+@@ -349,6 +359,9 @@ void digital_sequence_transmit(DigitalSequence* sequence) {
+     furi_check(sequence->size);
+     furi_check(sequence->state == DigitalSequenceStateIdle);
+ 
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++    digital_sequence_probe_tx_start_cyc = DWT->CYCCNT;
++#endif
+     FURI_CRITICAL_ENTER();
+ 
+     furi_hal_gpio_init(sequence->gpio, GpioModeOutputPushPull, GpioPullNo, GpioSpeedVeryHigh);
+diff --git a/lib/nfc/nfc.c b/lib/nfc/nfc.c
+index 20cbbde27..7e7ea9c8e 100644
+--- a/lib/nfc/nfc.c
++++ b/lib/nfc/nfc.c
+@@ -12,6 +12,23 @@
+ #define NFC_FELICA_LISTENER_RESPONSE_TIME_A_FC (512 * 64)
+ #define NFC_FELICA_LISTENER_RESPONSE_TIME_B_FC (256 * 64)
+ 
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++// Latency probe (FNFC-01.2), build with:
++//   ./fbt --extra-define=NFC_LISTENER_TX_LATENCY_PROBE
++// Add --extra-define=NFC_LISTENER_TX_LATENCY_PROBE_NO_PREPARE to skip tx_prepare
++// (encode after FDT wait, i.e. the pre-FNFC-01.2 behaviour) for a "before" baseline.
++// All values are DWT->CYCCNT cycles at 64 MHz (1 us = 64 cycles), relative to RxEnd.
++extern volatile uint32_t digital_sequence_probe_dma_start_cyc;
++extern volatile uint32_t digital_sequence_probe_tx_start_cyc;
++extern volatile uint32_t iso15693_parser_probe_eof_cyc;
++static uint32_t nfc_probe_rx_end_cyc;
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE_V3
++// v3: stamps inside the handler (RxEnd -> nfc_listener_tx), see latency_probe_v3.patch header
++volatile uint32_t nfc_probe_handler_cyc[7];
++#define NFC_PROBE_H(i) (nfc_probe_handler_cyc[i] = DWT->CYCCNT)
++#endif
++#endif
++
+ typedef enum {
+     NfcStateIdle,
+     NfcStateRunning,
+@@ -142,11 +159,20 @@ static int32_t nfc_worker_listener(void* context) {
+         }
+         if(event & FuriHalNfcEventRxEnd) {
+             furi_hal_nfc_timer_block_tx_start(instance->fdt_listen_fc);
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++            nfc_probe_rx_end_cyc = DWT->CYCCNT;
++#endif
+ 
+             nfc_event.type = NfcEventTypeRxEnd;
+             furi_hal_nfc_listener_rx(
+                 instance->rx_buffer, sizeof(instance->rx_buffer), &instance->rx_bits);
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE_V3
++            NFC_PROBE_H(0);
++#endif
+             bit_buffer_copy_bits(event_data.buffer, instance->rx_buffer, instance->rx_bits);
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE_V3
++            NFC_PROBE_H(1);
++#endif
+             command = instance->callback(nfc_event, instance->context);
+             if(command == NfcCommandStop) {
+                 break;
+@@ -348,22 +374,66 @@ NfcError nfc_listener_tx(Nfc* instance, const BitBuffer* tx_buffer) {
+     const size_t tx_bits = bit_buffer_get_size(tx_buffer);
+ 
+     do {
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++        const uint32_t probe_tx_enter_cyc = DWT->CYCCNT;
++#endif
+         // Do the length-dependent frame preparation while the FDT timer is still running
++#ifndef NFC_LISTENER_TX_LATENCY_PROBE_NO_PREPARE
+         FuriHalNfcError error = furi_hal_nfc_listener_tx_prepare(tx_data, tx_bits);
+         if(error != FuriHalNfcErrorNone) {
+             FURI_LOG_D(TAG, "Failed in listener TX prepare");
+             ret = nfc_process_hal_error(error);
+             break;
+         }
++#else
++        FuriHalNfcError error = FuriHalNfcErrorNone;
++#endif
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++        const uint32_t probe_prepared_cyc = DWT->CYCCNT;
++        const bool probe_fdt_running = furi_hal_nfc_timer_block_tx_is_running();
++#endif
+ 
+         while(furi_hal_nfc_timer_block_tx_is_running()) {
+         }
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++        const uint32_t probe_fdt_cyc = DWT->CYCCNT;
++#endif
+ 
+         error = furi_hal_nfc_listener_tx(tx_data, tx_bits);
+         if(error != FuriHalNfcErrorNone) {
+             FURI_LOG_D(TAG, "Failed in listener TX");
+             ret = nfc_process_hal_error(error);
+         }
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++        // FURI_LOG_I, not _D: debug logs are compiled out of release builds
++        const uint32_t t0 = nfc_probe_rx_end_cyc;
++        FURI_LOG_I(
++            TAG,
++            "[PROBE] %uB eof2rx=%lu tx_enter=%lu prepared=%lu fdt_end=%lu seq_tx=%lu dma=%lu (fdt_after_prep=%d) us:dma-fdt=%lu",
++            (unsigned)(tx_bits / 8),
++            t0 - iso15693_parser_probe_eof_cyc,
++            probe_tx_enter_cyc - t0,
++            probe_prepared_cyc - t0,
++            probe_fdt_cyc - t0,
++            digital_sequence_probe_tx_start_cyc - t0,
++            digital_sequence_probe_dma_start_cyc - t0,
++            probe_fdt_running,
++            (digital_sequence_probe_dma_start_cyc - probe_fdt_cyc) / 64);
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE_V3
++        FURI_LOG_I(
++            TAG,
++            "[PROBE3] %uB rx=%lu copy=%lu run=%lu crc=%lu handler=%lu send=%lu crc_app=%lu tx_enter=%lu",
++            (unsigned)(tx_bits / 8),
++            nfc_probe_handler_cyc[0] - t0,
++            nfc_probe_handler_cyc[1] - t0,
++            nfc_probe_handler_cyc[2] - t0,
++            nfc_probe_handler_cyc[3] - t0,
++            nfc_probe_handler_cyc[4] - t0,
++            nfc_probe_handler_cyc[5] - t0,
++            nfc_probe_handler_cyc[6] - t0,
++            probe_tx_enter_cyc - t0);
++#endif
++#endif
+     } while(false);
+ 
+     return ret;
+diff --git a/lib/nfc/protocols/iso15693_3/iso15693_3_listener.c b/lib/nfc/protocols/iso15693_3/iso15693_3_listener.c
+index 2d1d053c3..114f0cfab 100644
+--- a/lib/nfc/protocols/iso15693_3/iso15693_3_listener.c
++++ b/lib/nfc/protocols/iso15693_3/iso15693_3_listener.c
+@@ -8,6 +8,14 @@
+ 
+ #define TAG "Iso15693_3Listener"
+ 
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE_V3
++#include <stm32wbxx.h>
++extern volatile uint32_t nfc_probe_handler_cyc[7];
++#define NFC_PROBE_H(i) (nfc_probe_handler_cyc[i] = DWT->CYCCNT)
++#else
++#define NFC_PROBE_H(i)
++#endif
++
+ Iso15693_3Listener* iso15693_3_listener_alloc(Nfc* nfc, Iso15693_3Data* data) {
+     furi_assert(nfc);
+ 
+@@ -63,11 +71,13 @@ NfcCommand iso15693_3_listener_run(NfcGenericEvent event, void* context) {
+     NfcCommand command = NfcCommandContinue;
+ 
+     if(nfc_event->type == NfcEventTypeRxEnd) {
++        NFC_PROBE_H(2);
+         BitBuffer* rx_buffer = nfc_event->data.buffer;
+ 
+         bit_buffer_reset(instance->tx_buffer);
+         if(iso13239_crc_check(Iso13239CrcTypeDefault, rx_buffer)) {
+             iso13239_crc_trim(rx_buffer);
++            NFC_PROBE_H(3);
+ 
+             const Iso15693_3Error error = iso15693_3_listener_process_request(instance, rx_buffer);
+ 
+diff --git a/lib/nfc/protocols/iso15693_3/iso15693_3_listener_i.c b/lib/nfc/protocols/iso15693_3/iso15693_3_listener_i.c
+index e41aa89ca..622b900fe 100644
+--- a/lib/nfc/protocols/iso15693_3/iso15693_3_listener_i.c
++++ b/lib/nfc/protocols/iso15693_3/iso15693_3_listener_i.c
+@@ -4,6 +4,14 @@
+ 
+ #define TAG "Iso15693_3Listener"
+ 
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE_V3
++#include <stm32wbxx.h>
++extern volatile uint32_t nfc_probe_handler_cyc[7];
++#define NFC_PROBE_H(i) (nfc_probe_handler_cyc[i] = DWT->CYCCNT)
++#else
++#define NFC_PROBE_H(i)
++#endif
++
+ typedef Iso15693_3Error (*Iso15693_3RequestHandler)(
+     Iso15693_3Listener* instance,
+     const uint8_t* data,
+@@ -659,6 +667,7 @@ static Iso15693_3Error iso15693_3_listener_handle_standard_request(
+         bit_buffer_reset(instance->tx_buffer);
+         bit_buffer_append_byte(instance->tx_buffer, ISO15693_3_RESP_FLAG_NONE);
+ 
++        NFC_PROBE_H(4);
+         error = handler(instance, data, data_size, flags);
+ 
+         // The request was fully handled in the protocol extension, no further action necessary
+@@ -754,8 +763,10 @@ Iso15693_3Error
+     furi_assert(instance);
+     furi_assert(tx_buffer);
+ 
++    NFC_PROBE_H(5);
+     bit_buffer_copy(instance->tx_buffer, tx_buffer);
+     iso13239_crc_append(Iso13239CrcTypeDefault, instance->tx_buffer);
++    NFC_PROBE_H(6);
+ 
+     NfcError error = nfc_listener_tx(instance->nfc, instance->tx_buffer);
+     return iso15693_3_listener_process_nfc_error(error);
+diff --git a/lib/signal_reader/parsers/iso15693/iso15693_parser.c b/lib/signal_reader/parsers/iso15693/iso15693_parser.c
+index b493def94..cc282659c 100644
+--- a/lib/signal_reader/parsers/iso15693/iso15693_parser.c
++++ b/lib/signal_reader/parsers/iso15693/iso15693_parser.c
+@@ -10,6 +10,12 @@
+ 
+ #define TAG "Iso15693Parser"
+ 
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++#include <stm32wbxx.h>
++// Latency probe v2 (FNFC-01.2): DWT->CYCCNT when the EOF pattern is seen in the signal reader ISR
++volatile uint32_t iso15693_parser_probe_eof_cyc = 0;
++#endif
++
+ typedef enum {
+     Iso15693ParserStateParseSoF,
+     Iso15693ParserStateParseFrame,
+@@ -131,6 +137,9 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
+             instance->state = Iso15693ParserStateParseFrame;
+         } else if(event.data->data[0] == eof_single) {
+             instance->eof_received = true;
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++            iso15693_parser_probe_eof_cyc = DWT->CYCCNT;
++#endif
+             instance->callback(Iso15693ParserEventDataReceived, instance->context);
+         } else {
+             instance->state = Iso15693ParserStateFail;
+@@ -140,6 +149,9 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
+         if(instance->mode == Iso15693ParserMode1OutOf4) {
+             if(event.data->data[0] == eof) {
+                 instance->eof_received = true;
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++                iso15693_parser_probe_eof_cyc = DWT->CYCCNT;
++#endif
+                 instance->callback(Iso15693ParserEventDataReceived, instance->context);
+             } else {
+                 instance->bitstream_buff[instance->bytes_to_process] = event.data->data[0];

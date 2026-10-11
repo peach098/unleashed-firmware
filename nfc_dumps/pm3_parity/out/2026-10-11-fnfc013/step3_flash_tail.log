@@ -1,0 +1,40 @@
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_setup.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_setup_done.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_setup_howto.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_pin_setup_howto2.c
+	CC	applications/settings/desktop_settings/scenes/desktop_settings_scene_start.c
+	CC	applications/settings/desktop_settings/views/desktop_settings_view_pin_setup_howto.c
+	CC	applications/settings/desktop_settings/views/desktop_settings_view_pin_setup_howto2.c
+	CC	applications/settings/desktop_settings/views/desktop_view_pin_input.c
+	CC	applications/settings/desktop_settings/desktop_settings_app.c
+	CC	applications/settings/expansion_settings_app/expansion_settings_app.c
+	CC	applications/settings/input_settings_app/input_settings_app.c
+	CC	applications/settings/notification_settings/notification_settings_app.c
+	CC	applications/settings/dolphin_passport/passport.c
+	LINK	build/f7-firmware-C/.extapps/passport_d.elf
+	APPMETA	build/f7-firmware-C/.extapps/passport.fap
+	FAP	build/f7-firmware-C/.extapps/passport.fap
+	FASTFAP	build/f7-firmware-C/.extapps/passport.fap
+	RESDIST	build/f7-firmware-C/resources
+	MANIFST	build/f7-firmware-C/resources/Manifest
+2026-10-11 20:23:06,132 [INFO] Creating temporary Manifest for directory "build/f7-firmware-C/resources"[0m
+2026-10-11 20:23:06,180 [INFO] Comparing new manifest with existing[0m
+2026-10-11 20:23:06,186 [INFO] Manifest updated (1275 new, 0 removed, 0 changed)[0m
+2026-10-11 20:23:06,187 [INFO] Complete[0m
+	DIST	dist_updater_package
+2026-10-11 20:23:06,281 [INFO] [1;32mFirmware binaries can be found at:
+	dist/f7-C[0m
+2026-10-11 20:23:06,283 [INFO] Using guessed radio address 0x080D7000, verify with Release_Notes or specify --radioaddr[0m
+2026-10-11 20:23:08,288 [INFO] Resources compression ratio: 44.17%[0m
+2026-10-11 20:23:08,344 [INFO] [1;32mUse this directory to self-update your Flipper:
+	dist/f7-C/f7-update-local[0m
+2026-10-11 20:23:08,515 [INFO] Bundling SDK[0m
+2026-10-11 20:23:11,281 [INFO] [1;32mSDK bundle can be found at:
+	dist/f7-C/flipper-z-f7-sdk-local.zip[0m
+python3 scripts/selfupdate.py -p /dev/serial/by-id/usb-Flipper_Devices_Inc._Flipper_E17ana_flip_E17ana-if00 dist/f7-C/f7-update-local/update.fuf
+2026-10-11 20:23:11,371 [INFO] Installing "f7-update-local" from /ext/update/f7-update-local[0m
+2026-10-11 20:23:13,788 [INFO] Sending "/opt/ai-team/projects/flipper-nfc/.claude/worktrees/bridge-cse_01VZQG1Yv8AtTrZaPQV4hNnw/dist/f7-C/f7-update-local/firmware.dfu" to "/ext/update/f7-update-local/firmware.dfu"[0m
+2026-10-11 20:23:28,149 [INFO] Sending "/opt/ai-team/projects/flipper-nfc/.claude/worktrees/bridge-cse_01VZQG1Yv8AtTrZaPQV4hNnw/dist/f7-C/f7-update-local/resources.ths" to "/ext/update/f7-update-local/resources.ths"[0m
+2026-10-11 20:23:51,794 [INFO] Sending "/opt/ai-team/projects/flipper-nfc/.claude/worktrees/bridge-cse_01VZQG1Yv8AtTrZaPQV4hNnw/dist/f7-C/f7-update-local/update.fuf" to "/ext/update/f7-update-local/update.fuf"[0m
+2026-10-11 20:23:52,122 [INFO] Sending "/opt/ai-team/projects/flipper-nfc/.claude/worktrees/bridge-cse_01VZQG1Yv8AtTrZaPQV4hNnw/dist/f7-C/f7-update-local/updater.bin" to "/ext/update/f7-update-local/updater.bin"[0m
+Touch("build/usbinstall.flag")

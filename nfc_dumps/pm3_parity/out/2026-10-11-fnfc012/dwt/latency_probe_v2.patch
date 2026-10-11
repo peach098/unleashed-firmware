@@ -1,0 +1,172 @@
+FNFC-01.2 latency probe v2 (temporary, NOT for commit). Superset of latency_probe.patch.
+Apply on top of the FNFC-01.2 change (HEAD 4247163c7):
+  git apply nfc_dumps/pm3_parity/out/2026-10-11-fnfc012/dwt/latency_probe_v2.patch
+"after":  ./fbt DEBUG=0 --extra-define=NFC_LISTENER_TX_LATENCY_PROBE flash_usb_full
+"before": ./fbt DEBUG=0 --extra-define=NFC_LISTENER_TX_LATENCY_PROBE --extra-define=NFC_LISTENER_TX_LATENCY_PROBE_NO_PREPARE flash_usb_full
+Output (Info level, CLI `log info`), one line per listener TX, DWT cycles @64MHz relative to RxEnd
+(RxEnd = nfc worker got FuriHalNfcEventRxEnd and started the FDT timer):
+  [PROBE] <N>B eof2rx= tx_enter= prepared= fdt_end= seq_tx= dma= (fdt_after_prep=) us:dma-fdt=
+  eof2rx  = cycles from EOF seen in the iso15693 parser ISR to RxEnd (thread wakeup + parser_run)
+  tx_enter= nfc_listener_tx() entry (=> handler / protocol processing time)
+  prepared= after furi_hal_nfc_listener_tx_prepare (== tx_enter in NO_PREPARE)
+  fdt_end = FDT busy-wait finished
+  seq_tx  = digital_sequence_transmit() entry (encode done; in NO_PREPARE this includes the encode)
+  dma     = first DMA started (after GPIO init + ring-buffer prefill)
+Remove with: git apply -R .../latency_probe_v2.patch
+
+diff --git a/lib/digital_signal/digital_sequence.c b/lib/digital_signal/digital_sequence.c
+index 14cb3aab2..38b052690 100644
+--- a/lib/digital_signal/digital_sequence.c
++++ b/lib/digital_signal/digital_sequence.c
+@@ -131,8 +131,18 @@ void digital_sequence_add_signal(DigitalSequence* sequence, uint8_t signal_index
+     sequence->data[sequence->size++] = signal_index;
+ }
+ 
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++// Latency probe (FNFC-01.2): DWT->CYCCNT at the moment the first DMA transfer is started
++volatile uint32_t digital_sequence_probe_dma_start_cyc = 0;
++// v2: DWT->CYCCNT at digital_sequence_transmit() entry (encode done, before GPIO init + DMA prefill)
++volatile uint32_t digital_sequence_probe_tx_start_cyc = 0;
++#endif
++
+ static inline void digital_sequence_start_dma(DigitalSequence* sequence) {
+     furi_assert(sequence);
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++    digital_sequence_probe_dma_start_cyc = DWT->CYCCNT;
++#endif
+ 
+     LL_DMA_Init(DMA1, LL_DMA_CHANNEL_1, &sequence->dma_config_gpio);
+     LL_DMA_Init(DMA1, LL_DMA_CHANNEL_2, &sequence->dma_config_timer);
+@@ -285,6 +295,9 @@ void digital_sequence_transmit(DigitalSequence* sequence) {
+     furi_check(sequence->size);
+     furi_check(sequence->state == DigitalSequenceStateIdle);
+ 
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++    digital_sequence_probe_tx_start_cyc = DWT->CYCCNT;
++#endif
+     FURI_CRITICAL_ENTER();
+ 
+     furi_hal_gpio_init(sequence->gpio, GpioModeOutputPushPull, GpioPullNo, GpioSpeedVeryHigh);
+diff --git a/lib/nfc/nfc.c b/lib/nfc/nfc.c
+index 20cbbde27..728ba5c3c 100644
+--- a/lib/nfc/nfc.c
++++ b/lib/nfc/nfc.c
+@@ -12,6 +12,18 @@
+ #define NFC_FELICA_LISTENER_RESPONSE_TIME_A_FC (512 * 64)
+ #define NFC_FELICA_LISTENER_RESPONSE_TIME_B_FC (256 * 64)
+ 
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++// Latency probe (FNFC-01.2), build with:
++//   ./fbt --extra-define=NFC_LISTENER_TX_LATENCY_PROBE
++// Add --extra-define=NFC_LISTENER_TX_LATENCY_PROBE_NO_PREPARE to skip tx_prepare
++// (encode after FDT wait, i.e. the pre-FNFC-01.2 behaviour) for a "before" baseline.
++// All values are DWT->CYCCNT cycles at 64 MHz (1 us = 64 cycles), relative to RxEnd.
++extern volatile uint32_t digital_sequence_probe_dma_start_cyc;
++extern volatile uint32_t digital_sequence_probe_tx_start_cyc;
++extern volatile uint32_t iso15693_parser_probe_eof_cyc;
++static uint32_t nfc_probe_rx_end_cyc;
++#endif
++
+ typedef enum {
+     NfcStateIdle,
+     NfcStateRunning,
+@@ -142,6 +154,9 @@ static int32_t nfc_worker_listener(void* context) {
+         }
+         if(event & FuriHalNfcEventRxEnd) {
+             furi_hal_nfc_timer_block_tx_start(instance->fdt_listen_fc);
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++            nfc_probe_rx_end_cyc = DWT->CYCCNT;
++#endif
+ 
+             nfc_event.type = NfcEventTypeRxEnd;
+             furi_hal_nfc_listener_rx(
+@@ -348,22 +363,52 @@ NfcError nfc_listener_tx(Nfc* instance, const BitBuffer* tx_buffer) {
+     const size_t tx_bits = bit_buffer_get_size(tx_buffer);
+ 
+     do {
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++        const uint32_t probe_tx_enter_cyc = DWT->CYCCNT;
++#endif
+         // Do the length-dependent frame preparation while the FDT timer is still running
++#ifndef NFC_LISTENER_TX_LATENCY_PROBE_NO_PREPARE
+         FuriHalNfcError error = furi_hal_nfc_listener_tx_prepare(tx_data, tx_bits);
+         if(error != FuriHalNfcErrorNone) {
+             FURI_LOG_D(TAG, "Failed in listener TX prepare");
+             ret = nfc_process_hal_error(error);
+             break;
+         }
++#else
++        FuriHalNfcError error = FuriHalNfcErrorNone;
++#endif
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++        const uint32_t probe_prepared_cyc = DWT->CYCCNT;
++        const bool probe_fdt_running = furi_hal_nfc_timer_block_tx_is_running();
++#endif
+ 
+         while(furi_hal_nfc_timer_block_tx_is_running()) {
+         }
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++        const uint32_t probe_fdt_cyc = DWT->CYCCNT;
++#endif
+ 
+         error = furi_hal_nfc_listener_tx(tx_data, tx_bits);
+         if(error != FuriHalNfcErrorNone) {
+             FURI_LOG_D(TAG, "Failed in listener TX");
+             ret = nfc_process_hal_error(error);
+         }
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++        // FURI_LOG_I, not _D: debug logs are compiled out of release builds
++        const uint32_t t0 = nfc_probe_rx_end_cyc;
++        FURI_LOG_I(
++            TAG,
++            "[PROBE] %uB eof2rx=%lu tx_enter=%lu prepared=%lu fdt_end=%lu seq_tx=%lu dma=%lu (fdt_after_prep=%d) us:dma-fdt=%lu",
++            (unsigned)(tx_bits / 8),
++            t0 - iso15693_parser_probe_eof_cyc,
++            probe_tx_enter_cyc - t0,
++            probe_prepared_cyc - t0,
++            probe_fdt_cyc - t0,
++            digital_sequence_probe_tx_start_cyc - t0,
++            digital_sequence_probe_dma_start_cyc - t0,
++            probe_fdt_running,
++            (digital_sequence_probe_dma_start_cyc - probe_fdt_cyc) / 64);
++#endif
+     } while(false);
+ 
+     return ret;
+diff --git a/lib/signal_reader/parsers/iso15693/iso15693_parser.c b/lib/signal_reader/parsers/iso15693/iso15693_parser.c
+index b493def94..cc282659c 100644
+--- a/lib/signal_reader/parsers/iso15693/iso15693_parser.c
++++ b/lib/signal_reader/parsers/iso15693/iso15693_parser.c
+@@ -10,6 +10,12 @@
+ 
+ #define TAG "Iso15693Parser"
+ 
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++#include <stm32wbxx.h>
++// Latency probe v2 (FNFC-01.2): DWT->CYCCNT when the EOF pattern is seen in the signal reader ISR
++volatile uint32_t iso15693_parser_probe_eof_cyc = 0;
++#endif
++
+ typedef enum {
+     Iso15693ParserStateParseSoF,
+     Iso15693ParserStateParseFrame,
+@@ -131,6 +137,9 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
+             instance->state = Iso15693ParserStateParseFrame;
+         } else if(event.data->data[0] == eof_single) {
+             instance->eof_received = true;
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++            iso15693_parser_probe_eof_cyc = DWT->CYCCNT;
++#endif
+             instance->callback(Iso15693ParserEventDataReceived, instance->context);
+         } else {
+             instance->state = Iso15693ParserStateFail;
+@@ -140,6 +149,9 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
+         if(instance->mode == Iso15693ParserMode1OutOf4) {
+             if(event.data->data[0] == eof) {
+                 instance->eof_received = true;
++#ifdef NFC_LISTENER_TX_LATENCY_PROBE
++                iso15693_parser_probe_eof_cyc = DWT->CYCCNT;
++#endif
+                 instance->callback(Iso15693ParserEventDataReceived, instance->context);
+             } else {
+                 instance->bitstream_buff[instance->bytes_to_process] = event.data->data[0];

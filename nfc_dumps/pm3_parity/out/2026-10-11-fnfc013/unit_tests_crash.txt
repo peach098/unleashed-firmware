@@ -1,0 +1,19 @@
+`unit_tests test_nfc` on HEAD cb6a47264 (FIRMWARE_APP_SET=unit_tests DEBUG=0), 2026-10-11 20:37 and 20:38 MSK.
+
+Both runs: the Flipper reboots (USB EIO, uptime 25 s afterwards) right after iso15693_signal_encode_equivalence();
+screen after reboot: "Flipper crashed and was rebooted / furi_check failed" (unit_tests_crash_screen.png).
+Run 1 printed the encode timing line before the crash, run 2 lost it in the CLI buffer.
+Logs: unit_tests_nfc_head_run1.log, unit_tests_nfc_head_run2.log.
+
+Cause (static, not verified by a fixed run): test bug, not firmware.
+targets/f7/furi_hal/furi_hal_random.c:57  furi_hal_random_fill_buf() has furi_check(len).
+- iso13239_crc_table_test (nfc_test.c:1250-1254): i = 0 -> size = 0 -> furi_hal_random_fill_buf(data, 0)
+  -> furi_check fails deterministically. This is the next test after the encode test.
+- iso15693_signal_encode_equivalence random frames (nfc_iso15693_signal_test.c, 200 frames,
+  data_size = rand % 1028): same call with size 0, ~18 % chance per run.
+Fix: `if(size) furi_hal_random_fill_buf(data, size);` in both places.
+
+Encode timing from run 1 (DWT, inside FURI_CRITICAL, code compiled into the test FAP and running from RAM):
+  NfcIso15693SignalTest: encode 323 B: 8584 cycles (134 us), per-bit reference 141606 cycles (2212 us)
+The per-bit reference here is 2212 us vs 1500 us measured for the same work in firmware (01.2 probe),
+so FAP-in-RAM execution is ~1.47x slower; scaled, firmware encode ~ 91 us (estimate, not measured).

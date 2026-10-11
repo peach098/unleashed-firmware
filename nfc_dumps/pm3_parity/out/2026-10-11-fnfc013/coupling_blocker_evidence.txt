@@ -1,0 +1,24 @@
+FNFC-01.3 on-device run, 2026-10-11 ~20:25-20:35 MSK: PM3 does not see the Flipper emulation (no coupling).
+
+1. step3 firmware (effe31b99 + latency_probe_v2_rebased.patch, DEBUG=0, PROBE define) flashed OK via
+   flash_usb_full; device back on USB after ~3.5 min (resources reinstall); `info device`:
+   firmware.commit.hash = effe31b9, dirty = true (probe applied)  -> step3_device_info.txt
+2. RPC app_start("/ext/apps/NFC/nfc.fap", "/ext/nfc/SLIX2_2026-02-27_16,08,34.nfc") -> status 0,
+   screen "Emulating SLIX2 SLIX2_2026-02-27_16,08,34" (step3_emu_screen.png).
+3. PM3 (iceman, ttyACM0): `hf 15 reader` -> no UID (step3_coupling_reader.log);
+   `hf 15 raw -a -c -d 260100` -> "command failed" (= no response, see memory pm3-hf15-message-semantics);
+   `hf search` -> "No known/supported 13.56 MHz tags found". Flipper `log info` during these: no [PROBE] line
+   (the listener never answered a frame; only Dolphin state-save lines) -> step3_probe_log.txt.
+4. Control with a path untouched by FNFC-01.3: emulate /ext/nfc/MFC_1K_2026-03-23_21,06,03.nfc
+   (Mifare Classic 1K, ISO14443-A, ST25R3916 hardware framing, no DigitalSequence); screen "Emulating Mifare
+   Classic 1K"; PM3 `hf 14a reader` -> nothing, `hf search` -> "No known/supported 13.56 MHz tags found".
+5. PM3 `hw tune`: HF 13.56 MHz 14.28 V, HF antenna ok (PM3 itself works).
+6. The same PM3 / Flipper / card file pair worked in FNFC-01.2 (fnfc012/dwt/*_coupling_reader.log).
+
+Conclusion: neither ISO15693 nor ISO14443-A emulation is seen, so this is not specific to the 01.3 code;
+most likely the Flipper is no longer on the PM3 antenna after the USB replug (or something else
+is between them). Needs a human to put the Flipper back on the PM3 HF antenna (back side, NFC coil centred),
+with exactly one tag in the field. Per the task rules the measurement was stopped here.
+
+7. Clean firmware from HEAD 5baa86315 (no probe, dirty=false) flashed at ~20:45 MSK: SLIX2 emulation started
+   (app_start status 0), PM3 `hf 15 reader` still sees nothing (final_coupling_reader.log).

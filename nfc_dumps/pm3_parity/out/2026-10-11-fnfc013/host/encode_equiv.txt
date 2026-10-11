@@ -1,0 +1,27 @@
+OK read_single (7B)             rate=0 bytes=7    indices=58
+OK inventory (12B)              rate=0 bytes=12   indices=98
+OK empty                        rate=0 bytes=0    indices=2
+OK 1B                           rate=0 bytes=1    indices=10
+OK rdm8 (35B)                   rate=0 bytes=35   indices=282
+OK rdm32 (131B)                 rate=0 bytes=131  indices=1050
+OK rdm64 (259B)                 rate=0 bytes=259  indices=2074
+OK rdm80 (323B)                 rate=0 bytes=323  indices=2586
+OK max (1027B)                  rate=0 bytes=1027 indices=8218
+OK all 0x00 (323B)              rate=0 bytes=323  indices=2586
+OK all 0xFF (323B)              rate=0 bytes=323  indices=2586
+OK all 0xA5 (323B)              rate=0 bytes=323  indices=2586
+OK every byte value (256B)      rate=0 bytes=256  indices=2050
+OK read_single (7B)             rate=1 bytes=7    indices=58
+OK inventory (12B)              rate=1 bytes=12   indices=98
+OK empty                        rate=1 bytes=0    indices=2
+OK 1B                           rate=1 bytes=1    indices=10
+OK rdm8 (35B)                   rate=1 bytes=35   indices=282
+OK rdm32 (131B)                 rate=1 bytes=131  indices=1050
+OK rdm64 (259B)                 rate=1 bytes=259  indices=2074
+OK rdm80 (323B)                 rate=1 bytes=323  indices=2586
+OK max (1027B)                  rate=1 bytes=1027 indices=8218
+OK all 0x00 (323B)              rate=1 bytes=323  indices=2586
+OK all 0xFF (323B)              rate=1 bytes=323  indices=2586
+OK all 0xA5 (323B)              rate=1 bytes=323  indices=2586
+OK every byte value (256B)      rate=1 bytes=256  indices=2050
+frames compared: 4026, mismatches: 0
