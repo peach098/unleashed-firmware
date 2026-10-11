@@ -36,6 +36,9 @@
 
 #define NFC_TEST_FLAG_WORKER_DONE (1)
 
+// nfc_iso15693_signal_test.c
+void nfc_iso15693_signal_encode_equivalence_test(void);
+
 typedef enum {
     NfcTestMfClassicSendFrameTestStateAuth,
     NfcTestMfClassicSendFrameTestStateReadBlock,
@@ -1229,6 +1232,10 @@ MU_TEST(mf_plus_crypto_data_iv_layout) {
     mu_assert(memcmp(iv, exp_write_full, 16) == 0, "write IV counter-word mismatch");
 }
 
+MU_TEST(iso15693_signal_encode_equivalence) {
+    nfc_iso15693_signal_encode_equivalence_test();
+}
+
 MU_TEST_SUITE(nfc) {
     nfc_test_alloc();
 
@@ -1282,6 +1289,8 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(slix_set_password_default_cap_correct_pass);
     MU_RUN_TEST(slix_set_password_default_cap_incorrect_pass);
     MU_RUN_TEST(slix_set_password_access_all_passwords_cap);
+
+    MU_RUN_TEST(iso15693_signal_encode_equivalence);
 
     MU_RUN_TEST(mf_plus_crypto_cmac_rfc4493);
     MU_RUN_TEST(mf_plus_crypto_data_iv_layout);
