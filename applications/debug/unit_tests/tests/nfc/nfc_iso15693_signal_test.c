@@ -124,9 +124,10 @@ void nfc_iso15693_signal_encode_equivalence_test(void) {
     nfc_iso15693_signal_test_reference_encode(reference, Iso15693SignalDataRateHi, data, 323);
     const uint32_t reference_cycles = DWT->CYCCNT - start;
     FURI_CRITICAL_EXIT();
-    FURI_LOG_I(
+    // printf, not FURI_LOG: the unit test CLI output does not include log lines
+    printf(
+        "%s: encode 323 B: %lu cycles (%lu us), per-bit reference %lu cycles (%lu us)\r\n",
         TAG,
-        "encode 323 B: %lu cycles (%lu us), per-bit reference %lu cycles (%lu us)",
         bulk_cycles,
         bulk_cycles / 64,
         reference_cycles,
