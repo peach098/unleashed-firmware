@@ -4,6 +4,8 @@
 #include <furi.h>
 #include <furi_hal_bus.h>
 
+#include <string.h>
+
 #include <stm32wbxx_ll_dma.h>
 #include <stm32wbxx_ll_tim.h>
 
@@ -34,6 +36,9 @@
 #define DIGITAL_SEQUENCE_RING_BUFFER_SIZE 128
 
 #define DIGITAL_SEQUENCE_RING_BUFFER_MIN_FREE_SIZE 2
+
+#define DIGITAL_SEQUENCE_BITS_IN_BYTE   (8U)
+#define DIGITAL_SEQUENCE_BITS_IN_NIBBLE (4U)
 
 /* Maximum amount of registered signals. */
 #define DIGITAL_SEQUENCE_BANK_SIZE 32
@@ -129,6 +134,52 @@ void digital_sequence_add_signal(DigitalSequence* sequence, uint8_t signal_index
     furi_check(sequence->size < sequence->max_size);
 
     sequence->data[sequence->size++] = signal_index;
+}
+
+void digital_sequence_bit_table_init(
+    DigitalSequenceBitTable* table,
+    uint8_t signal_index_zero,
+    uint8_t signal_index_one) {
+    furi_check(table);
+    furi_check(signal_index_zero < DIGITAL_SEQUENCE_BANK_SIZE);
+    furi_check(signal_index_one < DIGITAL_SEQUENCE_BANK_SIZE);
+
+    for(uint32_t nibble = 0; nibble < COUNT_OF(table->nibble); ++nibble) {
+        uint32_t packed = 0;
+        for(uint32_t bit = 0; bit < DIGITAL_SEQUENCE_BITS_IN_NIBBLE; ++bit) {
+            const uint32_t index = (nibble & (1U << bit)) ? signal_index_one : signal_index_zero;
+            packed |= index << (bit * DIGITAL_SEQUENCE_BITS_IN_BYTE);
+        }
+        table->nibble[nibble] = packed;
+    }
+}
+
+void digital_sequence_add_bytes(
+    DigitalSequence* sequence,
+    const DigitalSequenceBitTable* table,
+    const uint8_t* data,
+    size_t data_size) {
+    furi_check(sequence);
+    furi_check(table);
+    furi_check(data || data_size == 0);
+    furi_check(data_size <= (sequence->max_size - sequence->size) / DIGITAL_SEQUENCE_BITS_IN_BYTE);
+
+    /* The table holds the indices for 4 bits in one word: two (possibly unaligned) word
+     * stores per byte instead of eight checked digital_sequence_add_signal() calls.
+     * memcpy() with a constant size compiles to a single store, not a library call. */
+    uint8_t* dst = &sequence->data[sequence->size];
+    const uint32_t* nibble = table->nibble;
+
+    for(size_t i = 0; i < data_size; ++i) {
+        const uint32_t byte = data[i];
+        const uint32_t lo = nibble[byte & 0x0FU];
+        const uint32_t hi = nibble[byte >> DIGITAL_SEQUENCE_BITS_IN_NIBBLE];
+        memcpy(dst, &lo, sizeof(lo));
+        memcpy(dst + sizeof(lo), &hi, sizeof(hi));
+        dst += DIGITAL_SEQUENCE_BITS_IN_BYTE;
+    }
+
+    sequence->size += data_size * DIGITAL_SEQUENCE_BITS_IN_BYTE;
 }
 
 static inline void digital_sequence_start_dma(DigitalSequence* sequence) {

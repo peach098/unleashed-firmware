@@ -30,6 +30,7 @@
  */
 #pragma once
 
+#include <stddef.h>
 #include <furi_hal_gpio.h>
 
 #include <digital_signal/digital_signal.h>
@@ -83,6 +84,48 @@ void digital_sequence_register_signal(
  * @param[in] signal_index signal index to be appended to the sequence (must be less than 32).
  */
 void digital_sequence_add_signal(DigitalSequence* sequence, uint8_t signal_index);
+
+/**
+ * @brief Lookup table for digital_sequence_add_bytes().
+ *
+ * Maps every 4-bit value to the four signal indices of its bits, bit 0 first,
+ * packed into one little-endian word (the index of bit 0 is in the lowest byte).
+ * Must be filled with digital_sequence_bit_table_init().
+ */
+typedef struct {
+    uint32_t nibble[16];
+} DigitalSequenceBitTable;
+
+/**
+ * @brief Fill a DigitalSequenceBitTable for a bit-serial encoding with one signal per bit.
+ *
+ * Intended to be called once, outside of time-critical code.
+ *
+ * @param[out] table pointer to the table to be filled.
+ * @param[in] signal_index_zero signal index to transmit for a 0 bit (must be less than 32).
+ * @param[in] signal_index_one signal index to transmit for a 1 bit (must be less than 32).
+ */
+void digital_sequence_bit_table_init(
+    DigitalSequenceBitTable* table,
+    uint8_t signal_index_zero,
+    uint8_t signal_index_one);
+
+/**
+ * @brief Append one signal index per data bit to a DigitalSequence instance, bit 0 of each byte first.
+ *
+ * The result is identical to calling digital_sequence_add_signal() once per bit, but
+ * the capacity is checked once and four indices are written at a time.
+ *
+ * @param[in,out] sequence pointer to the instance to be modified.
+ * @param[in] table pointer to a table filled with digital_sequence_bit_table_init().
+ * @param[in] data pointer to the data to be appended.
+ * @param[in] data_size size of the data in bytes (appends 8 * data_size indices).
+ */
+void digital_sequence_add_bytes(
+    DigitalSequence* sequence,
+    const DigitalSequenceBitTable* table,
+    const uint8_t* data,
+    size_t data_size);
 
 /**
  * @brief Transmit the sequence contained in the DigitalSequence instance.

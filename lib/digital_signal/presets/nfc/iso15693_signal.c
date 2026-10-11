@@ -35,6 +35,8 @@ typedef DigitalSignal* Iso15693SignalBank[Iso15693SignalIndexNum];
 struct Iso15693Signal {
     DigitalSequence* tx_sequence;
     Iso15693SignalBank banks[Iso15693SignalDataRateNum];
+    // Signal indices of the data bits, filled once in alloc (64 bytes per data rate)
+    DigitalSequenceBitTable bit_tables[Iso15693SignalDataRateNum];
 };
 
 // Add an unmodulated signal for the length of Fc / 256 * k (where k = 1 or 4)
@@ -88,17 +90,6 @@ static inline uint32_t
     return index + data_rate * Iso15693SignalIndexNum;
 }
 
-static inline void
-    iso15693_add_byte(Iso15693Signal* instance, Iso15693SignalDataRate data_rate, uint8_t byte) {
-    for(size_t i = 0; i < BITS_IN_BYTE; i++) {
-        const uint8_t bit = byte & (1U << i);
-        digital_sequence_add_signal(
-            instance->tx_sequence,
-            iso15693_get_sequence_index(
-                bit ? Iso15693SignalIndexOne : Iso15693SignalIndexZero, data_rate));
-    }
-}
-
 static inline void iso15693_signal_encode_frame(
     Iso15693Signal* instance,
     Iso15693SignalDataRate data_rate,
@@ -107,9 +98,9 @@ static inline void iso15693_signal_encode_frame(
     digital_sequence_add_signal(
         instance->tx_sequence, iso15693_get_sequence_index(Iso15693SignalIndexSof, data_rate));
 
-    for(size_t i = 0; i < tx_data_size; i++) {
-        iso15693_add_byte(instance, data_rate, tx_data[i]);
-    }
+    // One data bit per signal, LSB first
+    digital_sequence_add_bytes(
+        instance->tx_sequence, &instance->bit_tables[data_rate], tx_data, tx_data_size);
 
     digital_sequence_add_signal(
         instance->tx_sequence, iso15693_get_sequence_index(Iso15693SignalIndexEof, data_rate));
@@ -148,6 +139,11 @@ static void
             iso15693_get_sequence_index(i, data_rate),
             instance->banks[data_rate][i]);
     }
+
+    digital_sequence_bit_table_init(
+        &instance->bit_tables[data_rate],
+        iso15693_get_sequence_index(Iso15693SignalIndexZero, data_rate),
+        iso15693_get_sequence_index(Iso15693SignalIndexOne, data_rate));
 }
 
 Iso15693Signal* iso15693_signal_alloc(const GpioPin* pin) {

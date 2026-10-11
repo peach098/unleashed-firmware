@@ -5,6 +5,8 @@
  * This file is an implementation detail. It must not be included in
  * any public API-related headers.
  */
+#pragma once
+
 #include <stdint.h>
 #include <stdbool.h>
 

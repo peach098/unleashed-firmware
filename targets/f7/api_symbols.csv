@@ -1069,8 +1069,10 @@ Function,+,dialog_message_set_icon,void,"DialogMessage*, const Icon*, uint8_t, u
 Function,+,dialog_message_set_text,void,"DialogMessage*, const char*, uint8_t, uint8_t, Align, Align"
 Function,+,dialog_message_show,DialogMessageButton,"DialogsApp*, const DialogMessage*"
 Function,+,dialog_message_show_storage_error,void,"DialogsApp*, const char*"
+Function,-,digital_sequence_add_bytes,void,"DigitalSequence*, const DigitalSequenceBitTable*, const uint8_t*, size_t"
 Function,+,digital_sequence_add_signal,void,"DigitalSequence*, uint8_t"
 Function,-,digital_sequence_alloc,DigitalSequence*,"uint32_t, const GpioPin*"
+Function,-,digital_sequence_bit_table_init,void,"DigitalSequenceBitTable*, uint8_t, uint8_t"
 Function,-,digital_sequence_clear,void,DigitalSequence*
 Function,-,digital_sequence_free,void,DigitalSequence*
 Function,+,digital_sequence_register_signal,void,"DigitalSequence*, uint8_t, const DigitalSignal*"
