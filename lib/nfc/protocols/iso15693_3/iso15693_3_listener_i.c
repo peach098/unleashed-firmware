@@ -287,12 +287,16 @@ static Iso15693_3Error iso15693_3_listener_read_multi_blocks_handler(
             break;
         }
 
-        for(uint32_t i = block_index_start; i <= block_index_end; ++i) {
-            if(include_block_security) {
+        if(include_block_security) {
+            for(uint32_t i = block_index_start; i <= block_index_end; ++i) {
                 iso15693_3_append_block_security(
                     instance->data, i, instance->tx_buffer); // Block security (optional)
+                iso15693_3_append_block(instance->data, i, instance->tx_buffer); // Block data
             }
-            iso15693_3_append_block(instance->data, i, instance->tx_buffer); // Block data
+        } else {
+            // Without block security the response is the block data as stored, copy it at once
+            iso15693_3_append_blocks(
+                instance->data, block_index_start, block_count, instance->tx_buffer);
         }
     } while(false);
 

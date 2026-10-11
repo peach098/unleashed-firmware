@@ -483,6 +483,13 @@ static Iso15693_3Error slix_listener_iso15693_3_read_multi_block_extension_handl
     const uint32_t block_index_start = va_arg(args, uint32_t);
     const uint32_t block_index_end = va_arg(args, uint32_t);
 
+    // No block is read protected unless a read protection condition is set: skip the
+    // per-block check, its cost grows with the response length (up to 80 blocks)
+    const uint8_t read_conditions = SLIX_PP_CONDITION_RL | SLIX_PP_CONDITION_RH;
+    if((instance->data->system_info.protection.condition & read_conditions) == 0) {
+        return error;
+    }
+
     for(uint32_t i = block_index_start; i <= block_index_end; ++i) {
         // SLIX Counter has no read protection
         if(i == SLIX_COUNTER_BLOCK_NUM) continue;
