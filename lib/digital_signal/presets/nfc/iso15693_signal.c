@@ -99,7 +99,7 @@ static inline void
     }
 }
 
-static inline void iso15693_signal_encode(
+static inline void iso15693_signal_encode_frame(
     Iso15693Signal* instance,
     Iso15693SignalDataRate data_rate,
     const uint8_t* tx_data,
@@ -177,7 +177,7 @@ void iso15693_signal_free(Iso15693Signal* instance) {
     free(instance);
 }
 
-void iso15693_signal_tx(
+void iso15693_signal_encode(
     Iso15693Signal* instance,
     Iso15693SignalDataRate data_rate,
     const uint8_t* tx_data,
@@ -186,12 +186,25 @@ void iso15693_signal_tx(
     furi_assert(data_rate < Iso15693SignalDataRateNum);
     furi_assert(tx_data);
 
-    FURI_CRITICAL_ENTER();
     digital_sequence_clear(instance->tx_sequence);
-    iso15693_signal_encode(instance, data_rate, tx_data, tx_data_size);
-    digital_sequence_transmit(instance->tx_sequence);
+    iso15693_signal_encode_frame(instance, data_rate, tx_data, tx_data_size);
+}
 
+void iso15693_signal_transmit(Iso15693Signal* instance) {
+    furi_assert(instance);
+
+    FURI_CRITICAL_ENTER();
+    digital_sequence_transmit(instance->tx_sequence);
     FURI_CRITICAL_EXIT();
+}
+
+void iso15693_signal_tx(
+    Iso15693Signal* instance,
+    Iso15693SignalDataRate data_rate,
+    const uint8_t* tx_data,
+    size_t tx_data_size) {
+    iso15693_signal_encode(instance, data_rate, tx_data, tx_data_size);
+    iso15693_signal_transmit(instance);
 }
 
 void iso15693_signal_tx_sof(Iso15693Signal* instance, Iso15693SignalDataRate data_rate) {

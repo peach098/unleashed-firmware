@@ -560,6 +560,19 @@ FuriHalNfcError furi_hal_nfc_listener_tx(const uint8_t* tx_data, size_t tx_bits)
     return furi_hal_nfc_tech[furi_hal_nfc.tech]->listener.tx(handle, tx_data, tx_bits);
 }
 
+FuriHalNfcError furi_hal_nfc_listener_tx_prepare(const uint8_t* tx_data, size_t tx_bits) {
+    furi_check(tx_data);
+
+    furi_check(furi_hal_nfc.mode == FuriHalNfcModeListener);
+    furi_check(furi_hal_nfc.tech < FuriHalNfcTechNum);
+
+    const FuriHalNfcTx tx_prepare = furi_hal_nfc_tech[furi_hal_nfc.tech]->listener.tx_prepare;
+    if(tx_prepare == NULL) return FuriHalNfcErrorNone;
+
+    const FuriHalSpiBusHandle* handle = &furi_hal_spi_bus_handle_nfc;
+    return tx_prepare(handle, tx_data, tx_bits);
+}
+
 FuriHalNfcError furi_hal_nfc_common_fifo_rx(
     const FuriHalSpiBusHandle* handle,
     uint8_t* rx_data,

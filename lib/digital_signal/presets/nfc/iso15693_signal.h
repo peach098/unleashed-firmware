@@ -41,8 +41,42 @@ Iso15693Signal* iso15693_signal_alloc(const GpioPin* pin);
 void iso15693_signal_free(Iso15693Signal* instance);
 
 /**
- * @brief Transmit arbitrary bytes using an Iso15693Signal instance.
+ * @brief Encode arbitrary bytes into an Iso15693Signal instance without transmitting.
  * @see Iso15693SignalDataRate
+ *
+ * Replaces any previously encoded frame. The encoded frame (SOF + data + EOF)
+ * is kept in the instance until the next call to iso15693_signal_encode(),
+ * iso15693_signal_tx() or iso15693_signal_tx_sof().
+ *
+ * Use together with iso15693_signal_transmit() to move the (length-dependent)
+ * encoding work out of the timing-critical path.
+ *
+ * @param[in,out] instance pointer to the instance to encode into.
+ * @param[in] data_rate data rate to transmit at.
+ * @param[in] tx_data pointer to the data to be encoded.
+ * @param[in] tx_data_size size of the data to be encoded in bytes.
+ */
+void iso15693_signal_encode(
+    Iso15693Signal* instance,
+    Iso15693SignalDataRate data_rate,
+    const uint8_t* tx_data,
+    size_t tx_data_size);
+
+/**
+ * @brief Transmit the frame previously encoded with iso15693_signal_encode().
+ *
+ * This function will block until the transmisson has been completed.
+ * A frame must have been encoded beforehand.
+ *
+ * @param[in,out] instance pointer to the instance used in transmission.
+ */
+void iso15693_signal_transmit(Iso15693Signal* instance);
+
+/**
+ * @brief Encode and transmit arbitrary bytes using an Iso15693Signal instance.
+ * @see Iso15693SignalDataRate
+ *
+ * Equivalent to iso15693_signal_encode() followed by iso15693_signal_transmit().
  *
  * This function will block until the transmisson has been completed.
  *

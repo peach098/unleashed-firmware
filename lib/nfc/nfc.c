@@ -344,15 +344,27 @@ NfcError nfc_listener_tx(Nfc* instance, const BitBuffer* tx_buffer) {
 
     NfcError ret = NfcErrorNone;
 
-    while(furi_hal_nfc_timer_block_tx_is_running()) {
-    }
+    const uint8_t* tx_data = bit_buffer_get_data(tx_buffer);
+    const size_t tx_bits = bit_buffer_get_size(tx_buffer);
 
-    FuriHalNfcError error =
-        furi_hal_nfc_listener_tx(bit_buffer_get_data(tx_buffer), bit_buffer_get_size(tx_buffer));
-    if(error != FuriHalNfcErrorNone) {
-        FURI_LOG_D(TAG, "Failed in listener TX");
-        ret = nfc_process_hal_error(error);
-    }
+    do {
+        // Do the length-dependent frame preparation while the FDT timer is still running
+        FuriHalNfcError error = furi_hal_nfc_listener_tx_prepare(tx_data, tx_bits);
+        if(error != FuriHalNfcErrorNone) {
+            FURI_LOG_D(TAG, "Failed in listener TX prepare");
+            ret = nfc_process_hal_error(error);
+            break;
+        }
+
+        while(furi_hal_nfc_timer_block_tx_is_running()) {
+        }
+
+        error = furi_hal_nfc_listener_tx(tx_data, tx_bits);
+        if(error != FuriHalNfcErrorNone) {
+            FURI_LOG_D(TAG, "Failed in listener TX");
+            ret = nfc_process_hal_error(error);
+        }
+    } while(false);
 
     return ret;
 }

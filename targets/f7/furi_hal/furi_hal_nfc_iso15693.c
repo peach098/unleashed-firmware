@@ -31,6 +31,10 @@
 typedef struct {
     Iso15693Signal* signal;
     Iso15693Parser* parser;
+    // Frame pre-encoded by tx_prepare(), consumed by the next tx() if the arguments match
+    bool tx_prepared;
+    const uint8_t* tx_prepared_data;
+    size_t tx_prepared_bits;
 } FuriHalNfcIso15693Listener;
 
 typedef struct {
@@ -48,6 +52,9 @@ static FuriHalNfcIso15693Listener* furi_hal_nfc_iso15693_listener_alloc(void) {
     FuriHalNfcIso15693Listener* instance = malloc(sizeof(FuriHalNfcIso15693Listener));
 
     instance->signal = iso15693_signal_alloc(&gpio_spi_r_mosi);
+    instance->tx_prepared = false;
+    instance->tx_prepared_data = NULL;
+    instance->tx_prepared_bits = 0;
     instance->parser =
         iso15693_parser_alloc(&gpio_nfc_irq_rfid_pull, FURI_HAL_NFC_ISO15693_MAX_FRAME_SIZE);
 
@@ -342,14 +349,6 @@ static FuriHalNfcError furi_hal_nfc_iso15693_listener_deinit(const FuriHalSpiBus
     return FuriHalNfcErrorNone;
 }
 
-static FuriHalNfcError
-    furi_hal_nfc_iso15693_listener_tx_transparent(const uint8_t* data, size_t data_size) {
-    iso15693_signal_tx(
-        furi_hal_nfc_iso15693_listener->signal, Iso15693SignalDataRateHi, data, data_size);
-
-    return FuriHalNfcErrorNone;
-}
-
 static void furi_hal_nfc_iso15693_parser_callback(Iso15693ParserEvent event, void* context) {
     furi_check(context);
 
@@ -389,6 +388,25 @@ static FuriHalNfcEvent furi_hal_nfc_iso15693_wait_event(uint32_t timeout_ms) {
     return event;
 }
 
+static FuriHalNfcError furi_hal_nfc_iso15693_listener_tx_prepare(
+    const FuriHalSpiBusHandle* handle,
+    const uint8_t* tx_data,
+    size_t tx_bits) {
+    UNUSED(handle);
+    furi_check(furi_hal_nfc_iso15693_listener);
+
+    FuriHalNfcIso15693Listener* instance = furi_hal_nfc_iso15693_listener;
+
+    iso15693_signal_encode(
+        instance->signal, Iso15693SignalDataRateHi, tx_data, tx_bits / BITS_IN_BYTE);
+
+    instance->tx_prepared = true;
+    instance->tx_prepared_data = tx_data;
+    instance->tx_prepared_bits = tx_bits;
+
+    return FuriHalNfcErrorNone;
+}
+
 static FuriHalNfcError furi_hal_nfc_iso15693_listener_tx(
     const FuriHalSpiBusHandle* handle,
     const uint8_t* tx_data,
@@ -396,14 +414,30 @@ static FuriHalNfcError furi_hal_nfc_iso15693_listener_tx(
     UNUSED(handle);
     furi_check(furi_hal_nfc_iso15693_listener);
 
-    FuriHalNfcError error = FuriHalNfcErrorNone;
+    FuriHalNfcIso15693Listener* instance = furi_hal_nfc_iso15693_listener;
 
-    error = furi_hal_nfc_iso15693_listener_tx_transparent(tx_data, tx_bits / BITS_IN_BYTE);
+    // The pre-encoded frame is only used if it was prepared from the very same buffer
+    // and size, i.e. by the tx_prepare() call immediately preceding this one (see nfc_listener_tx()).
+    // Any other call path falls back to encoding here.
+    const bool use_prepared = instance->tx_prepared && (instance->tx_prepared_data == tx_data) &&
+                              (instance->tx_prepared_bits == tx_bits);
+    instance->tx_prepared = false;
 
-    return error;
+    if(!use_prepared) {
+        iso15693_signal_encode(
+            instance->signal, Iso15693SignalDataRateHi, tx_data, tx_bits / BITS_IN_BYTE);
+    }
+
+    iso15693_signal_transmit(instance->signal);
+
+    return FuriHalNfcErrorNone;
 }
 
 FuriHalNfcError furi_hal_nfc_iso15693_listener_tx_sof(void) {
+    furi_check(furi_hal_nfc_iso15693_listener);
+
+    // Transmitting SOF overwrites the encoded frame
+    furi_hal_nfc_iso15693_listener->tx_prepared = false;
     iso15693_signal_tx_sof(furi_hal_nfc_iso15693_listener->signal, Iso15693SignalDataRateHi);
 
     return FuriHalNfcErrorNone;
@@ -477,6 +511,7 @@ const FuriHalNfcTechBase furi_hal_nfc_iso15693 = {
             .deinit = furi_hal_nfc_iso15693_listener_deinit,
             .wait_event = furi_hal_nfc_iso15693_wait_event,
             .tx = furi_hal_nfc_iso15693_listener_tx,
+            .tx_prepare = furi_hal_nfc_iso15693_listener_tx_prepare,
             .rx = furi_hal_nfc_iso15693_listener_rx,
             .sleep = furi_hal_nfc_iso15693_listener_sleep,
             .idle = furi_hal_nfc_iso15693_listener_sleep,
