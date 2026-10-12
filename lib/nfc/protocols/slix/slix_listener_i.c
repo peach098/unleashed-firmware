@@ -602,7 +602,8 @@ SlixError slix_listener_process_request(SlixListener* instance, const BitBuffer*
             break;
         }
 
-        bit_buffer_reset(instance->tx_buffer);
+        // Size-only reset, as in the ISO15693-3 listener: replies are built with append only
+        bit_buffer_set_size(instance->tx_buffer, 0);
         bit_buffer_append_byte(instance->tx_buffer, ISO15693_3_RESP_FLAG_NONE);
 
         const uint8_t* request_data = &request->data[uid_field_size];
@@ -617,7 +618,7 @@ SlixError slix_listener_process_request(SlixListener* instance, const BitBuffer*
             break;
 
         if(error != SlixErrorNone) {
-            bit_buffer_reset(instance->tx_buffer);
+            bit_buffer_set_size(instance->tx_buffer, 0);
             bit_buffer_append_byte(instance->tx_buffer, ISO15693_3_RESP_FLAG_ERROR);
             bit_buffer_append_byte(instance->tx_buffer, ISO15693_3_RESP_ERROR_UNKNOWN);
         }
