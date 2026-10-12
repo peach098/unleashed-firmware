@@ -86,9 +86,23 @@ typedef struct {
     bool ppl;
 } SlixLockBits;
 
+/**
+ * @brief EAS (Electronic Article Surveillance) state of a SLIX tag.
+ *
+ * Not reported by GET NXP SYSTEM INFORMATION; stored in the .nfc file
+ * (optional keys, see slix_load()/slix_save()) and served by the listener.
+ */
+typedef struct {
+    bool enabled; /**< EAS mode is set (SET EAS / RESET EAS). */
+    bool eas_password_protected; /**< EAS commands require the EAS/AFI password. */
+    bool afi_password_protected; /**< WRITE/LOCK AFI require the EAS/AFI password. */
+    uint16_t id; /**< EAS ID, on air LSB first (WRITE EAS ID). */
+} SlixEas;
+
 typedef struct {
     SlixProtection protection;
     SlixLockBits lock_bits;
+    SlixEas eas;
 } SlixSystemInfo;
 
 typedef enum {
@@ -147,6 +161,14 @@ bool slix_is_block_protected(
     uint8_t block_num);
 
 bool slix_is_counter_increment_protected(const SlixData* data);
+
+bool slix_is_eas_enabled(const SlixData* data);
+
+uint16_t slix_get_eas_id(const SlixData* data);
+
+bool slix_is_eas_password_protected(const SlixData* data);
+
+bool slix_is_afi_password_protected(const SlixData* data);
 
 // Static methods
 bool slix_type_has_features(SlixType slix_type, SlixTypeFeatures features);

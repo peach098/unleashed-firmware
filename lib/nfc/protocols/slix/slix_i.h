@@ -83,6 +83,12 @@ void slix_set_privacy_mode(SlixData* data, bool set);
 
 void slix_increment_counter(SlixData* data);
 
+void slix_set_eas(SlixData* data, bool enabled);
+
+void slix_set_eas_id(SlixData* data, uint16_t eas_id);
+
+void slix_set_eas_afi_protection(SlixData* data, bool eas_protected, bool afi_protected);
+
 #ifdef __cplusplus
 }
 #endif

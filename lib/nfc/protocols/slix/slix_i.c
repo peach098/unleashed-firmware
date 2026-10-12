@@ -139,6 +139,25 @@ void slix_set_privacy_mode(SlixData* data, bool set) {
     data->privacy = set;
 }
 
+void slix_set_eas(SlixData* data, bool enabled) {
+    furi_assert(data);
+
+    data->system_info.eas.enabled = enabled;
+}
+
+void slix_set_eas_id(SlixData* data, uint16_t eas_id) {
+    furi_assert(data);
+
+    data->system_info.eas.id = eas_id;
+}
+
+void slix_set_eas_afi_protection(SlixData* data, bool eas_protected, bool afi_protected) {
+    furi_assert(data);
+
+    data->system_info.eas.eas_password_protected = eas_protected;
+    data->system_info.eas.afi_password_protected = afi_protected;
+}
+
 void slix_increment_counter(SlixData* data) {
     furi_assert(data);
 

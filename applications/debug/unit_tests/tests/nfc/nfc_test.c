@@ -1,6 +1,7 @@
 #include <furi.h>
 #include <furi_hal.h>
 #include <storage/storage.h>
+#include <flipper_format/flipper_format.h>
 
 #include <nfc/nfc_device.h>
 #include <nfc/helpers/nfc_data_generator.h>
@@ -1327,6 +1328,122 @@ MU_TEST(iso13239_crc_table_test) {
     bit_buffer_free(buf);
 }
 
+#define SLIX2_EAS_ON_FIXTURE EXT_PATH("unit_tests/nfc/slix2/SLIX2_eas_on.nfc")
+#define SLIX2_NO_EAS_FIXTURE EXT_PATH("unit_tests/nfc/slix2/SLIX2_2026-02-27_16,08,34.nfc")
+#define SLIX2_EAS_TMP        EXT_PATH("unit_tests/nfc/slix2_eas_tmp.nfc")
+
+// FNFC-01.4: a dump with the EAS keys loads them; EAS ID "12 34" is on-air order (LSB
+// first), i.e. the 16-bit value 0x3412, and is written back byte-for-byte.
+MU_TEST(slix2_eas_fixture_roundtrip_test) {
+    NfcDevice* dev = nfc_device_alloc();
+    mu_assert(nfc_device_load(dev, SLIX2_EAS_ON_FIXTURE), "load EAS fixture failed\r\n");
+    mu_assert(nfc_device_get_protocol(dev) == NfcProtocolSlix, "EAS fixture is not SLIX\r\n");
+
+    const SlixData* slix = nfc_device_get_data(dev, NfcProtocolSlix);
+    mu_assert(slix_is_eas_enabled(slix), "EAS Mode must be true\r\n");
+    mu_assert(slix_get_eas_id(slix) == 0x3412, "EAS ID must be 0x3412 (12 34 LSB first)\r\n");
+    mu_assert(slix_is_eas_password_protected(slix), "EAS must be password protected\r\n");
+    mu_assert(!slix_is_afi_password_protected(slix), "AFI must not be password protected\r\n");
+
+    mu_assert(nfc_device_save(dev, SLIX2_EAS_TMP), "save EAS fixture failed\r\n");
+
+    NfcDevice* reloaded = nfc_device_alloc();
+    mu_assert(nfc_device_load(reloaded, SLIX2_EAS_TMP), "reload EAS fixture failed\r\n");
+    mu_assert(nfc_device_is_equal(dev, reloaded), "EAS fixture round-trip not equal\r\n");
+    nfc_device_free(reloaded);
+
+    Storage* storage = furi_record_open(RECORD_STORAGE);
+    FlipperFormat* ff = flipper_format_file_alloc(storage);
+    mu_assert(flipper_format_file_open_existing(ff, SLIX2_EAS_TMP), "open saved file failed\r\n");
+    uint8_t eas_id[2] = {};
+    mu_assert(flipper_format_read_hex(ff, "EAS ID", eas_id, 2), "EAS ID key missing\r\n");
+    mu_assert(eas_id[0] == 0x12 && eas_id[1] == 0x34, "EAS ID not saved as 12 34\r\n");
+    flipper_format_free(ff);
+    storage_simply_remove(storage, SLIX2_EAS_TMP);
+    furi_record_close(RECORD_STORAGE);
+
+    nfc_device_free(dev);
+}
+
+// FNFC-01.4: an old dump without the EAS keys loads with defaults (EAS off, ID 00 00, no
+// protections) and the saved file then carries all four keys with the default values.
+MU_TEST(slix2_eas_defaults_test) {
+    NfcDevice* dev = nfc_device_alloc();
+    mu_assert(nfc_device_load(dev, SLIX2_NO_EAS_FIXTURE), "load dump without EAS keys failed\r\n");
+
+    const SlixData* slix = nfc_device_get_data(dev, NfcProtocolSlix);
+    mu_assert(!slix_is_eas_enabled(slix), "default EAS Mode must be false\r\n");
+    mu_assert(slix_get_eas_id(slix) == 0x0000, "default EAS ID must be 0000\r\n");
+    mu_assert(!slix_is_eas_password_protected(slix), "default EAS protection must be off\r\n");
+    mu_assert(!slix_is_afi_password_protected(slix), "default AFI protection must be off\r\n");
+
+    mu_assert(nfc_device_save(dev, SLIX2_EAS_TMP), "save dump failed\r\n");
+    nfc_device_free(dev);
+
+    Storage* storage = furi_record_open(RECORD_STORAGE);
+    FlipperFormat* ff = flipper_format_file_alloc(storage);
+    mu_assert(flipper_format_file_open_existing(ff, SLIX2_EAS_TMP), "open saved file failed\r\n");
+
+    bool value = true;
+    mu_assert(flipper_format_read_bool(ff, "EAS Mode", &value, 1), "EAS Mode not saved\r\n");
+    mu_assert(!value, "saved EAS Mode must be false\r\n");
+    uint8_t eas_id[2] = {0xFF, 0xFF};
+    mu_assert(flipper_format_read_hex(ff, "EAS ID", eas_id, 2), "EAS ID not saved\r\n");
+    mu_assert(eas_id[0] == 0x00 && eas_id[1] == 0x00, "saved EAS ID must be 00 00\r\n");
+    value = true;
+    mu_assert(
+        flipper_format_read_bool(ff, "EAS Password Protected", &value, 1),
+        "EAS Password Protected not saved\r\n");
+    mu_assert(!value, "saved EAS Password Protected must be false\r\n");
+    value = true;
+    mu_assert(
+        flipper_format_read_bool(ff, "AFI Password Protected", &value, 1),
+        "AFI Password Protected not saved\r\n");
+    mu_assert(!value, "saved AFI Password Protected must be false\r\n");
+
+    flipper_format_free(ff);
+    storage_simply_remove(storage, SLIX2_EAS_TMP);
+    furi_record_close(RECORD_STORAGE);
+}
+
+// FNFC-01.4: copy / is_equal / reset cover every EAS field (setters for the listener).
+MU_TEST(slix2_eas_copy_equal_reset_test) {
+    NfcDevice* dev = nfc_device_alloc();
+    mu_assert(nfc_device_load(dev, SLIX2_EAS_ON_FIXTURE), "load EAS fixture failed\r\n");
+    const SlixData* src = nfc_device_get_data(dev, NfcProtocolSlix);
+
+    SlixData* copy = slix_alloc();
+    slix_reset(copy);
+    slix_copy(copy, src);
+    mu_assert(slix_is_equal(copy, src), "copy must be equal\r\n");
+    mu_assert(slix_get_eas_id(copy) == 0x3412, "copy lost EAS ID\r\n");
+
+    slix_set_eas(copy, false);
+    mu_assert(!slix_is_equal(copy, src), "EAS Mode not compared\r\n");
+    slix_set_eas(copy, true);
+    mu_assert(slix_is_equal(copy, src), "restore EAS Mode\r\n");
+
+    slix_set_eas_id(copy, 0x3413);
+    mu_assert(!slix_is_equal(copy, src), "EAS ID not compared\r\n");
+    slix_set_eas_id(copy, 0x3412);
+
+    slix_set_eas_afi_protection(copy, false, false);
+    mu_assert(!slix_is_equal(copy, src), "EAS protection not compared\r\n");
+    slix_set_eas_afi_protection(copy, true, true);
+    mu_assert(!slix_is_equal(copy, src), "AFI protection not compared\r\n");
+    slix_set_eas_afi_protection(copy, true, false);
+    mu_assert(slix_is_equal(copy, src), "restore protections\r\n");
+
+    slix_reset(copy);
+    mu_assert(!slix_is_eas_enabled(copy), "reset must clear EAS Mode\r\n");
+    mu_assert(slix_get_eas_id(copy) == 0, "reset must clear EAS ID\r\n");
+    mu_assert(!slix_is_eas_password_protected(copy), "reset must clear EAS protection\r\n");
+    mu_assert(!slix_is_afi_password_protected(copy), "reset must clear AFI protection\r\n");
+
+    slix_free(copy);
+    nfc_device_free(dev);
+}
+
 // AES-CMAC known-answer vectors from RFC 4493 (Appendix D.1), NIST AES-128 key. Exercises
 // the empty / single-complete-block / partial-final / multi-block paths of the CMAC plus the
 // cmac8 odd-index truncation used by MIFARE Plus SL3.
@@ -1594,6 +1711,9 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(slix_set_password_default_cap_correct_pass);
     MU_RUN_TEST(slix_set_password_default_cap_incorrect_pass);
     MU_RUN_TEST(slix_set_password_access_all_passwords_cap);
+    MU_RUN_TEST(slix2_eas_fixture_roundtrip_test);
+    MU_RUN_TEST(slix2_eas_defaults_test);
+    MU_RUN_TEST(slix2_eas_copy_equal_reset_test);
 
     MU_RUN_TEST(iso15693_signal_encode_equivalence);
     MU_RUN_TEST(iso15693_signal_tick_exact);
