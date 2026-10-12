@@ -1,0 +1,37 @@
+pf16 pf16_rd1_1.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rd1_2.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rd1_3.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rd1_4.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rd1_5.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm8_1.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+pf16 pf16_rdm8_2.trace: len=35 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm8_3.trace: len=35 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm8_4.trace: len=35 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm8_5.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+pf16 pf16_rdm32_1.trace: len=131 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm32_2.trace: len=131 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm32_3.trace: len=131 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm32_4.trace: len=131 crc=True data=EQUAL sof_delay_us=316.2
+pf16 pf16_rdm32_5.trace: len=131 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm64_1.trace: silence
+pf16 pf16_rdm64_2.trace: silence
+pf16 pf16_rdm64_3.trace: len=259 crc=True data=EQUAL sof_delay_us=320.9
+pf16 pf16_rdm64_4.trace: len=259 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm64_5.trace: len=259 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm80_1.trace: silence
+pf16 pf16_rdm80_2.trace: silence
+pf16 pf16_rdm80_3.trace: len=323 crc=True data=EQUAL sof_delay_us=311.5
+pf16 pf16_rdm80_4.trace: silence
+pf16 pf16_rdm80_5.trace: len=323 crc=True data=EQUAL sof_delay_us=311.5
+
+### pf16
+
+| blocks | decoded | median us | min us | max us | median - 316 us |
+|---|---|---|---|---|---|
+| 1 | 5/5 | 311.5 | 311.5 | 311.5 | -4.5 |
+| 8 | 5/5 | 311.5 | 311.5 | 320.9 | -4.5 |
+| 32 | 5/5 | 311.5 | 311.5 | 316.2 | -4.5 |
+| 64 | 3/5 | 311.5 | 311.5 | 320.9 | -4.5 |
+| 80 | 2/5 | 311.5 | 311.5 | 311.5 | -4.5 |
+
+all lengths: min 311.5 us, max 320.9 us; 80/1 = 1.000
