@@ -24,20 +24,22 @@
 #define FURI_HAL_NFC_ISO15693_POLLER_FWT_COMP_FC   (-1300)
 // Listener FDT (t1): the reply SOF must start 4320/fc after the request EOF (window 4192..4384/fc).
 // nfc.c starts the block TX timer on RxEnd for (ISO15693_3_FDT_LISTEN_FC - COMP), so
-//   EOF->SOF = t_rx + (4320 - COMP) / fc + t_tx  =>  COMP = 4320 - (t1 - t_rx - t_tx) * fc
-// Terms, DWT medians from FNFC-01.10 (old FDT, 1..80 blocks):
-//   t_rx = request EOF -> RxEnd in the worker (signal reader EOF + thread wake-up): 65..71 us, ~68 us
-//   t_tx = timer expiry -> first DMA transfer: furi_hal_nfc_listener_tx call 4.2 us + prefill 30.3 us
-//   t1   = target EOF->DMA 318 us: the real SLIX2 card's SOF delay on the Proxmark3 is 316 us, and
-//          the PM3 sees the Flipper's SOF ~2 us before EOF->DMA
-// => COMP = 4320 - (318 - 68 - 34.5) us * 13.56 MHz = 1398 ~ 1400 fc (timer ~215 us after RxEnd).
-// The resulting SOF delay with 1400 is a prediction, not yet measured (FNFC-01.11 report).
+//   EOF->DMA = t_rx + (4320 - COMP) / fc + t_timer + t_tx
+//   =>  COMP = 4320 - (t1 - t_rx - t_timer - t_tx) * fc
+// Terms measured with DWT on the device (FNFC-01.11, release build, medians over 1..80 blocks):
+//   t_rx    = request EOF -> RxEnd in the worker (signal reader EOF + thread wake-up): 65..69, 68 us
+//   t_timer = timer overrun: it ends 6.7 us after the requested time, seen from RxEnd
+//   t_tx    = timer expiry -> first DMA transfer: furi_hal_nfc_listener_tx call 4.2 us
+//             + DMA prefill (16 entries) 20.9 us = 25.1 us
+//   t1      = EOF->DMA 319 us: the real SLIX2 card's SOF delay on the Proxmark3 is 316 us, and
+//             the PM3 reports the Flipper's SOF 0..4.7 us (one sample) before EOF->DMA
+// => COMP = 4320 - (319 - 68 - 6.7 - 25.1) us * 13.56 MHz = 1347 ~ 1345 fc.
 // The reply has to be encoded (tx_prepare) before the timer expires: an 80-block reply is ready
-// ~200 us after RxEnd (release build), so the margin is ~13 us. DEBUG=1 builds are slower and may
-// miss the timer for long replies, which then start late (after t1), not early.
+// ~208 us after RxEnd, the timer expires ~226 us after RxEnd. DEBUG=1 builds are slower and are
+// expected to miss the timer for long replies, which then start late (after t1), not early.
 // The former 2850 expired ~108 us after RxEnd, before any reply was ready, so the SOF delay
-// followed the handler and encoding time (370..541 us for 1..80 blocks).
-#define FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_FC (1400)
+// followed the handler and encoding time (370..539 us for 1..80 blocks).
+#define FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_FC (1345)
 
 #define BITS_IN_BYTE (8U)
 
