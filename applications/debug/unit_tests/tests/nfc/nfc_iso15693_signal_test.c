@@ -151,8 +151,7 @@ void nfc_iso15693_signal_encode_equivalence_test(void) {
 // FNFC-01.10: the periods of every ISO15693 signal must add up exactly to the requested durations.
 // One 64 MHz timer tick is 3125 units of 5 ps (DIGITAL_SIGNAL_T_TIM), the public API takes 10 ps,
 // so for each signal: sum(period ticks) * T_TIM + remainder == 2 * requested, |remainder| <= T_TIM / 2.
-// (The joints between signals are handled in digital_sequence_transmit(), see the host test
-// nfc_dumps/pm3_parity/out/2026-10-11-fnfc0110/host.)
+// (The joints between signals are handled in digital_sequence_transmit() and are not covered here.)
 void nfc_iso15693_signal_tick_exact_test(void) {
     Iso15693Signal* signal = iso15693_signal_alloc(&gpio_ext_pa7);
     const char* failure = NULL;
