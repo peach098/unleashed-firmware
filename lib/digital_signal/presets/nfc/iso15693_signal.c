@@ -21,8 +21,10 @@
 // (~44 CPU cycles per entry, so ~65 us less delay before SOF). Every frame starts with SOF
 // subcarrier periods of fc/16 (~75 CPU cycles each), and the CPU refills the ring at
 // ~55-60 cycles per entry, so the ring keeps growing after the DMA starts. 32 entries keep
-// it from running empty even if refilling were ~90 cycles per entry.
-#define ISO15693_SIGNAL_PREFILL_SIZE (32U)
+// it from running empty even if refilling were ~90 cycles per entry. 16 entries (FNFC-01.11):
+// the ring still only grows after the start, and the ~11 us saved go to the listener FDT margin
+// (an 80-block reply must be encoded before the t1 timer expires).
+#define ISO15693_SIGNAL_PREFILL_SIZE (16U)
 
 #define ISO15693_SIGNAL_FC     (13.56e6)
 #define ISO15693_SIGNAL_FC_16  (16.0e11 / ISO15693_SIGNAL_FC)
