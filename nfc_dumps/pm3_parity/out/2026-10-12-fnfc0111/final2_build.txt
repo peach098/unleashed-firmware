@@ -1,0 +1,1 @@
+b9673b213 furi_hal: nfc: iso15693 listener FDT compensation 1345 -> 1385 fc (release build)

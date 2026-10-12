@@ -1,0 +1,14 @@
+== env0110 (727b29c11dd8f7a254ba97f723d70e5afe4d89ed) probes: none defines:
+device runs 727b29c1 (dirty: false)
+coupling OK
+env0110_s80_1: (323) 00 00 00 00 00 00
+env0110_s80_2: (323) 00 00 00 00 00 00
+env0110_s80_3: command failed
+env0110_s80_4: (323) 00 00 00 00 00 00
+env0110_s80_5: (323) 00 00 00 00 00 00
+env0110_s80_6: (323) 00 00 00 00 00 00
+env0110_s80_7: (323) 00 00 00 00 00 00
+env0110_s80_8: (323) 00 00 00 00 00 00
+env0110_s80_9: (323) 00 00 00 00 00 00
+env0110_s80_10: command failed
+series env0110 done
