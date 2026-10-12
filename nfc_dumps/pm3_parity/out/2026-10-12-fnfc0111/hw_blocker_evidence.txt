@@ -1,0 +1,20 @@
+FNFC-01.11 hardware blocker, 2026-10-12 (MSK)
+
+10:39  measure.sh before=727b29c11:v3 (step 0, probe v3 on the 01.10 firmware) built fine;
+       flash_usb_full reached scripts/selfupdate.py and hung at its first RPC exchange:
+         2026-10-12 10:41:30,969 [INFO] Installing "f7-update-local" from /ext/update/f7-update-local
+         (nothing after this line; after the kill: scons: *** [build/usbinstall.flag] Error -15)
+10:52  no progress for 11 min; selfupdate.py killed (measure.sh restored the branch, tree clean).
+10:53+ Flipper CLI does not answer. The port opens, but every write blocks:
+         pyserial write_timeout=3 s -> "Write timeout" on "\r\n"
+         DTR toggle -> OSError [Errno 71] Protocol error
+       The USB device is still enumerated (/dev/serial/by-id/...flip_E17ana-if00 -> ttyACM1,
+       symlink/devnode dated 01:03, i.e. from the end of the previous session) and is not re-enumerating.
+       No process holds the port. Retried every 40-60 s for > 30 min: always "Write timeout".
+       PM3 is fine (hw version Iceman/master/v4.23346), nothing on its antenna (hf search: no tag),
+       so the Flipper is not emulating either.
+Cause: unknown. Either the Flipper was already hung when this session started (the first
+RPC exchange of selfupdate.py never completed; nothing had been uploaded or installed yet), or it
+hung on that first exchange. The firmware on it is the 01.10 clean build from the previous session.
+Recovery needs a human: reboot the Flipper (hold LEFT + BACK ~5 s) or replug USB.
+No sudo / no write access to /dev/bus/usb or sysfs 'authorized' here, so a USB reset is not possible from the agent.
