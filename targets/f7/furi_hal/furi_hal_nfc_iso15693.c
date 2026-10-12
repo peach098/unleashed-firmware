@@ -25,14 +25,18 @@
 // Listener FDT (t1): the reply SOF must start 4320/fc after the request EOF (window 4192..4384/fc).
 // nfc.c starts the block TX timer on RxEnd for (ISO15693_3_FDT_LISTEN_FC - COMP), so
 //   EOF->SOF = t_rx + (4320 - COMP) / fc + t_tx  =>  COMP = 4320 - (t1 - t_rx - t_tx) * fc
-// t_rx = request EOF -> RxEnd in the worker (signal reader EOF + thread wake-up), ~68 us
-// t_tx = timer expiry -> first DMA transfer (furi_hal_nfc_listener_tx call 4 us + DMA prefill 30 us)
-// t1   = 318 us EOF->DMA, i.e. the 316 us SOF delay of the real SLIX2 card on the Proxmark3
-//        (the PM3 sees the SOF ~2 us before EOF->DMA)
-// => COMP = 4320 - (318 - 68 - 34.5) us * 13.56 MHz ~ 1400 fc (timer ~215 us after RxEnd).
-// The reply has to be encoded (tx_prepare) before the timer expires: 80 blocks are ready ~200 us
-// after RxEnd. The former 2850 expired ~108 us after RxEnd, before any reply was ready, so the
-// SOF delay followed the handler and encoding time (370..541 us for 1..80 blocks).
+// Terms, DWT medians from FNFC-01.10 (old FDT, 1..80 blocks):
+//   t_rx = request EOF -> RxEnd in the worker (signal reader EOF + thread wake-up): 65..71 us, ~68 us
+//   t_tx = timer expiry -> first DMA transfer: furi_hal_nfc_listener_tx call 4.2 us + prefill 30.3 us
+//   t1   = target EOF->DMA 318 us: the real SLIX2 card's SOF delay on the Proxmark3 is 316 us, and
+//          the PM3 sees the Flipper's SOF ~2 us before EOF->DMA
+// => COMP = 4320 - (318 - 68 - 34.5) us * 13.56 MHz = 1398 ~ 1400 fc (timer ~215 us after RxEnd).
+// The resulting SOF delay with 1400 is a prediction, not yet measured (FNFC-01.11 report).
+// The reply has to be encoded (tx_prepare) before the timer expires: an 80-block reply is ready
+// ~200 us after RxEnd (release build), so the margin is ~13 us. DEBUG=1 builds are slower and may
+// miss the timer for long replies, which then start late (after t1), not early.
+// The former 2850 expired ~108 us after RxEnd, before any reply was ready, so the SOF delay
+// followed the handler and encoding time (370..541 us for 1..80 blocks).
 #define FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_FC (1400)
 
 #define BITS_IN_BYTE (8U)
