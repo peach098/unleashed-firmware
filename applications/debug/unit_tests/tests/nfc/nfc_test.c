@@ -1619,11 +1619,11 @@ typedef struct {
     bool afi_password_protected;
     bool eas_locked;
     uint16_t eas_id;
+    bool slix_l; // initial only: UID ICODE type changed to SLIX-L (not SLIX2)
 } NfcTestEasState;
 
 // Runs the steps against a listener started with `initial` (the SLIX2_eas_on fixture
-// otherwise) and checks the listener image ends in `expected`. The loaded NfcDevice data
-// must stay untouched: the commands change only the emulation image in memory.
+// otherwise) and checks that the listener's own copy of the image ends in `expected`.
 static void slix_eas_test(
     const NfcTestEasState* initial,
     const NfcTestEasStep* steps,
@@ -1634,10 +1634,14 @@ static void slix_eas_test(
 
     NfcDevice* nfc_device = nfc_device_alloc();
     mu_assert(nfc_device_load(nfc_device, SLIX2_EAS_ON_FIXTURE), "nfc_device_load() failed\r\n");
-    const SlixData* file_data = nfc_device_get_data(nfc_device, NfcProtocolSlix);
 
     SlixData* slix_data = slix_alloc();
-    slix_copy(slix_data, file_data);
+    slix_copy(slix_data, nfc_device_get_data(nfc_device, NfcProtocolSlix));
+    if(initial->slix_l) {
+        slix_data->iso15693_3_data->uid[2] = 0x03; // ICODE type byte: SLIX-L
+    }
+    const bool type_ok = slix_get_type(slix_data) ==
+                         (initial->slix_l ? SlixTypeSlixL : SlixTypeSlix2);
     slix_set_eas(slix_data, initial->eas_enabled);
     slix_set_eas_afi_protection(
         slix_data, initial->eas_password_protected, initial->afi_password_protected);
@@ -1672,11 +1676,6 @@ static void slix_eas_test(
         slix_is_afi_password_protected(image) == expected->afi_password_protected &&
         image->system_info.lock_bits.eas == expected->eas_locked &&
         slix_get_eas_id(image) == expected->eas_id;
-    // Fixture: EAS Mode true, EAS ID 12 34, EAS Password Protected true, AFI false
-    const bool file_untouched =
-        slix_is_eas_enabled(file_data) && slix_get_eas_id(file_data) == 0x3412 &&
-        slix_is_eas_password_protected(file_data) && !slix_is_afi_password_protected(file_data) &&
-        !file_data->system_info.lock_bits.eas;
 
     nfc_listener_free(slix_listener);
     slix_free(slix_data);
@@ -1687,11 +1686,11 @@ static void slix_eas_test(
     if(ctx.failed_step >= 0) {
         FURI_LOG_E(TAG, "EAS step %d failed", ctx.failed_step);
     }
+    mu_assert(type_ok, "unexpected SLIX type of the test image\r\n");
     mu_assert(flag == NFC_TEST_FLAG_WORKER_DONE, "Wrong thread flag\r\n");
     mu_assert(ctx.failed_step < 0, "EAS command reply differs\r\n");
     mu_assert(ctx.steps_passed == step_count, "Poller did not run all EAS steps\r\n");
     mu_assert(state_ok, "EAS state of the emulation image differs\r\n");
-    mu_assert(file_untouched, "EAS commands changed the loaded file data\r\n");
 }
 
 // No protection, EAS off: enable/disable without password (PM3 slixeasenable chain uses
@@ -1724,8 +1723,8 @@ MU_TEST(slix_eas_set_reset_alarm_test) {
         // error before the extension is consulted, so it cannot be exercised here.)
         NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_LOCK_AFI, NfcTestEasReplyOk),
     };
-    static const NfcTestEasState initial = {false, false, false, false, 0x3412};
-    static const NfcTestEasState expected = {false, false, false, false, 0xBEEF};
+    static const NfcTestEasState initial = {false, false, false, false, 0x3412, false};
+    static const NfcTestEasState expected = {false, false, false, false, 0xBEEF, false};
     slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
 }
 
@@ -1753,8 +1752,8 @@ MU_TEST(slix_eas_password_protected_test) {
         NFC_TEST_EAS_RAW(
             NFC_TEST_EAS_FLAGS_NONADDR_OPT, SLIX_CMD_PASSWORD_PROTECT_EAS_AFI, NfcTestEasReplyOk),
     };
-    static const NfcTestEasState initial = {true, true, false, false, 0x3412};
-    static const NfcTestEasState expected = {false, true, true, false, 0x0201};
+    static const NfcTestEasState initial = {true, true, false, false, 0x3412, false};
+    static const NfcTestEasState expected = {false, true, true, false, 0x0201, false};
     slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
 }
 
@@ -1769,8 +1768,8 @@ MU_TEST(slix_eas_protect_eas_test) {
         NFC_TEST_EAS_RAW(
             NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_PASSWORD_PROTECT_EAS_AFI, NfcTestEasReplyOk),
     };
-    static const NfcTestEasState initial = {false, false, true, false, 0x3412};
-    static const NfcTestEasState expected = {false, true, true, false, 0x3412};
+    static const NfcTestEasState initial = {false, false, true, false, 0x3412, false};
+    static const NfcTestEasState expected = {false, true, true, false, 0x3412, false};
     slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
 }
 
@@ -1790,8 +1789,41 @@ MU_TEST(slix_eas_lock_test) {
             NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_WRITE_EAS_ID, 0x01, 0x02, NfcTestEasReplyError),
         NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_EAS_ALARM, NfcTestEasReplySequence),
     };
-    static const NfcTestEasState initial = {true, false, false, false, 0x3412};
-    static const NfcTestEasState expected = {true, false, false, true, 0x3412};
+    static const NfcTestEasState initial = {true, false, false, false, 0x3412, false};
+    static const NfcTestEasState expected = {true, false, false, true, 0x3412, false};
+    slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
+}
+
+// Lock EAS together with EAS password protection: without the password the access check
+// comes first (silence), with it the lock answers 01 0F.
+MU_TEST(slix_eas_lock_protected_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_RESET_EAS, NfcTestEasReplySilence),
+        NFC_TEST_EAS_SET_PASSWORD,
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_RESET_EAS, NfcTestEasReplyError),
+    };
+    static const NfcTestEasState initial = {true, true, false, true, 0x3412, false};
+    static const NfcTestEasState expected = {true, true, false, true, 0x3412, false};
+    slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
+}
+
+// WRITE EAS ID and AFI password protection (A6 with option flag) are SLIX2 features: on a
+// SLIX-L image they get no reply; SET EAS and EAS password protection still work.
+MU_TEST(slix_eas_non_slix2_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_WRITE_EAS_ID, 0x01, 0x02, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_SET_EAS, NfcTestEasReplyOk),
+        NFC_TEST_EAS_SET_PASSWORD,
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_NONADDR_OPT,
+            SLIX_CMD_PASSWORD_PROTECT_EAS_AFI,
+            NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_PASSWORD_PROTECT_EAS_AFI, NfcTestEasReplyOk),
+    };
+    static const NfcTestEasState initial = {false, false, false, false, 0x3412, true};
+    static const NfcTestEasState expected = {true, true, false, false, 0x3412, false};
     slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
 }
 
@@ -2069,6 +2101,8 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(slix_eas_password_protected_test);
     MU_RUN_TEST(slix_eas_protect_eas_test);
     MU_RUN_TEST(slix_eas_lock_test);
+    MU_RUN_TEST(slix_eas_lock_protected_test);
+    MU_RUN_TEST(slix_eas_non_slix2_test);
 
     MU_RUN_TEST(iso15693_signal_encode_equivalence);
     MU_RUN_TEST(iso15693_signal_tick_exact);

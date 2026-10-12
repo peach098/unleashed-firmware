@@ -254,16 +254,22 @@ static SlixError slix_listener_password_protect_eas_afi_handler(
             break;
         }
 
+        // Option flag selects what to protect: 0 = EAS, 1 = AFI (as PM3 passprotecteas /
+        // passprotectafi). Protection cannot be removed.
+        SlixData* slix_data = instance->data;
+        const bool protect_afi = (flags & ISO15693_3_REQ_FLAG_T4_OPTION) != 0;
+
+        // AFI password protection is a SLIX2 feature (SLIX_FEATURE_FLAG_AFI_PP)
+        if(protect_afi && slix_get_type(slix_data) != SlixTypeSlix2) {
+            error = SlixErrorNotSupported;
+            break;
+        }
+
         // Always requires the EAS/AFI password, protection is not checked here
         if(slix_listener_is_password_lock_enabled(instance, SlixPasswordTypeEasAfi)) {
             error = SlixErrorNotSupported;
             break;
         }
-
-        // Option flag selects what to protect: 0 = EAS, 1 = AFI (as PM3 passprotecteas /
-        // passprotectafi). Protection cannot be removed.
-        SlixData* slix_data = instance->data;
-        const bool protect_afi = (flags & ISO15693_3_REQ_FLAG_T4_OPTION) != 0;
         slix_set_eas_afi_protection(
             slix_data,
             slix_is_eas_password_protected(slix_data) || !protect_afi,
@@ -285,6 +291,12 @@ static SlixError slix_listener_write_eas_id_handler(
         typedef struct {
             uint8_t eas_id[2]; // LSB first
         } SlixWriteEasIdRequestLayout;
+
+        // EAS ID is a SLIX2 feature (SLIX_FEATURE_FLAG_EAS_ID)
+        if(slix_get_type(instance->data) != SlixTypeSlix2) {
+            error = SlixErrorNotSupported;
+            break;
+        }
 
         if(data_size != sizeof(SlixWriteEasIdRequestLayout)) {
             error = SlixErrorFormat;
