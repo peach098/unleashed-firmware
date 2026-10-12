@@ -1,0 +1,17 @@
+	SDKCHK	targets/f7/api_symbols.csv
+[32mAPI version 88.17 is up to date[0m
+	CDB	build/f7-firmware-C/compile_commands.json
+[32mLinking build/f7-firmware-C as latest built dir (./build/latest/)[0m
+	DIST	dist_updater_package
+2026-10-12 11:50:21,201 [INFO] [1;32mFirmware binaries can be found at:
+	dist/f7-C[0m
+2026-10-12 11:50:21,202 [INFO] Using guessed radio address 0x080D7000, verify with Release_Notes or specify --radioaddr[0m
+2026-10-12 11:50:23,242 [INFO] Resources compression ratio: 40.48%[0m
+2026-10-12 11:50:23,290 [INFO] [1;32mUse this directory to self-update your Flipper:
+	dist/f7-C/f7-update-local[0m
+2026-10-12 11:50:23,462 [INFO] Bundling SDK[0m
+2026-10-12 11:50:25,928 [INFO] [1;32mSDK bundle can be found at:
+	dist/f7-C/flipper-z-f7-sdk-local.zip[0m
+python3 scripts/selfupdate.py -p /dev/serial/by-id/usb-Flipper_Devices_Inc._Flipper_E17ana_flip_E17ana-if00 dist/f7-C/f7-update-local/update.fuf
+2026-10-12 11:50:25,995 [INFO] Installing "f7-update-local" from /ext/update/f7-update-local[0m
+Touch("build/usbinstall.flag")

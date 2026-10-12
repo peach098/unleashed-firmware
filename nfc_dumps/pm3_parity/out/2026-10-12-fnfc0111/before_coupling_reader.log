@@ -1,0 +1,8 @@
+[=] Output will be flushed after every print.
+
+[=] No preferences file will be loaded
+[+] execute command from commandline: hf 15 reader
+
+[+] Using UART port /dev/serial/by-id/usb-proxmark.org_proxmark3_iceman-if00
+[!!] ERROR: cannot communicate with the Proxmark3
+

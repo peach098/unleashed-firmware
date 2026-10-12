@@ -1,0 +1,7 @@
+== before (727b29c11dd8f7a254ba97f723d70e5afe4d89ed) probes: v3 defines: --extra-define=NFC_LISTENER_TX_LATENCY_PROBE --extra-define=NFC_LISTENER_TX_LATENCY_PROBE_V3
+ lib/digital_signal/digital_sequence.c              | 13 ++++
+ lib/nfc/nfc.c                                      | 70 ++++++++++++++++++++++
+ lib/nfc/protocols/iso15693_3/iso15693_3_listener.c | 10 ++++
+ .../protocols/iso15693_3/iso15693_3_listener_i.c   | 11 ++++
+ .../parsers/iso15693/iso15693_parser.c             | 12 ++++
+ 5 files changed, 116 insertions(+)

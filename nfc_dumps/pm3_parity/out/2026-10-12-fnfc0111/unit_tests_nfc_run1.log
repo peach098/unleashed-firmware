@@ -1,0 +1,95 @@
+
+>: unit_tests test_nfc
+Skipping test_args
+Skipping test_bit_lib
+Skipping test_bt
+Skipping test_compress
+Skipping test_datetime
+Skipping test_dialogs_file_browser_options
+Skipping test_dirwalk
+Skipping test_expansion
+Skipping test_flipper_format
+Skipping test_flipper_format_string
+Skipping test_float_tools
+Skipping test_furi
+Skipping test_furi_hal
+Skipping test_furi_hal_crypto
+Skipping test_furi_string
+Skipping test_infrared
+Skipping test_js
+Skipping test_lfrfid
+Skipping test_manifest
+iso14443_3a_reader()
+[|][3Dmf_ultralight_11_reader()
+[/][3D[-][3Dmf_ultralight_21_reader()
+[\][3D[|][3Dntag_215_reader()
+[/][3D[-][3Dntag_216_reader()
+[\][3D[|][3Dntag_213_locked_reader()
+[/][3D[-][3Dmf_ultralight_c_reader()
+[\][3D[|][3Dmf_ultralight_write()
+[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3Diso14443_3a_4b_file_test()
+[|][3D[/][3Diso14443_3a_7b_file_test()
+[-][3D[\][3Dmf_ultralight_file_test()
+[|][3D[/][3Dmf_ultralight_ev1_11_file_test()
+[-][3D[\][3D[|][3Dmf_ultralight_ev1_h11_file_test()
+[/][3D[-][3Dmf_ultralight_ev1_21_file_test()
+[\][3D[|][3Dmf_ultralight_ev1_h21_file_test()
+[/][3D[-][3Dmf_ultralight_ntag_203_file_test()
+[\][3D[|][3Dmf_ultralight_ntag_213_file_test()
+[/][3D[-][3Dmf_ultralight_ntag_215_file_test()
+[\][3D[|][3Dmf_ultralight_ntag_216_file_test()
+[/][3D[-][3Dmf_ultralight_ntag_i2c_1k_file_test()
+[\][3D[|][3Dmf_ultralight_ntag_i2c_2k_file_test()
+[/][3D[-][3Dmf_ultralight_ntag_i2c_plus_1k_file_test()
+[\][3D[|][3Dmf_ultralight_ntag_i2c_plus_2k_file_test()
+[/][3D[-][3Dmf_classic_mini_file_test()
+[\][3D[|][3Dmf_classic_1k_4b_file_test()
+[/][3D[-][3Dmf_classic_1k_7b_file_test()
+[\][3D[|][3Dmf_classic_4k_4b_file_test()
+[/][3D[-][3Dmf_classic_4k_7b_file_test()
+[\][3D[|][3Dmf_classic_reader()
+[/][3Dmf_classic_write()
+[-][3Dmf_classic_value_block()
+[\][3D[|][3D[/][3Dmf_classic_send_frame_test()
+[-][3Dmf_classic_dict_test()
+[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3Dfelica_read()
+[|][3Dfelica_read_auth()
+[/][3Dfelica_standard_file_test()
+felica_standard_v2_file_test()
+[-][3Dfelica_standard_v3_file_test()
+felica_oversized_lite_file_test()
+[\][3Dfelica_standard_read()
+[|][3Dslix_file_with_capabilities_test()
+[/][3D[-][3Dslix_set_password_default_cap_correct_pass()
+[\][3D[|][3Dslix_set_password_default_cap_incorrect_pass()
+[/][3D[-][3Dslix_set_password_access_all_passwords_cap()
+[\][3D[|][3Dslix2_collection_roundtrip_test()
+[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3Dslix2_detection_by_uid_test()
+[|][3Dslix2_bad_file_robustness_test()
+[/][3D[-][3Dslix2_password_dict_test()
+[\][3D[|][3Diso15693_signal_encode_equivalence()
+NfcIso15693SignalTest: encode 323 B: 8586 cycles (134 us), per-bit reference 141604 cycles (2212 us)
+[/][3Diso15693_signal_tick_exact()
+iso13239_crc_table_test()
+[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3D[-][3D[\][3D[|][3D[/][3Diso15693_3_listener_read_multi_blocks_test()
+[-][3D[\][3Diso15693_3_listener_read_multi_blocks_read_protected_test()
+[|][3D[/][3D[-][3Diso15693_3_listener_short_after_long_test()
+[\][3D[|][3Dmf_plus_crypto_cmac_rfc4493()
+mf_plus_crypto_data_iv_layout()
+Skipping test_notification
+Skipping test_pipe
+Skipping test_power
+Skipping test_protocol_dict
+Skipping test_rpc
+Skipping test_storage
+Skipping test_stream
+Skipping test_strint
+Skipping test_subghz
+Skipping test_varint
+
+Failed tests: 0
+Consumed: 17838 ms
+Leaked: 0
+Status: PASSED
+
+>: 
