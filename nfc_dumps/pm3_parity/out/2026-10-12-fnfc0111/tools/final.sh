@@ -1,5 +1,6 @@
 #!/bin/bash
-# FNFC-01.10 acceptance on clean firmware (no probe). Repo root, inside `newgrp uucp`.
+# FNFC-01.11 acceptance on clean firmware (no probe; copy of the 01.10 tool + hf 15 reader --all;
+# DWT=1 NREP=n gives the 1/8/32/64/80-block SOF set for sof_table.py). Repo root, inside `newgrp uucp`.
 #  1. (unless SKIP_FLASH=1) flash the current tree, default app set
 #  2. SLIX2 card AC: coupling, N80 x 004F, N64 x 003F, N32 x 001F one-shot reads, NDUMP x hf 15 dump,
 #     each compared with the dump
@@ -29,6 +30,10 @@ for i in $(seq 1 ${N80:-10}); do python3 $T13/compare_dump.py "$DUMP" raw "$OUT/
 grep -h . "$OUT/${L}"_s80_*.compare.txt | sort | uniq -c
 # hf 15 dump (emulation restarted)
 timeout 40 $PY $T13/emu_open.py $T13 > "$OUT/${L}_dump_emu_open.txt" 2>&1 < /dev/null; sleep 2
+for i in 1 2 3; do
+  timeout 60 $PM3 -p $PORT --incognito -f -c "hf 15 reader --all" > "$OUT/${L}_reader_all_$i.log" 2>&1 < /dev/null
+  echo "hf 15 reader --all #$i: $(grep -acE 'E0 04 01 09 01 9A 83 AC' "$OUT/${L}_reader_all_$i.log") UID lines"
+done
 for i in $(seq 1 ${NDUMP:-3}); do
   timeout 180 $PM3 -p $PORT --incognito -f -c "hf 15 dump" > "$OUT/${L}_hf15_dump_$i.log" 2>&1 < /dev/null
   python3 $T13/compare_dump.py "$DUMP" dump "$OUT/${L}_hf15_dump_$i.log" | tee "$OUT/${L}_hf15_dump_$i.compare.txt"
