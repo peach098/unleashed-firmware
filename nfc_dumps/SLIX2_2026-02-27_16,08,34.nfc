@@ -1,0 +1,41 @@
+Filetype: Flipper NFC device
+Version: 4
+# Device type can be ISO14443-3A, ISO14443-3B, ISO14443-4A, ISO14443-4B, ISO15693-3, FeliCa, NTAG/Ultralight, Mifare Classic, Mifare Plus, Mifare DESFire, SLIX, ST25TB, NTAG4xx, Type 4 Tag, EMV
+Device type: SLIX
+# UID is common for all formats
+UID: E0 04 01 09 01 9A 83 AC
+# ISO15693-3 specific data
+# Data Storage Format Identifier
+DSFID: 01
+# Application Family Identifier
+AFI: 00
+# IC Reference - Vendor specific meaning
+IC Reference: 01
+# Lock Bits
+Lock DSFID: false
+Lock AFI: false
+# Number of memory blocks, valid range = 1..256
+Block Count: 80
+# Size of a single memory block, valid range = 01...20 (hex)
+Block Size: 04
+Data Content: 00 00 00 00 00 00 00 00 00 00 00 00 02 5A 50 05 00 00 00 20 E4 E2 C5 D7 8F 65 CC F7 0E 40 3A D1 5B D8 15 BB 68 F5 83 E1 FF 58 40 DF BE E7 F2 90 BE 02 19 5C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0D 00 00 00 03 20 53 42 00 30 50 49 00 00 00 00 BB 7B 74 7B 00 00 00 00
+# Block Security Status: 01 = locked, 00 = not locked
+Security Status: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+# SLIX specific data
+# SLIX capabilities field affects emulation modes. Possible options: Default, AcceptAllPasswords
+Capabilities: Default
+# Passwords are optional. If a password is omitted, a default value will be used
+Password Read: 00 00 00 00
+Password Write: 00 00 00 00
+Password Privacy: 0F 0F 0F 0F
+Password Destroy: 0F 0F 0F 0F
+Password EAS: 00 00 00 00
+# This is the card's secp128r1 elliptic curve signature. It can not be calculated without knowing NXP's private key.
+Signature: E4 F1 9B A8 B0 FA 44 6B 8D 38 43 8E 90 C5 55 A9 26 C9 57 C4 75 80 6B 6A A5 7B 5F 32 C5 82 D3 A7
+Privacy Mode: false
+# Protection pointer configuration
+Protection Pointer: 00
+Protection Condition: 00
+# SLIX Lock Bits
+Lock EAS: false
+Lock PPL: false

@@ -16,5 +16,6 @@ FNFC-01.11 hardware blocker, 2026-10-12 (MSK)
 Cause: unknown. Either the Flipper was already hung when this session started (the first
 RPC exchange of selfupdate.py never completed; nothing had been uploaded or installed yet), or it
 hung on that first exchange. The firmware on it is the 01.10 clean build from the previous session.
-Recovery needs a human: reboot the Flipper (hold LEFT + BACK ~5 s) or replug USB.
+Resolved: the user replugged the Flipper at ~11:31. Later (~11:40-12:00) the PM3 stopped answering (no reply to a raw NG ping) and recovered by itself.
+Recovery needed a human: reboot the Flipper (hold LEFT + BACK ~5 s) or replug USB.
 No sudo / no write access to /dev/bus/usb or sysfs 'authorized' here, so a USB reset is not possible from the agent.
