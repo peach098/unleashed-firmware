@@ -102,7 +102,6 @@ typedef struct {
 typedef struct {
     SlixProtection protection;
     SlixLockBits lock_bits;
-    SlixEas eas;
 } SlixSystemInfo;
 
 typedef enum {
@@ -119,6 +118,7 @@ typedef struct {
     SlixPassword passwords[SlixPasswordTypeCount];
     SlixPrivacy privacy;
     SlixCapabilities capabilities;
+    SlixEas eas; /**< Last field: appended to keep earlier SlixData offsets (API ABI). */
 } SlixData;
 
 SlixData* slix_alloc(void);

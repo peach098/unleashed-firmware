@@ -128,6 +128,7 @@ void slix_reset(SlixData* data) {
 
     memset(&data->system_info, 0, sizeof(SlixSystemInfo));
     memset(data->signature, 0, sizeof(SlixSignature));
+    memset(&data->eas, 0, sizeof(SlixEas));
 
     data->privacy = false;
 }
@@ -143,6 +144,7 @@ void slix_copy(SlixData* data, const SlixData* other) {
     memcpy(data->signature, other->signature, sizeof(SlixSignature));
 
     data->system_info = other->system_info;
+    data->eas = other->eas;
     data->privacy = other->privacy;
 }
 
@@ -287,7 +289,7 @@ bool slix_load(SlixData* data, FlipperFormat* ff, uint32_t version) {
         }
 
         if(slix_type_has_features(slix_type, SLIX_TYPE_FEATURE_EAS)) {
-            if(!slix_load_eas(&data->system_info.eas, ff)) break;
+            if(!slix_load_eas(&data->eas, ff)) break;
         }
 
         loaded = true;
@@ -416,7 +418,7 @@ bool slix_save(const SlixData* data, FlipperFormat* ff) {
         }
 
         if(slix_type_has_features(slix_type, SLIX_TYPE_FEATURE_EAS)) {
-            if(!slix_save_eas(&data->system_info.eas, ff)) break;
+            if(!slix_save_eas(&data->eas, ff)) break;
         }
 
         saved = true;
@@ -425,14 +427,11 @@ bool slix_save(const SlixData* data, FlipperFormat* ff) {
     return saved;
 }
 
-// Field-wise: SlixEas has padding, so memcmp() of SlixSystemInfo is not reliable.
-static bool slix_system_info_is_equal(const SlixSystemInfo* a, const SlixSystemInfo* b) {
-    return a->protection.pointer == b->protection.pointer &&
-           a->protection.condition == b->protection.condition &&
-           a->lock_bits.eas == b->lock_bits.eas && a->lock_bits.ppl == b->lock_bits.ppl &&
-           a->eas.enabled == b->eas.enabled && a->eas.id == b->eas.id &&
-           a->eas.eas_password_protected == b->eas.eas_password_protected &&
-           a->eas.afi_password_protected == b->eas.afi_password_protected;
+// Field-wise: SlixEas has padding, so memcmp() is not reliable.
+static bool slix_eas_is_equal(const SlixEas* a, const SlixEas* b) {
+    return a->enabled == b->enabled && a->id == b->id &&
+           a->eas_password_protected == b->eas_password_protected &&
+           a->afi_password_protected == b->afi_password_protected;
 }
 
 bool slix_is_equal(const SlixData* data, const SlixData* other) {
@@ -440,7 +439,8 @@ bool slix_is_equal(const SlixData* data, const SlixData* other) {
     furi_check(other);
 
     return iso15693_3_is_equal(data->iso15693_3_data, other->iso15693_3_data) &&
-           slix_system_info_is_equal(&data->system_info, &other->system_info) &&
+           memcmp(&data->system_info, &other->system_info, sizeof(SlixSystemInfo)) == 0 &&
+           slix_eas_is_equal(&data->eas, &other->eas) &&
            memcmp(
                data->passwords, other->passwords, sizeof(SlixPassword) * SlixPasswordTypeCount) ==
                0 &&
@@ -562,25 +562,25 @@ bool slix_is_counter_increment_protected(const SlixData* data) {
 bool slix_is_eas_enabled(const SlixData* data) {
     furi_check(data);
 
-    return data->system_info.eas.enabled;
+    return data->eas.enabled;
 }
 
 uint16_t slix_get_eas_id(const SlixData* data) {
     furi_check(data);
 
-    return data->system_info.eas.id;
+    return data->eas.id;
 }
 
 bool slix_is_eas_password_protected(const SlixData* data) {
     furi_check(data);
 
-    return data->system_info.eas.eas_password_protected;
+    return data->eas.eas_password_protected;
 }
 
 bool slix_is_afi_password_protected(const SlixData* data) {
     furi_check(data);
 
-    return data->system_info.eas.afi_password_protected;
+    return data->eas.afi_password_protected;
 }
 
 bool slix_type_has_features(SlixType slix_type, SlixTypeFeatures features) {
