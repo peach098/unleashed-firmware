@@ -1,0 +1,47 @@
+cal2 cal2_rd1_1.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+cal2 cal2_rd1_2.trace: len=7 crc=True data=EQUAL sof_delay_us=306.8
+cal2 cal2_rd1_3.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+cal2 cal2_rd1_4.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+cal2 cal2_rd1_5.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+cal2 cal2_rd1_6.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+cal2 cal2_rd1_7.trace: len=7 crc=True data=EQUAL sof_delay_us=306.8
+cal2 cal2_rdm8_1.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm8_2.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm8_3.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm8_4.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+cal2 cal2_rdm8_5.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm8_6.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+cal2 cal2_rdm8_7.trace: len=35 crc=True data=EQUAL sof_delay_us=311.5
+cal2 cal2_rdm32_1.trace: len=131 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm32_2.trace: len=131 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm32_3.trace: len=131 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm32_4.trace: len=131 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm32_5.trace: len=131 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm32_6.trace: len=131 crc=True data=EQUAL sof_delay_us=320.9
+cal2 cal2_rdm32_7.trace: len=131 crc=True data=EQUAL sof_delay_us=311.5
+cal2 cal2_rdm64_1.trace: len=259 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm64_2.trace: len=259 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm64_3.trace: len=259 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm64_4.trace: silence
+cal2 cal2_rdm64_5.trace: len=259 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm64_6.trace: len=259 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm64_7.trace: len=259 crc=True data=EQUAL sof_delay_us=316.2
+cal2 cal2_rdm80_1.trace: len=323 crc=True data=EQUAL sof_delay_us=320.9
+cal2 cal2_rdm80_2.trace: silence
+cal2 cal2_rdm80_3.trace: len=323 crc=True data=EQUAL sof_delay_us=311.5
+cal2 cal2_rdm80_4.trace: silence
+cal2 cal2_rdm80_5.trace: len=323 crc=True data=EQUAL sof_delay_us=311.5
+cal2 cal2_rdm80_6.trace: silence
+cal2 cal2_rdm80_7.trace: silence
+
+### cal2
+
+| blocks | decoded | median us | min us | max us | median - 316 us |
+|---|---|---|---|---|---|
+| 1 | 7/7 | 311.5 | 306.8 | 311.5 | -4.5 |
+| 8 | 7/7 | 316.2 | 311.5 | 320.9 | +0.2 |
+| 32 | 7/7 | 316.2 | 311.5 | 320.9 | +0.2 |
+| 64 | 6/7 | 316.2 | 316.2 | 316.2 | +0.2 |
+| 80 | 3/7 | 311.5 | 311.5 | 320.9 | -4.5 |
+
+all lengths: min 306.8 us, max 320.9 us; 80/1 = 1.000
