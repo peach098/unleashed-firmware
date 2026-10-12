@@ -65,7 +65,9 @@ NfcCommand iso15693_3_listener_run(NfcGenericEvent event, void* context) {
     if(nfc_event->type == NfcEventTypeRxEnd) {
         BitBuffer* rx_buffer = nfc_event->data.buffer;
 
-        bit_buffer_reset(instance->tx_buffer);
+        // Size-only reset: bit_buffer_reset() clears the whole 1027 B capacity (~120 us),
+        // and the reply is only ever built with append_byte(s), which never reads old bytes
+        bit_buffer_set_size(instance->tx_buffer, 0);
         if(iso13239_crc_check(Iso13239CrcTypeDefault, rx_buffer)) {
             iso13239_crc_trim(rx_buffer);
 
