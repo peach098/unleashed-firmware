@@ -33,13 +33,15 @@
 //             + DMA prefill (16 entries) 20.9 us = 25.1 us
 //   t1      = EOF->DMA 319 us: the real SLIX2 card's SOF delay on the Proxmark3 is 316 us, and
 //             the PM3 reports the Flipper's SOF 0..4.7 us (one sample) before EOF->DMA
-// => COMP = 4320 - (319 - 68 - 6.7 - 25.1) us * 13.56 MHz = 1347 ~ 1345 fc.
+// => COMP = 4320 - (319 - 68 - 6.7 - 25.1) us * 13.56 MHz = 1347 fc. Measured with 1345: PM3 SOF
+// median 316.2 us (probe build) but 320.9 us on the release build (one PM3 sample later, at every
+// length), so the release build is moved 3 us earlier: 1345 + 3 us * 13.56 MHz = 1385 fc.
 // The reply has to be encoded (tx_prepare) before the timer expires: an 80-block reply is ready
-// ~208 us after RxEnd, the timer expires ~226 us after RxEnd. DEBUG=1 builds are slower and are
+// ~208 us after RxEnd, the timer expires ~223 us after RxEnd. DEBUG=1 builds are slower and are
 // expected to miss the timer for long replies, which then start late (after t1), not early.
 // The former 2850 expired ~108 us after RxEnd, before any reply was ready, so the SOF delay
 // followed the handler and encoding time (370..539 us for 1..80 blocks).
-#define FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_FC (1345)
+#define FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_FC (1385)
 
 #define BITS_IN_BYTE (8U)
 
