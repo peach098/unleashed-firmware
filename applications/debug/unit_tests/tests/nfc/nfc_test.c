@@ -2153,6 +2153,327 @@ MU_TEST(slix_write_afi_password_protected_test) {
     nfc_test_write_afi_dsfid(NfcProtocolSlix, &initial, steps, COUNT_OF(steps), &expected);
 }
 
+// ---- INVENTORY: 16 slots, mask (FNFC-01.7) --------------------------------------------
+// The listener answers a 16-slot INVENTORY in slot (UID >> mask_len) & 0xF of the on-air
+// (LSB-first) UID, i.e. right away in slot 0 or after the Nth single EOF (PM3 sends the
+// command, then 15 EOF-only frames), and stays silent when the mask does not match.
+// The SLIX2_eas_on fixture has UID E0 04 01 08 11 22 33 44, on air 44 33 22 11 08 01 04 E0,
+// DSFID 01: mask 0 -> slot 4, 8-bit mask 44 -> slot 3.
+
+#define NFC_TEST_INV_FRAME_MAX (12U)
+
+typedef enum {
+    NfcTestInvReplySilence,
+    NfcTestInvReplyInventory, // 00 DSFID UID (LSB-first)
+    NfcTestInvReplyAny, // any reply (other commands)
+} NfcTestInvReply;
+
+typedef struct {
+    uint8_t frame[NFC_TEST_INV_FRAME_MAX]; // request without CRC
+    uint8_t frame_size; // 0: single EOF
+    uint8_t repeat; // send the step this many times (0 counts as 1)
+    NfcTestInvReply reply;
+} NfcTestInvStep;
+
+typedef struct {
+    FuriThreadId thread_id;
+    Nfc* nfc;
+    const NfcTestInvStep* steps;
+    size_t step_count;
+    size_t steps_passed;
+    int failed_step;
+} NfcTestInvContext;
+
+#define NFC_TEST_INV_FLAGS_16                                              \
+    (ISO15693_3_REQ_FLAG_DATA_RATE_HI | ISO15693_3_REQ_FLAG_INVENTORY_T5 | \
+     ISO15693_3_REQ_FLAG_T5_N_SLOTS_16)
+#define NFC_TEST_INV_FLAGS_1                                               \
+    (ISO15693_3_REQ_FLAG_DATA_RATE_HI | ISO15693_3_REQ_FLAG_INVENTORY_T5 | \
+     ISO15693_3_REQ_FLAG_T5_N_SLOTS_1)
+
+#define NFC_TEST_INV_EOF(count, reply_type) {{0}, 0, (count), (reply_type)}
+#define NFC_TEST_INV_FRAME(reply_type, ...) \
+    {{__VA_ARGS__}, sizeof((const uint8_t[]){__VA_ARGS__}), 1, (reply_type)}
+
+static bool nfc_test_inv_reply_matches(
+    const NfcTestInvStep* step,
+    bool replied,
+    const BitBuffer* rx,
+    const Iso15693_3Data* data) {
+    if(step->reply == NfcTestInvReplySilence) return !replied;
+    if(!replied) return false;
+    if(step->reply == NfcTestInvReplyAny) return true;
+
+    const uint8_t* reply = bit_buffer_get_data(rx);
+    if(bit_buffer_get_size_bytes(rx) != 2 + ISO15693_3_UID_SIZE) return false;
+    if(reply[0] != ISO15693_3_RESP_FLAG_NONE || reply[1] != data->system_info.dsfid) return false;
+    for(size_t i = 0; i < ISO15693_3_UID_SIZE; ++i) {
+        if(reply[2 + i] != data->uid[ISO15693_3_UID_SIZE - i - 1]) return false;
+    }
+    return true;
+}
+
+NfcCommand nfc_test_inv_callback(NfcGenericEventEx event, void* context) {
+    NfcTestInvContext* ctx = context;
+    Iso15693_3PollerEvent* iso15_event = event.parent_event_data;
+    SlixPoller* poller = event.poller;
+
+    if(iso15_event->type == Iso15693_3PollerEventTypeReady) {
+        const Iso15693_3Data* data = iso15693_3_poller_get_data(poller->iso15693_3_poller);
+        BitBuffer* tx = bit_buffer_alloc(NFC_TEST_INV_FRAME_MAX);
+        BitBuffer* rx = bit_buffer_alloc(ISO15693_3_LISTENER_TEST_RX_SIZE);
+
+        for(size_t i = 0; i < ctx->step_count; ++i) {
+            const NfcTestInvStep* step = &ctx->steps[i];
+            const size_t repeat = step->repeat ? step->repeat : 1;
+            bool passed = true;
+
+            for(size_t j = 0; j < repeat && passed; ++j) {
+                bool replied;
+                bit_buffer_copy_bytes(tx, step->frame, step->frame_size);
+                if(step->frame_size == 0) {
+                    // Single EOF: a frame of zero length, without CRC
+                    const NfcError error =
+                        nfc_poller_trx(ctx->nfc, tx, rx, ISO15693_3_FDT_POLL_FC);
+                    replied = error == NfcErrorNone;
+                    if(replied) {
+                        if(!iso13239_crc_check(Iso13239CrcTypeDefault, rx)) {
+                            passed = false;
+                            break;
+                        }
+                        iso13239_crc_trim(rx);
+                    }
+                } else {
+                    const SlixError error =
+                        slix_poller_send_frame(poller, tx, rx, ISO15693_3_FDT_POLL_FC);
+                    replied = error != SlixErrorTimeout;
+                }
+                passed = nfc_test_inv_reply_matches(step, replied, rx, data);
+                if(!passed) {
+                    FURI_LOG_E(TAG, "Inventory step %zu, repeat %zu", i, j);
+                }
+            }
+
+            if(!passed) {
+                ctx->failed_step = i;
+                break;
+            }
+            ctx->steps_passed++;
+        }
+
+        bit_buffer_free(rx);
+        bit_buffer_free(tx);
+    }
+
+    furi_thread_flags_set(ctx->thread_id, NFC_TEST_FLAG_WORKER_DONE);
+    return NfcCommandStop;
+}
+
+// Runs the steps against a SLIX or plain ISO15693-3 listener emulating the SLIX2_eas_on
+// fixture.
+static void
+    nfc_test_inventory_run(NfcProtocol protocol, const NfcTestInvStep* steps, size_t step_count) {
+    NfcDevice* nfc_device = nfc_device_alloc();
+    mu_assert(nfc_device_load(nfc_device, SLIX2_EAS_ON_FIXTURE), "nfc_device_load() failed\r\n");
+    SlixData* slix_data = slix_alloc();
+    slix_copy(slix_data, nfc_device_get_data(nfc_device, NfcProtocolSlix));
+    nfc_device_free(nfc_device);
+
+    Nfc* poller = nfc_alloc();
+    Nfc* listener = nfc_alloc();
+
+    NfcListener* nfc_listener = nfc_listener_alloc(
+        listener,
+        protocol,
+        protocol == NfcProtocolSlix ? (const NfcDeviceData*)slix_data :
+                                      (const NfcDeviceData*)slix_data->iso15693_3_data);
+    nfc_listener_start(nfc_listener, NULL, NULL);
+
+    NfcTestInvContext ctx = {
+        .thread_id = furi_thread_get_current_id(),
+        .nfc = poller,
+        .steps = steps,
+        .step_count = step_count,
+        .steps_passed = 0,
+        .failed_step = -1,
+    };
+
+    NfcPoller* slix_poller = nfc_poller_alloc(poller, NfcProtocolSlix);
+    nfc_poller_start_ex(slix_poller, nfc_test_inv_callback, &ctx);
+
+    uint32_t flag =
+        furi_thread_flags_wait(NFC_TEST_FLAG_WORKER_DONE, FuriFlagWaitAny, FuriWaitForever);
+
+    nfc_poller_stop(slix_poller);
+    nfc_poller_free(slix_poller);
+    nfc_listener_stop(nfc_listener);
+    nfc_listener_free(nfc_listener);
+    nfc_free(listener);
+    nfc_free(poller);
+    slix_free(slix_data);
+
+    if(ctx.failed_step >= 0) {
+        FURI_LOG_E(TAG, "Inventory step %d failed", ctx.failed_step);
+    }
+    mu_assert(flag == NFC_TEST_FLAG_WORKER_DONE, "Wrong thread flag\r\n");
+    mu_assert(ctx.failed_step < 0, "INVENTORY reply differs\r\n");
+    mu_assert(ctx.steps_passed == step_count, "Poller did not run all steps\r\n");
+}
+
+static const NfcTestInvStep nfc_test_inventory_16_slots_steps[] = {
+    // Mask 0: slot 4 - silent for the command and EOFs 1..3, answer on EOF 4, then
+    // silent for EOFs 5..15
+    NFC_TEST_INV_FRAME(NfcTestInvReplySilence, NFC_TEST_INV_FLAGS_16, 0x01, 0x00),
+    NFC_TEST_INV_EOF(3, NfcTestInvReplySilence),
+    NFC_TEST_INV_EOF(1, NfcTestInvReplyInventory),
+    NFC_TEST_INV_EOF(11, NfcTestInvReplySilence),
+    // 8-bit mask 44 = first on-air byte: slot = next nibble = 3
+    NFC_TEST_INV_FRAME(NfcTestInvReplySilence, NFC_TEST_INV_FLAGS_16, 0x01, 0x08, 0x44),
+    NFC_TEST_INV_EOF(2, NfcTestInvReplySilence),
+    NFC_TEST_INV_EOF(1, NfcTestInvReplyInventory),
+    NFC_TEST_INV_EOF(12, NfcTestInvReplySilence),
+    // 4-bit mask mismatch: silent in every slot
+    NFC_TEST_INV_FRAME(NfcTestInvReplySilence, NFC_TEST_INV_FLAGS_16, 0x01, 0x04, 0x03),
+    NFC_TEST_INV_EOF(15, NfcTestInvReplySilence),
+    // 36-bit mask 44 33 22 11 x8 (upper nibble of the last byte is beyond mask_len and
+    // ignored): slot = nibble 9 of the UID = 0 -> answer right away, EOFs stay silent
+    NFC_TEST_INV_FRAME(
+        NfcTestInvReplyInventory,
+        NFC_TEST_INV_FLAGS_16,
+        0x01,
+        0x24,
+        0x44,
+        0x33,
+        0x22,
+        0x11,
+        0xF8),
+    NFC_TEST_INV_EOF(2, NfcTestInvReplySilence),
+    // 8-bit mask, one bit off: silence
+    NFC_TEST_INV_FRAME(NfcTestInvReplySilence, NFC_TEST_INV_FLAGS_16, 0x01, 0x08, 0x45),
+    NFC_TEST_INV_EOF(15, NfcTestInvReplySilence),
+    // 60-bit mask (the longest for 16 slots): slot = top nibble E = 14
+    NFC_TEST_INV_FRAME(
+        NfcTestInvReplySilence,
+        NFC_TEST_INV_FLAGS_16,
+        0x01,
+        0x3C,
+        0x44,
+        0x33,
+        0x22,
+        0x11,
+        0x08,
+        0x01,
+        0x04,
+        0x00),
+    NFC_TEST_INV_EOF(13, NfcTestInvReplySilence),
+    NFC_TEST_INV_EOF(1, NfcTestInvReplyInventory),
+    // 61-bit mask with 16 slots leaves no 4 slot bits: malformed, ignored
+    NFC_TEST_INV_FRAME(
+        NfcTestInvReplySilence,
+        NFC_TEST_INV_FLAGS_16,
+        0x01,
+        0x3D,
+        0x44,
+        0x33,
+        0x22,
+        0x11,
+        0x08,
+        0x01,
+        0x04,
+        0x00),
+    NFC_TEST_INV_EOF(15, NfcTestInvReplySilence),
+    // Wrong mask length (4 bits, 2 mask bytes): ignored
+    NFC_TEST_INV_FRAME(NfcTestInvReplySilence, NFC_TEST_INV_FLAGS_16, 0x01, 0x04, 0x04, 0x00),
+    NFC_TEST_INV_EOF(15, NfcTestInvReplySilence),
+};
+
+// 16 slots: slot from the UID nibble after the mask, answer after the Nth single EOF, mask
+// compared bit by bit
+MU_TEST(slix_inventory_16_slots_test) {
+    nfc_test_inventory_run(
+        NfcProtocolSlix,
+        nfc_test_inventory_16_slots_steps,
+        COUNT_OF(nfc_test_inventory_16_slots_steps));
+}
+
+// Plain ISO15693-3 emulation gets the same slot handling
+MU_TEST(iso15693_3_inventory_16_slots_test) {
+    nfc_test_inventory_run(
+        NfcProtocolIso15693_3,
+        nfc_test_inventory_16_slots_steps,
+        COUNT_OF(nfc_test_inventory_16_slots_steps));
+}
+
+// Any other request drops a pending slot reply; 1-slot INVENTORY answers right away and
+// takes the mask into account; a quiet tag ignores INVENTORY in either mode
+MU_TEST(slix_inventory_reset_1_slot_quiet_test) {
+    static const NfcTestInvStep steps[] = {
+        // 32-bit mask 44 33 22 11: slot 8 pending, 5 EOFs, then GET SYSTEM INFO: EOFs 6..15
+        // stay silent
+        NFC_TEST_INV_FRAME(
+            NfcTestInvReplySilence, NFC_TEST_INV_FLAGS_16, 0x01, 0x20, 0x44, 0x33, 0x22, 0x11),
+        NFC_TEST_INV_EOF(5, NfcTestInvReplySilence),
+        NFC_TEST_INV_FRAME(
+            NfcTestInvReplyAny, ISO15693_3_REQ_FLAG_DATA_RATE_HI, ISO15693_3_CMD_GET_SYS_INFO),
+        NFC_TEST_INV_EOF(10, NfcTestInvReplySilence),
+        // Slot 8 pending, then a 1-slot INVENTORY: answered at once, no slot reply later
+        NFC_TEST_INV_FRAME(
+            NfcTestInvReplySilence, NFC_TEST_INV_FLAGS_16, 0x01, 0x20, 0x44, 0x33, 0x22, 0x11),
+        NFC_TEST_INV_EOF(5, NfcTestInvReplySilence),
+        NFC_TEST_INV_FRAME(NfcTestInvReplyInventory, NFC_TEST_INV_FLAGS_1, 0x01, 0x00),
+        NFC_TEST_INV_EOF(10, NfcTestInvReplySilence),
+        // 1 slot with a full 64-bit mask: match -> answer
+        NFC_TEST_INV_FRAME(
+            NfcTestInvReplyInventory,
+            NFC_TEST_INV_FLAGS_1,
+            0x01,
+            0x40,
+            0x44,
+            0x33,
+            0x22,
+            0x11,
+            0x08,
+            0x01,
+            0x04,
+            0xE0),
+        // 1 slot, 4-bit mask mismatch -> silence; 4-bit mask match -> answer
+        NFC_TEST_INV_FRAME(NfcTestInvReplySilence, NFC_TEST_INV_FLAGS_1, 0x01, 0x04, 0x0B),
+        NFC_TEST_INV_FRAME(NfcTestInvReplyInventory, NFC_TEST_INV_FLAGS_1, 0x01, 0x04, 0x04),
+        // 1 slot, 65-bit mask: malformed, ignored
+        NFC_TEST_INV_FRAME(
+            NfcTestInvReplySilence,
+            NFC_TEST_INV_FLAGS_1,
+            0x01,
+            0x41,
+            0x44,
+            0x33,
+            0x22,
+            0x11,
+            0x08,
+            0x01,
+            0x04,
+            0xE0,
+            0x00),
+        // STAY QUIET (addressed): INVENTORY is ignored in both modes, also on EOFs
+        NFC_TEST_INV_FRAME(
+            NfcTestInvReplySilence,
+            ISO15693_3_REQ_FLAG_DATA_RATE_HI | ISO15693_3_REQ_FLAG_T4_ADDRESSED,
+            ISO15693_3_CMD_STAY_QUIET,
+            0x44,
+            0x33,
+            0x22,
+            0x11,
+            0x08,
+            0x01,
+            0x04,
+            0xE0),
+        NFC_TEST_INV_FRAME(NfcTestInvReplySilence, NFC_TEST_INV_FLAGS_16, 0x01, 0x00),
+        NFC_TEST_INV_EOF(15, NfcTestInvReplySilence),
+        NFC_TEST_INV_FRAME(NfcTestInvReplySilence, NFC_TEST_INV_FLAGS_1, 0x01, 0x00),
+    };
+    nfc_test_inventory_run(NfcProtocolSlix, steps, COUNT_OF(steps));
+}
+
 // AES-CMAC known-answer vectors from RFC 4493 (Appendix D.1), NIST AES-128 key. Exercises
 // the empty / single-complete-block / partial-final / multi-block paths of the CMAC plus the
 // cmac8 odd-index truncation used by MIFARE Plus SL3.
@@ -2437,6 +2758,9 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(iso15693_3_write_afi_dsfid_test);
     MU_RUN_TEST(slix_write_afi_dsfid_locked_test);
     MU_RUN_TEST(slix_write_afi_password_protected_test);
+    MU_RUN_TEST(slix_inventory_16_slots_test);
+    MU_RUN_TEST(iso15693_3_inventory_16_slots_test);
+    MU_RUN_TEST(slix_inventory_reset_1_slot_quiet_test);
 
     MU_RUN_TEST(iso15693_signal_encode_equivalence);
     MU_RUN_TEST(iso15693_signal_tick_exact);

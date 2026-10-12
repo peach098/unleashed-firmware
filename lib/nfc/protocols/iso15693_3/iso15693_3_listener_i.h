@@ -32,6 +32,10 @@ typedef struct {
     bool selected;
     bool addressed;
     bool wait_for_eof;
+    // 16-slot INVENTORY in slot N > 0: the reply goes out after the Nth single EOF
+    bool inventory_pending;
+    uint8_t inventory_slot;
+    uint8_t inventory_eof_count;
 } Iso15693_3ListenerSessionState;
 
 typedef Iso15693_3Error (*Iso15693_3ExtensionHandler)(void* context, va_list args);

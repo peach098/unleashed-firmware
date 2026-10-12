@@ -97,6 +97,9 @@ NfcCommand iso15693_3_listener_run(NfcGenericEvent event, void* context) {
             FURI_LOG_D(
                 TAG, "Wrong CRC, buffer size: %zu", bit_buffer_get_size(nfc_event->data.buffer));
         }
+    } else if(nfc_event->type == NfcEventTypeFieldOff) {
+        // A pending 16-slot INVENTORY reply does not survive the field going off
+        instance->session_state.inventory_pending = false;
     }
 
     return command;
