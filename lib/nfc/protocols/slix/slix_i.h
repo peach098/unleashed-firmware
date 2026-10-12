@@ -17,7 +17,7 @@ extern "C" {
 #define SLIX_LOCK_BITS_PPL   (1U << 3)
 
 // EAS ALARM response (EAS mode on, option flag 0): fixed 256-bit EAS sequence after the
-// flags byte. Captured from two SLIX2 cards (FNFC-01.1 reference, card_79 and card_AC).
+// flags byte. Captured from two SLIX2 cards (FNFC-01.1 reference measurement).
 #define SLIX_EAS_SEQUENCE_SIZE (32U)
 #define SLIX_EAS_SEQUENCE                                              \
     {0x2F, 0xB3, 0x62, 0x70, 0xD5, 0xA7, 0x90, 0x7F, 0xE8, 0xB1, 0x80, \

@@ -216,7 +216,7 @@ static SlixError slix_listener_eas_alarm_handler(
     SlixError error = SlixErrorNone;
 
     do {
-        // EAS mode off: the card does not answer (FNFC-01.1 reference, card_AC)
+        // EAS mode off: the card does not answer (FNFC-01.1 reference measurement)
         if(!slix_is_eas_enabled(instance->data)) {
             error = SlixErrorNotSupported;
             break;

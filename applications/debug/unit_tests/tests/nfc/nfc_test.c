@@ -1328,8 +1328,8 @@ MU_TEST(iso13239_crc_table_test) {
     bit_buffer_free(buf);
 }
 
-#define SLIX2_EAS_ON_FIXTURE EXT_PATH("unit_tests/nfc/slix2/SLIX2_eas_on.nfc")
-#define SLIX2_NO_EAS_FIXTURE EXT_PATH("unit_tests/nfc/slix2/SLIX2_2026-02-27_16,08,34.nfc")
+#define SLIX2_EAS_ON_FIXTURE EXT_PATH("unit_tests/nfc/Slix2_eas_on.nfc")
+#define SLIX2_NO_EAS_FIXTURE EXT_PATH("unit_tests/nfc/Slix2_no_eas.nfc")
 #define SLIX2_EAS_TMP        EXT_PATH("unit_tests/nfc/slix2_eas_tmp.nfc")
 
 // FNFC-01.4: a dump with the EAS keys loads them; EAS ID "12 34" is on-air order (LSB
@@ -1485,8 +1485,8 @@ MU_TEST(slix2_eas_copy_equal_reset_test) {
 
 // ---- SLIX EAS commands A2..A7 listener (FNFC-01.5) ----------------------
 // The poller sends raw EAS frames to the listener and compares the replies byte by byte.
-// Expected replies follow the card reference (FNFC-01.1, card_AC / card_79): SET/RESET EAS
-// -> 00, EAS ALARM with EAS off -> silence, with EAS on -> 00 + 32-byte EAS sequence.
+// Expected replies follow the FNFC-01.1 measurement on two SLIX2 cards: SET/RESET EAS -> 00,
+// EAS ALARM with EAS off -> silence, with EAS on -> 00 + 32-byte EAS sequence.
 
 typedef enum {
     NfcTestEasStepRaw, // send flags/cmd/manufacturer [+ UID] [+ data]
@@ -1680,7 +1680,7 @@ static bool nfc_test_eas_run(
            ctx.steps_passed == step_count;
 }
 
-// Runs the steps against a listener started with `initial` (the SLIX2_eas_on fixture
+// Runs the steps against a listener started with `initial` (the Slix2_eas_on fixture
 // otherwise) and checks that the listener's own copy of the image ends in `expected`.
 static void slix_eas_test(
     const NfcTestEasState* initial,
