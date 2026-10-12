@@ -10,7 +10,7 @@ FNFC-01.11 hardware blocker, 2026-10-12 (MSK)
          DTR toggle -> OSError [Errno 71] Protocol error
        The USB device is still enumerated (/dev/serial/by-id/...flip_E17ana-if00 -> ttyACM1,
        symlink/devnode dated 01:03, i.e. from the end of the previous session) and is not re-enumerating.
-       No process holds the port. Retried every 40-60 s for > 30 min: always "Write timeout".
+       No process holds the port. Retried every 40-60 s from 10:53 to 11:27 (34 min): always "Write timeout".
        PM3 is fine (hw version Iceman/master/v4.23346), nothing on its antenna (hf search: no tag),
        so the Flipper is not emulating either.
 Cause: unknown. Either the Flipper was already hung when this session started (the first
