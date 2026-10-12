@@ -1905,11 +1905,11 @@ static NfcCommand nfc_test_slix_read_callback(NfcGenericEvent event, void* conte
 // probe (the listener answers with the EAS sequence when on and is silent when off); the
 // probe outcome never fails the read.
 static void slix_read_eas_test(bool eas_enabled, bool eas_password_protected) {
-    Nfc* poller = nfc_alloc();
-    Nfc* listener = nfc_alloc();
-
     NfcDevice* nfc_device = nfc_device_alloc();
     mu_assert(nfc_device_load(nfc_device, SLIX2_EAS_ON_FIXTURE), "nfc_device_load() failed\r\n");
+
+    Nfc* poller = nfc_alloc();
+    Nfc* listener = nfc_alloc();
 
     SlixData* slix_data = slix_alloc();
     slix_copy(slix_data, nfc_device_get_data(nfc_device, NfcProtocolSlix));
