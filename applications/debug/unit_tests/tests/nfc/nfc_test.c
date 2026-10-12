@@ -1483,6 +1483,318 @@ MU_TEST(slix2_eas_copy_equal_reset_test) {
     mu_assert(reset_clear, "reset must clear all EAS fields\r\n");
 }
 
+// ---- SLIX EAS commands A2..A7 listener (FNFC-01.5) ----------------------
+// The poller sends raw EAS frames to the listener and compares the replies byte by byte.
+// Expected replies follow the card reference (FNFC-01.1, card_AC / card_79): SET/RESET EAS
+// -> 00, EAS ALARM with EAS off -> silence, with EAS on -> 00 + 32-byte EAS sequence.
+
+typedef enum {
+    NfcTestEasStepRaw, // send flags/cmd/manufacturer [+ UID] [+ data]
+    NfcTestEasStepSetPassword, // GET RANDOM + SET PASSWORD (EAS/AFI, 00000000)
+} NfcTestEasStepType;
+
+typedef enum {
+    NfcTestEasReplyOk, // 00
+    NfcTestEasReplyError, // 01 0F
+    NfcTestEasReplySilence, // no reply
+    NfcTestEasReplySequence, // 00 + 32-byte EAS sequence
+    NfcTestEasReplyNxpInfoEasLocked, // GET NXP SYSTEM INFO with the EAS lock bit set
+} NfcTestEasReply;
+
+typedef struct {
+    NfcTestEasStepType type;
+    uint8_t flags;
+    uint8_t command;
+    uint8_t data[2];
+    uint8_t data_size;
+    NfcTestEasReply reply;
+} NfcTestEasStep;
+
+typedef struct {
+    FuriThreadId thread_id;
+    const NfcTestEasStep* steps;
+    size_t step_count;
+    size_t steps_passed;
+    int failed_step;
+} NfcTestEasContext;
+
+#define NFC_TEST_EAS_FLAGS_NONADDR (ISO15693_3_REQ_FLAG_DATA_RATE_HI)
+#define NFC_TEST_EAS_FLAGS_ADDR \
+    (ISO15693_3_REQ_FLAG_DATA_RATE_HI | ISO15693_3_REQ_FLAG_T4_ADDRESSED)
+#define NFC_TEST_EAS_FLAGS_NONADDR_OPT \
+    (ISO15693_3_REQ_FLAG_DATA_RATE_HI | ISO15693_3_REQ_FLAG_T4_OPTION)
+
+#define NFC_TEST_EAS_RAW(fl, cmd, reply_type) \
+    {NfcTestEasStepRaw, (fl), (cmd), {0, 0}, 0, (reply_type)}
+#define NFC_TEST_EAS_RAW2(fl, cmd, b0, b1, reply_type) \
+    {NfcTestEasStepRaw, (fl), (cmd), {(b0), (b1)}, 2, (reply_type)}
+#define NFC_TEST_EAS_SET_PASSWORD {NfcTestEasStepSetPassword, 0, 0, {0, 0}, 0, NfcTestEasReplyOk}
+
+static bool
+    nfc_test_eas_reply_matches(NfcTestEasReply reply, SlixError error, const BitBuffer* rx) {
+    static const uint8_t eas_sequence[SLIX_EAS_SEQUENCE_SIZE] = SLIX_EAS_SEQUENCE;
+    const size_t size = bit_buffer_get_size_bytes(rx);
+    const uint8_t* data = bit_buffer_get_data(rx);
+
+    if(reply == NfcTestEasReplySilence) return error == SlixErrorTimeout;
+    if(error != SlixErrorNone) return false;
+
+    switch(reply) {
+    case NfcTestEasReplyOk:
+        return size == 1 && data[0] == ISO15693_3_RESP_FLAG_NONE;
+    case NfcTestEasReplyError:
+        return size == 2 && data[0] == ISO15693_3_RESP_FLAG_ERROR &&
+               data[1] == ISO15693_3_RESP_ERROR_UNKNOWN;
+    case NfcTestEasReplySequence:
+        return size == 1 + SLIX_EAS_SEQUENCE_SIZE && data[0] == ISO15693_3_RESP_FLAG_NONE &&
+               memcmp(&data[1], eas_sequence, SLIX_EAS_SEQUENCE_SIZE) == 0;
+    case NfcTestEasReplyNxpInfoEasLocked:
+        // flags, PP pointer, PP condition, lock bits, 4 feature flag bytes
+        return size == 8 && data[0] == ISO15693_3_RESP_FLAG_NONE &&
+               (data[3] & SLIX_LOCK_BITS_EAS) != 0;
+    default:
+        return false;
+    }
+}
+
+NfcCommand nfc_test_eas_callback(NfcGenericEventEx event, void* context) {
+    NfcTestEasContext* ctx = context;
+    Iso15693_3PollerEvent* iso15_event = event.parent_event_data;
+    SlixPoller* poller = event.poller;
+
+    if(iso15_event->type == Iso15693_3PollerEventTypeReady) {
+        // Addressed requests (SET PASSWORD, raw frames) take the UID from the poller data
+        iso15693_3_copy(
+            poller->data->iso15693_3_data, iso15693_3_poller_get_data(poller->iso15693_3_poller));
+
+        BitBuffer* tx = bit_buffer_alloc(16);
+        BitBuffer* rx = bit_buffer_alloc(ISO15693_3_LISTENER_TEST_RX_SIZE);
+
+        for(size_t i = 0; i < ctx->step_count; ++i) {
+            const NfcTestEasStep* step = &ctx->steps[i];
+            bool passed = false;
+
+            if(step->type == NfcTestEasStepSetPassword) {
+                SlixRandomNumber random_number = 0;
+                passed = slix_poller_get_random_number(poller, &random_number) == SlixErrorNone &&
+                         slix_poller_set_password(
+                             poller, SlixPasswordTypeEasAfi, 0x00000000U, random_number) ==
+                             SlixErrorNone;
+            } else {
+                bit_buffer_reset(tx);
+                bit_buffer_append_byte(tx, step->flags);
+                bit_buffer_append_byte(tx, step->command);
+                // ISO15693-3 commands (LOCK AFI) have no manufacturer code
+                if(step->command >= SLIX_CMD_CUSTOM_START) {
+                    bit_buffer_append_byte(tx, SLIX_NXP_MANUFACTURER_CODE);
+                }
+                if(step->flags & ISO15693_3_REQ_FLAG_T4_ADDRESSED) {
+                    iso15693_3_append_uid(poller->data->iso15693_3_data, tx);
+                }
+                bit_buffer_append_bytes(tx, step->data, step->data_size);
+
+                const SlixError error =
+                    slix_poller_send_frame(poller, tx, rx, ISO15693_3_FDT_POLL_FC);
+                passed = nfc_test_eas_reply_matches(step->reply, error, rx);
+            }
+
+            if(!passed) {
+                ctx->failed_step = i;
+                break;
+            }
+            ctx->steps_passed++;
+        }
+
+        bit_buffer_free(rx);
+        bit_buffer_free(tx);
+    }
+
+    furi_thread_flags_set(ctx->thread_id, NFC_TEST_FLAG_WORKER_DONE);
+    return NfcCommandStop;
+}
+
+typedef struct {
+    bool eas_enabled;
+    bool eas_password_protected;
+    bool afi_password_protected;
+    bool eas_locked;
+    uint16_t eas_id;
+} NfcTestEasState;
+
+// Runs the steps against a listener started with `initial` (the SLIX2_eas_on fixture
+// otherwise) and checks the listener image ends in `expected`. The loaded NfcDevice data
+// must stay untouched: the commands change only the emulation image in memory.
+static void slix_eas_test(
+    const NfcTestEasState* initial,
+    const NfcTestEasStep* steps,
+    size_t step_count,
+    const NfcTestEasState* expected) {
+    Nfc* poller = nfc_alloc();
+    Nfc* listener = nfc_alloc();
+
+    NfcDevice* nfc_device = nfc_device_alloc();
+    mu_assert(nfc_device_load(nfc_device, SLIX2_EAS_ON_FIXTURE), "nfc_device_load() failed\r\n");
+    const SlixData* file_data = nfc_device_get_data(nfc_device, NfcProtocolSlix);
+
+    SlixData* slix_data = slix_alloc();
+    slix_copy(slix_data, file_data);
+    slix_set_eas(slix_data, initial->eas_enabled);
+    slix_set_eas_afi_protection(
+        slix_data, initial->eas_password_protected, initial->afi_password_protected);
+    slix_set_eas_id(slix_data, initial->eas_id);
+    slix_data->system_info.lock_bits.eas = initial->eas_locked;
+
+    NfcListener* slix_listener = nfc_listener_alloc(listener, NfcProtocolSlix, slix_data);
+    nfc_listener_start(slix_listener, NULL, NULL);
+
+    NfcTestEasContext ctx = {
+        .thread_id = furi_thread_get_current_id(),
+        .steps = steps,
+        .step_count = step_count,
+        .steps_passed = 0,
+        .failed_step = -1,
+    };
+
+    NfcPoller* slix_poller = nfc_poller_alloc(poller, NfcProtocolSlix);
+    nfc_poller_start_ex(slix_poller, nfc_test_eas_callback, &ctx);
+
+    uint32_t flag =
+        furi_thread_flags_wait(NFC_TEST_FLAG_WORKER_DONE, FuriFlagWaitAny, FuriWaitForever);
+
+    nfc_poller_stop(slix_poller);
+    nfc_poller_free(slix_poller);
+    nfc_listener_stop(slix_listener);
+
+    const SlixData* image = nfc_listener_get_data(slix_listener, NfcProtocolSlix);
+    const bool state_ok =
+        slix_is_eas_enabled(image) == expected->eas_enabled &&
+        slix_is_eas_password_protected(image) == expected->eas_password_protected &&
+        slix_is_afi_password_protected(image) == expected->afi_password_protected &&
+        image->system_info.lock_bits.eas == expected->eas_locked &&
+        slix_get_eas_id(image) == expected->eas_id;
+    // Fixture: EAS Mode true, EAS ID 12 34, EAS Password Protected true, AFI false
+    const bool file_untouched =
+        slix_is_eas_enabled(file_data) && slix_get_eas_id(file_data) == 0x3412 &&
+        slix_is_eas_password_protected(file_data) && !slix_is_afi_password_protected(file_data) &&
+        !file_data->system_info.lock_bits.eas;
+
+    nfc_listener_free(slix_listener);
+    slix_free(slix_data);
+    nfc_device_free(nfc_device);
+    nfc_free(listener);
+    nfc_free(poller);
+
+    if(ctx.failed_step >= 0) {
+        FURI_LOG_E(TAG, "EAS step %d failed", ctx.failed_step);
+    }
+    mu_assert(flag == NFC_TEST_FLAG_WORKER_DONE, "Wrong thread flag\r\n");
+    mu_assert(ctx.failed_step < 0, "EAS command reply differs\r\n");
+    mu_assert(ctx.steps_passed == step_count, "Poller did not run all EAS steps\r\n");
+    mu_assert(state_ok, "EAS state of the emulation image differs\r\n");
+    mu_assert(file_untouched, "EAS commands changed the loaded file data\r\n");
+}
+
+// No protection, EAS off: enable/disable without password (PM3 slixeasenable chain uses
+// the non-addressed form), EAS ALARM follows the mode, WRITE EAS ID and LOCK AFI work
+// without password.
+MU_TEST(slix_eas_set_reset_alarm_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_EAS_ALARM, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_SET_EAS, NfcTestEasReplyOk),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_EAS_ALARM, NfcTestEasReplySequence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_EAS_ALARM, NfcTestEasReplySequence),
+        // EAS ID mode (option flag) is not implemented: no reply
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_NONADDR_OPT, SLIX_CMD_EAS_ALARM, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_RESET_EAS, NfcTestEasReplyOk),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_EAS_ALARM, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_SET_EAS, NfcTestEasReplyOk),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_RESET_EAS, NfcTestEasReplyOk),
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_WRITE_EAS_ID, 0xEF, 0xBE, NfcTestEasReplyOk),
+        // Malformed WRITE EAS ID (1 byte) is ignored
+        {NfcTestEasStepRaw,
+         NFC_TEST_EAS_FLAGS_ADDR,
+         SLIX_CMD_WRITE_EAS_ID,
+         {0x11, 0},
+         1,
+         NfcTestEasReplySilence},
+        // LOCK AFI without password: AFI is not password protected. (WRITE AFI shares the
+        // SLIX extension handler, but the base listener drops its 1-byte request as a format
+        // error before the extension is consulted, so it cannot be exercised here.)
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_LOCK_AFI, NfcTestEasReplyOk),
+    };
+    static const NfcTestEasState initial = {false, false, false, false, 0x3412};
+    static const NfcTestEasState expected = {false, false, false, false, 0xBEEF};
+    slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
+}
+
+// EAS password protected: without SET PASSWORD (EAS/AFI) the EAS commands get no reply
+// and change nothing; with it they work. PASSWORD PROTECT with the option flag protects AFI.
+MU_TEST(slix_eas_password_protected_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_RESET_EAS, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_RESET_EAS, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_SET_EAS, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_LOCK_EAS, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_WRITE_EAS_ID, 0x01, 0x02, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_NONADDR_OPT,
+            SLIX_CMD_PASSWORD_PROTECT_EAS_AFI,
+            NfcTestEasReplySilence),
+        // EAS ALARM is not password protected
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_EAS_ALARM, NfcTestEasReplySequence),
+        NFC_TEST_EAS_SET_PASSWORD,
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_RESET_EAS, NfcTestEasReplyOk),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_EAS_ALARM, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_WRITE_EAS_ID, 0x01, 0x02, NfcTestEasReplyOk),
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_NONADDR_OPT, SLIX_CMD_PASSWORD_PROTECT_EAS_AFI, NfcTestEasReplyOk),
+    };
+    static const NfcTestEasState initial = {true, true, false, false, 0x3412};
+    static const NfcTestEasState expected = {false, true, true, false, 0x0201};
+    slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
+}
+
+// PASSWORD PROTECT EAS/AFI always needs the EAS/AFI password; option flag 0 protects EAS.
+// With AFI protected, LOCK AFI without password is refused.
+MU_TEST(slix_eas_protect_eas_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_PASSWORD_PROTECT_EAS_AFI, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_LOCK_AFI, NfcTestEasReplyError),
+        NFC_TEST_EAS_SET_PASSWORD,
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_PASSWORD_PROTECT_EAS_AFI, NfcTestEasReplyOk),
+    };
+    static const NfcTestEasState initial = {false, false, true, false, 0x3412};
+    static const NfcTestEasState expected = {false, true, true, false, 0x3412};
+    slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
+}
+
+// LOCK EAS: the lock bit is reported by GET NXP SYSTEM INFO; afterwards SET/RESET/LOCK EAS
+// and WRITE EAS ID are refused with an error and the EAS mode stays as locked.
+MU_TEST(slix_eas_lock_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_LOCK_EAS, NfcTestEasReplyOk),
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_ADDR,
+            SLIX_CMD_GET_NXP_SYSTEM_INFORMATION,
+            NfcTestEasReplyNxpInfoEasLocked),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_RESET_EAS, NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_SET_EAS, NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_LOCK_EAS, NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_WRITE_EAS_ID, 0x01, 0x02, NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_EAS_ALARM, NfcTestEasReplySequence),
+    };
+    static const NfcTestEasState initial = {true, false, false, false, 0x3412};
+    static const NfcTestEasState expected = {true, false, false, true, 0x3412};
+    slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
+}
+
 // AES-CMAC known-answer vectors from RFC 4493 (Appendix D.1), NIST AES-128 key. Exercises
 // the empty / single-complete-block / partial-final / multi-block paths of the CMAC plus the
 // cmac8 odd-index truncation used by MIFARE Plus SL3.
@@ -1753,6 +2065,10 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(slix2_eas_fixture_roundtrip_test);
     MU_RUN_TEST(slix2_eas_defaults_test);
     MU_RUN_TEST(slix2_eas_copy_equal_reset_test);
+    MU_RUN_TEST(slix_eas_set_reset_alarm_test);
+    MU_RUN_TEST(slix_eas_password_protected_test);
+    MU_RUN_TEST(slix_eas_protect_eas_test);
+    MU_RUN_TEST(slix_eas_lock_test);
 
     MU_RUN_TEST(iso15693_signal_encode_equivalence);
     MU_RUN_TEST(iso15693_signal_tick_exact);

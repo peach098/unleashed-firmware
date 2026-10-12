@@ -23,6 +23,7 @@ static constexpr auto unit_tests_api_table = sort(create_array_t<sym_entry>(
     API_METHOD(slix_set_eas_id, void, (SlixData*, uint16_t)),
     API_METHOD(slix_set_eas_afi_protection, void, (SlixData*, bool, bool)),
     API_METHOD(iso15693_3_poller_get_data, const Iso15693_3Data*, (Iso15693_3Poller*)),
+    API_METHOD(iso15693_3_append_uid, void, (const Iso15693_3Data*, BitBuffer*)),
     API_METHOD(mf_plus_crypto_cmac, void, (const uint8_t*, const uint8_t*, size_t, uint8_t*)),
     API_METHOD(mf_plus_crypto_cmac8, void, (const uint8_t*, const uint8_t*, size_t, uint8_t*)),
     API_METHOD(mf_plus_crypto_build_read_iv, void, (const uint8_t*, uint16_t, uint16_t, uint8_t*)),

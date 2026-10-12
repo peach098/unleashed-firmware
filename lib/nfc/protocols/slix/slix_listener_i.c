@@ -108,6 +108,40 @@ static SlixError slix_listener_write_password(
     return error;
 }
 
+// EAS commands are refused silently when EAS is password protected and the EAS/AFI
+// password was not set in this session (assumption, no card reference: same as a wrong
+// password). Lock is checked by the caller where the command is a write.
+static SlixError slix_listener_check_eas_access(SlixListener* instance) {
+    if(slix_is_eas_password_protected(instance->data) &&
+       slix_listener_is_password_lock_enabled(instance, SlixPasswordTypeEasAfi)) {
+        return SlixErrorNotSupported;
+    }
+
+    return SlixErrorNone;
+}
+
+// SET EAS / RESET EAS / LOCK EAS share the checks: no payload, EAS not locked, password
+static SlixError slix_listener_check_eas_write(SlixListener* instance, size_t data_size) {
+    SlixError error = SlixErrorNone;
+
+    do {
+        if(data_size != 0) {
+            error = SlixErrorFormat;
+            break;
+        }
+
+        error = slix_listener_check_eas_access(instance);
+        if(error != SlixErrorNone) break;
+
+        if(instance->data->system_info.lock_bits.eas) {
+            error = SlixErrorInternal;
+            break;
+        }
+    } while(false);
+
+    return error;
+}
+
 // Custom SLIX request handlers
 static SlixError slix_listener_default_handler(
     SlixListener* instance,
@@ -121,6 +155,156 @@ static SlixError slix_listener_default_handler(
 
     // Empty placeholder handler
     return SlixErrorNotSupported;
+}
+
+static SlixError slix_listener_set_eas_handler(
+    SlixListener* instance,
+    const uint8_t* data,
+    size_t data_size,
+    uint8_t flags) {
+    UNUSED(data);
+    UNUSED(flags);
+
+    const SlixError error = slix_listener_check_eas_write(instance, data_size);
+    if(error == SlixErrorNone) {
+        slix_set_eas(instance->data, true);
+    }
+
+    return error;
+}
+
+static SlixError slix_listener_reset_eas_handler(
+    SlixListener* instance,
+    const uint8_t* data,
+    size_t data_size,
+    uint8_t flags) {
+    UNUSED(data);
+    UNUSED(flags);
+
+    const SlixError error = slix_listener_check_eas_write(instance, data_size);
+    if(error == SlixErrorNone) {
+        slix_set_eas(instance->data, false);
+    }
+
+    return error;
+}
+
+static SlixError slix_listener_lock_eas_handler(
+    SlixListener* instance,
+    const uint8_t* data,
+    size_t data_size,
+    uint8_t flags) {
+    UNUSED(data);
+    UNUSED(flags);
+
+    const SlixError error = slix_listener_check_eas_write(instance, data_size);
+    if(error == SlixErrorNone) {
+        instance->data->system_info.lock_bits.eas = true;
+    }
+
+    return error;
+}
+
+static SlixError slix_listener_eas_alarm_handler(
+    SlixListener* instance,
+    const uint8_t* data,
+    size_t data_size,
+    uint8_t flags) {
+    UNUSED(data);
+
+    static const uint8_t eas_sequence[SLIX_EAS_SEQUENCE_SIZE] = SLIX_EAS_SEQUENCE;
+    SlixError error = SlixErrorNone;
+
+    do {
+        // EAS mode off: the card does not answer (FNFC-01.1 reference, card_AC)
+        if(!slix_is_eas_enabled(instance->data)) {
+            error = SlixErrorNotSupported;
+            break;
+        }
+
+        // EAS ID mode (option flag set, EAS ID mask in the request): no card reference,
+        // not implemented, no reply
+        if(flags & ISO15693_3_REQ_FLAG_T4_OPTION) {
+            error = SlixErrorNotSupported;
+            break;
+        }
+
+        if(data_size != 0) {
+            error = SlixErrorFormat;
+            break;
+        }
+
+        bit_buffer_append_bytes(instance->tx_buffer, eas_sequence, sizeof(eas_sequence));
+    } while(false);
+
+    return error;
+}
+
+static SlixError slix_listener_password_protect_eas_afi_handler(
+    SlixListener* instance,
+    const uint8_t* data,
+    size_t data_size,
+    uint8_t flags) {
+    UNUSED(data);
+    SlixError error = SlixErrorNone;
+
+    do {
+        if(data_size != 0) {
+            error = SlixErrorFormat;
+            break;
+        }
+
+        // Always requires the EAS/AFI password, protection is not checked here
+        if(slix_listener_is_password_lock_enabled(instance, SlixPasswordTypeEasAfi)) {
+            error = SlixErrorNotSupported;
+            break;
+        }
+
+        // Option flag selects what to protect: 0 = EAS, 1 = AFI (as PM3 passprotecteas /
+        // passprotectafi). Protection cannot be removed.
+        SlixData* slix_data = instance->data;
+        const bool protect_afi = (flags & ISO15693_3_REQ_FLAG_T4_OPTION) != 0;
+        slix_set_eas_afi_protection(
+            slix_data,
+            slix_is_eas_password_protected(slix_data) || !protect_afi,
+            slix_is_afi_password_protected(slix_data) || protect_afi);
+    } while(false);
+
+    return error;
+}
+
+static SlixError slix_listener_write_eas_id_handler(
+    SlixListener* instance,
+    const uint8_t* data,
+    size_t data_size,
+    uint8_t flags) {
+    UNUSED(flags);
+    SlixError error = SlixErrorNone;
+
+    do {
+        typedef struct {
+            uint8_t eas_id[2]; // LSB first
+        } SlixWriteEasIdRequestLayout;
+
+        if(data_size != sizeof(SlixWriteEasIdRequestLayout)) {
+            error = SlixErrorFormat;
+            break;
+        }
+
+        error = slix_listener_check_eas_access(instance);
+        if(error != SlixErrorNone) break;
+
+        // Assumption: LOCK EAS also locks the EAS ID
+        if(instance->data->system_info.lock_bits.eas) {
+            error = SlixErrorInternal;
+            break;
+        }
+
+        const SlixWriteEasIdRequestLayout* request = (const SlixWriteEasIdRequestLayout*)data;
+        slix_set_eas_id(instance->data, request->eas_id[0] | (request->eas_id[1] << 8));
+    } while(false);
+
+    return error;
 }
 
 static SlixError slix_listener_get_nxp_system_info_handler(
@@ -346,12 +530,12 @@ static SlixError slix_listener_read_signature_handler(
 
 // Custom SLIX commands handler table
 static const SlixRequestHandler slix_request_handler_table[SLIX_CMD_CUSTOM_COUNT] = {
-    slix_listener_default_handler, // SLIX_CMD_SET_EAS (0xA2U)
-    slix_listener_default_handler, // SLIX_CMD_RESET_EAS (0xA3U)
-    slix_listener_default_handler, // SLIX_CMD_LOCK_EAS (0xA4U)
-    slix_listener_default_handler, // SLIX_CMD_EAS_ALARM (0xA5U)
-    slix_listener_default_handler, // SLIX_CMD_PASSWORD_PROTECT_EAS_AFI (0xA6U)
-    slix_listener_default_handler, // SLIX_CMD_WRITE_EAS_ID (0xA7U)
+    slix_listener_set_eas_handler,
+    slix_listener_reset_eas_handler,
+    slix_listener_lock_eas_handler,
+    slix_listener_eas_alarm_handler,
+    slix_listener_password_protect_eas_afi_handler,
+    slix_listener_write_eas_id_handler,
     slix_listener_default_handler, // UNUSED (0xA8U)
     slix_listener_default_handler, // UNUSED (0xA9U)
     slix_listener_default_handler, // UNUSED (0xAAU)
@@ -519,7 +703,9 @@ static Iso15693_3Error slix_listener_iso15693_3_write_lock_afi_extension_handler
     va_list args) {
     UNUSED(args);
 
-    return slix_listener_is_password_lock_enabled(instance, SlixPasswordTypeEasAfi) ?
+    // The EAS/AFI password is needed only once AFI is password protected (A6 with option flag)
+    return slix_is_afi_password_protected(instance->data) &&
+                   slix_listener_is_password_lock_enabled(instance, SlixPasswordTypeEasAfi) ?
                Iso15693_3ErrorInternal :
                Iso15693_3ErrorNone;
 }
