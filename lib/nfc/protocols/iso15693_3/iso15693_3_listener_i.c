@@ -835,6 +835,18 @@ Iso15693_3Error iso15693_3_listener_ready(Iso15693_3Listener* instance) {
     return Iso15693_3ErrorNone;
 }
 
+Iso15693_3Error iso15693_3_listener_quiet(Iso15693_3Listener* instance) {
+    furi_assert(instance);
+    instance->state = Iso15693_3ListenerStateQuiet;
+    return Iso15693_3ErrorNone;
+}
+
+Iso15693_3Error iso15693_3_listener_silence(Iso15693_3Listener* instance) {
+    furi_assert(instance);
+    instance->state = Iso15693_3ListenerStateSilent;
+    return Iso15693_3ErrorNone;
+}
+
 static Iso15693_3Error iso15693_3_listener_process_nfc_error(NfcError error) {
     Iso15693_3Error ret = Iso15693_3ErrorNone;
 
@@ -886,6 +898,11 @@ Iso15693_3Error
         const Iso15693_3RequestLayout* request =
             (const Iso15693_3RequestLayout*)bit_buffer_get_data(rx_buffer);
 
+        if(instance->state == Iso15693_3ListenerStateSilent) {
+            error = Iso15693_3ErrorIgnore;
+            break;
+        }
+
         Iso15693_3ListenerSessionState* session_state = &instance->session_state;
 
         if((request->flags & ISO15693_3_REQ_FLAG_INVENTORY_T5) == 0) {
@@ -897,8 +914,9 @@ Iso15693_3Error
                 error = Iso15693_3ErrorUnknown;
                 break;
             } else if(instance->state == Iso15693_3ListenerStateQuiet) {
-                // If the card is quiet, ignore non-addressed commands
-                if(session_state->addressed) {
+                // If the card is quiet, ignore non-addressed commands (selected ones too: a
+                // quiet card is not selected)
+                if(!session_state->addressed) {
                     error = Iso15693_3ErrorIgnore;
                     break;
                 }
@@ -962,6 +980,11 @@ Iso15693_3Error iso15693_3_listener_process_single_eof(Iso15693_3Listener* insta
     Iso15693_3Error error = Iso15693_3ErrorNone;
 
     do {
+        if(instance->state == Iso15693_3ListenerStateSilent) {
+            error = Iso15693_3ErrorIgnore;
+            break;
+        }
+
         Iso15693_3ListenerSessionState* session_state = &instance->session_state;
 
         if(session_state->inventory_pending) {
