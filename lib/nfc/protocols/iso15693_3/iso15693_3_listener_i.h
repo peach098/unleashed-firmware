@@ -40,9 +40,16 @@ typedef struct {
 
 typedef Iso15693_3Error (*Iso15693_3ExtensionHandler)(void* context, va_list args);
 
+// Called for a standard command that failed, before the error reply is built. Returns the
+// error to answer with: the same one, another one (its ISO15693-3 error code is sent) or
+// Iso15693_3ErrorIgnore for no reply. Lets a protocol answer like its real cards do.
+typedef Iso15693_3Error (
+    *Iso15693_3ExtensionErrorHandler)(void* context, uint8_t command, Iso15693_3Error error);
+
 typedef struct {
     Iso15693_3ExtensionHandler mandatory[ISO15693_3_MANDATORY_COUNT];
     Iso15693_3ExtensionHandler optional[ISO15693_3_OPTIONAL_COUNT];
+    Iso15693_3ExtensionErrorHandler error; // NULL = ISO15693-3 error codes as is
 } Iso15693_3ExtensionHandlerTable;
 
 struct Iso15693_3Listener {

@@ -1078,8 +1078,12 @@ static bool nfc_test_read_multi_expected(
         return true;
     }
 
-    // first > block count: the listener stays silent (count wraps over the response limit)
-    if(first > last + 1) return false;
+    // First block past the end: ISO15693-3 error 0x10 (FNFC-01.8)
+    if(first >= block_count) {
+        bit_buffer_append_byte(expected, ISO15693_3_RESP_FLAG_ERROR);
+        bit_buffer_append_byte(expected, ISO15693_3_RESP_ERROR_BLOCK_UNAVAILABLE);
+        return true;
+    }
 
     bool protected_block = false;
     for(uint32_t i = first; i <= last; ++i) {
@@ -1241,8 +1245,8 @@ static void nfc_test_read_multi(bool read_protected_low) {
         // clamped to the last block, includes the counter block
         {70, 14, false, NfcTestRequestReadMulti},
         {79, 0, false, NfcTestRequestReadMulti}, // counter block only
-        {80, 0, false, NfcTestRequestReadMulti}, // first block == block count: flags only
-        {81, 0, false, NfcTestRequestReadMulti}, // out of range: no reply
+        {80, 0, false, NfcTestRequestReadMulti}, // first block == block count: 01 10
+        {81, 0, false, NfcTestRequestReadMulti}, // out of range: 01 10
         {0, 0, true, NfcTestRequestReadMulti}, // with block security
         // 12 blocks with block security, across the protection pointer
         {20, 11, true, NfcTestRequestReadMulti},
@@ -1274,8 +1278,8 @@ MU_TEST(iso15693_3_listener_short_after_long_test) {
         {32, 14, false, NfcTestRequestReadMulti}, // 61 B
         {0, 0, false, NfcTestRequestGetRandom}, // SLIX extension: 3 B
         {32, 14, false, NfcTestRequestReadMulti}, // 61 B
-        {80, 0, false, NfcTestRequestReadMulti}, // first block == block count: flags only, 1 B
-        {33, 0, false, NfcTestRequestReadSingle}, // 5 B after 1 B: no stale bytes either way
+        {80, 0, false, NfcTestRequestReadMulti}, // first block == block count: 01 10, 2 B
+        {33, 0, false, NfcTestRequestReadSingle}, // 5 B after 2 B: no stale bytes either way
     };
     nfc_test_read_multi_run(true, cases, COUNT_OF(cases));
 }
@@ -1499,15 +1503,21 @@ typedef enum {
     NfcTestEasReplySilence, // no reply
     NfcTestEasReplySequence, // 00 + 32-byte EAS sequence
     NfcTestEasReplyNxpInfoEasLocked, // GET NXP SYSTEM INFO with the EAS lock bit set
+    NfcTestEasReplyData, // 00 + reply_size bytes
+    NfcTestEasReplyErrorNotSupported, // 01 01
+    NfcTestEasReplyErrorBlockUnavailable, // 01 10
+    NfcTestEasReplyErrorBlockAlreadyLocked, // 01 11
+    NfcTestEasReplyErrorBlockLocked, // 01 12
 } NfcTestEasReply;
 
 typedef struct {
     NfcTestEasStepType type;
     uint8_t flags;
     uint8_t command;
-    uint8_t data[2];
+    uint8_t data[6];
     uint8_t data_size;
     NfcTestEasReply reply;
+    uint8_t reply_size; // NfcTestEasReplyData only
 } NfcTestEasStep;
 
 typedef struct {
@@ -1525,15 +1535,38 @@ typedef struct {
     (ISO15693_3_REQ_FLAG_DATA_RATE_HI | ISO15693_3_REQ_FLAG_T4_OPTION)
 
 #define NFC_TEST_EAS_RAW(fl, cmd, reply_type) \
-    {NfcTestEasStepRaw, (fl), (cmd), {0, 0}, 0, (reply_type)}
+    {NfcTestEasStepRaw, (fl), (cmd), {0, 0}, 0, (reply_type), 0}
 #define NFC_TEST_EAS_RAW1(fl, cmd, b0, reply_type) \
-    {NfcTestEasStepRaw, (fl), (cmd), {(b0), 0}, 1, (reply_type)}
+    {NfcTestEasStepRaw, (fl), (cmd), {(b0), 0}, 1, (reply_type), 0}
 #define NFC_TEST_EAS_RAW2(fl, cmd, b0, b1, reply_type) \
-    {NfcTestEasStepRaw, (fl), (cmd), {(b0), (b1)}, 2, (reply_type)}
-#define NFC_TEST_EAS_SET_PASSWORD {NfcTestEasStepSetPassword, 0, 0, {0, 0}, 0, NfcTestEasReplyOk}
+    {NfcTestEasStepRaw, (fl), (cmd), {(b0), (b1)}, 2, (reply_type), 0}
+#define NFC_TEST_EAS_SET_PASSWORD \
+    {NfcTestEasStepSetPassword, 0, 0, {0, 0}, 0, NfcTestEasReplyOk, 0}
+#define NFC_TEST_EAS_DATA1(fl, cmd, b0, size) \
+    {NfcTestEasStepRaw, (fl), (cmd), {(b0), 0}, 1, NfcTestEasReplyData, (size)}
+#define NFC_TEST_EAS_DATA2(fl, cmd, b0, b1, size) \
+    {NfcTestEasStepRaw, (fl), (cmd), {(b0), (b1)}, 2, NfcTestEasReplyData, (size)}
+// WRITE SINGLE BLOCK of a 4-byte block filled with `b`
+#define NFC_TEST_EAS_WRITE_BLOCK(fl, blk, b, reply_type) \
+    {NfcTestEasStepRaw,                                  \
+     (fl),                                               \
+     ISO15693_3_CMD_WRITE_BLOCK,                         \
+     {(blk), (b), (b), (b), (b)},                        \
+     5,                                                  \
+     (reply_type),                                       \
+     0}
 
-static bool
-    nfc_test_eas_reply_matches(NfcTestEasReply reply, SlixError error, const BitBuffer* rx) {
+static bool nfc_test_eas_error_matches(const BitBuffer* rx, uint8_t code) {
+    const uint8_t* data = bit_buffer_get_data(rx);
+    return bit_buffer_get_size_bytes(rx) == 2 && data[0] == ISO15693_3_RESP_FLAG_ERROR &&
+           data[1] == code;
+}
+
+static bool nfc_test_eas_reply_matches(
+    NfcTestEasReply reply,
+    uint8_t reply_size,
+    SlixError error,
+    const BitBuffer* rx) {
     static const uint8_t eas_sequence[SLIX_EAS_SEQUENCE_SIZE] = SLIX_EAS_SEQUENCE;
     const size_t size = bit_buffer_get_size_bytes(rx);
     const uint8_t* data = bit_buffer_get_data(rx);
@@ -1545,8 +1578,17 @@ static bool
     case NfcTestEasReplyOk:
         return size == 1 && data[0] == ISO15693_3_RESP_FLAG_NONE;
     case NfcTestEasReplyError:
-        return size == 2 && data[0] == ISO15693_3_RESP_FLAG_ERROR &&
-               data[1] == ISO15693_3_RESP_ERROR_UNKNOWN;
+        return nfc_test_eas_error_matches(rx, ISO15693_3_RESP_ERROR_UNKNOWN);
+    case NfcTestEasReplyErrorNotSupported:
+        return nfc_test_eas_error_matches(rx, ISO15693_3_RESP_ERROR_NOT_SUPPORTED);
+    case NfcTestEasReplyErrorBlockUnavailable:
+        return nfc_test_eas_error_matches(rx, ISO15693_3_RESP_ERROR_BLOCK_UNAVAILABLE);
+    case NfcTestEasReplyErrorBlockAlreadyLocked:
+        return nfc_test_eas_error_matches(rx, ISO15693_3_RESP_ERROR_BLOCK_ALREADY_LOCKED);
+    case NfcTestEasReplyErrorBlockLocked:
+        return nfc_test_eas_error_matches(rx, ISO15693_3_RESP_ERROR_BLOCK_LOCKED);
+    case NfcTestEasReplyData:
+        return size == 1U + reply_size && data[0] == ISO15693_3_RESP_FLAG_NONE;
     case NfcTestEasReplySequence:
         return size == 1 + SLIX_EAS_SEQUENCE_SIZE && data[0] == ISO15693_3_RESP_FLAG_NONE &&
                memcmp(&data[1], eas_sequence, SLIX_EAS_SEQUENCE_SIZE) == 0;
@@ -1597,7 +1639,7 @@ NfcCommand nfc_test_eas_callback(NfcGenericEventEx event, void* context) {
 
                 const SlixError error =
                     slix_poller_send_frame(poller, tx, rx, ISO15693_3_FDT_POLL_FC);
-                passed = nfc_test_eas_reply_matches(step->reply, error, rx);
+                passed = nfc_test_eas_reply_matches(step->reply, step->reply_size, error, rx);
             }
 
             if(!passed) {
@@ -1744,7 +1786,8 @@ MU_TEST(slix_eas_set_reset_alarm_test) {
          SLIX_CMD_WRITE_EAS_ID,
          {0x11, 0},
          1,
-         NfcTestEasReplySilence},
+         NfcTestEasReplySilence,
+         0},
         // LOCK AFI without password: AFI is not password protected (WRITE AFI: see
         // slix_write_afi_dsfid_* tests)
         NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_LOCK_AFI, NfcTestEasReplyOk),
@@ -2006,8 +2049,8 @@ MU_TEST(slix_read_eas_on_password_protected_test) {
 
 // ---- WRITE AFI / WRITE DSFID (0x27 / 0x29) listener (FNFC-01.15) --------
 // A valid request carries exactly one data byte: it is answered with 00 and changes the
-// image; any other length gets no reply. A locked AFI/DSFID answers 01 0F. On SLIX2 a
-// password protected AFI needs the EAS/AFI password first (01 0F without it).
+// image; any other length gets no reply. A locked AFI/DSFID answers 01 12 (FNFC-01.8).
+// On SLIX2 a password protected AFI needs the EAS/AFI password first (01 0F without it).
 
 typedef struct {
     uint8_t afi;
@@ -2112,17 +2155,30 @@ MU_TEST(iso15693_3_write_afi_dsfid_test) {
         &nfc_test_write_afi_dsfid_expected);
 }
 
-// Locked AFI / DSFID: 01 0F, addressed and non-addressed, values unchanged
+// Locked AFI / DSFID: 01 12 (ISO15693-3 "locked"), addressed and non-addressed, values
+// unchanged
 MU_TEST(slix_write_afi_dsfid_locked_test) {
     static const NfcTestEasStep steps[] = {
         NFC_TEST_EAS_RAW1(
-            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_WRITE_AFI, 0x07, NfcTestEasReplyError),
+            NFC_TEST_EAS_FLAGS_ADDR,
+            ISO15693_3_CMD_WRITE_AFI,
+            0x07,
+            NfcTestEasReplyErrorBlockLocked),
         NFC_TEST_EAS_RAW1(
-            NFC_TEST_EAS_FLAGS_NONADDR, ISO15693_3_CMD_WRITE_AFI, 0x07, NfcTestEasReplyError),
+            NFC_TEST_EAS_FLAGS_NONADDR,
+            ISO15693_3_CMD_WRITE_AFI,
+            0x07,
+            NfcTestEasReplyErrorBlockLocked),
         NFC_TEST_EAS_RAW1(
-            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_WRITE_DSFID, 0x5A, NfcTestEasReplyError),
+            NFC_TEST_EAS_FLAGS_ADDR,
+            ISO15693_3_CMD_WRITE_DSFID,
+            0x5A,
+            NfcTestEasReplyErrorBlockLocked),
         NFC_TEST_EAS_RAW1(
-            NFC_TEST_EAS_FLAGS_NONADDR, ISO15693_3_CMD_WRITE_DSFID, 0x5A, NfcTestEasReplyError),
+            NFC_TEST_EAS_FLAGS_NONADDR,
+            ISO15693_3_CMD_WRITE_DSFID,
+            0x5A,
+            NfcTestEasReplyErrorBlockLocked),
         // A wrong length is still dropped before the lock check
         NFC_TEST_EAS_RAW2(
             NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_WRITE_AFI, 0x11, 0x22, NfcTestEasReplySilence),
@@ -2151,6 +2207,234 @@ MU_TEST(slix_write_afi_password_protected_test) {
     static const NfcTestAfiState initial = {0x00, 0x01, false, false, true};
     static const NfcTestAfiState expected = {0x09, 0x5A, false, false, true};
     nfc_test_write_afi_dsfid(NfcProtocolSlix, &initial, steps, COUNT_OF(steps), &expected);
+}
+
+// ---- Error replies of the standard commands (FNFC-01.8) -------------------------------
+// Plain ISO15693-3 emulation answers failed commands with the ISO15693-3 Table 7 codes:
+// 10 block not available, 11 already locked, 12 locked. SLIX emulation follows the SLIX2
+// card reference (FNFC-01.1) where it differs: READ SINGLE BLOCK past the end -> 01 0F
+// addressed or selected (the card: 01 0F or silence), silence non-addressed (the card too).
+// READ MULTIPLE BLOCKS and GET MULTIPLE BLOCK SECURITY ranges past the end are cut at the
+// last block, as on the card. Fixture: SLIX2_eas_on, 80 blocks of 4 bytes, none locked.
+// The mock NFC layer limits replies to 64 bytes, so long ranges are not covered here.
+
+#define NFC_TEST_ERR_FLAGS_ADDR_OPT (NFC_TEST_EAS_FLAGS_ADDR | ISO15693_3_REQ_FLAG_T4_OPTION)
+#define NFC_TEST_ERR_FLAGS_SELECTED \
+    (ISO15693_3_REQ_FLAG_DATA_RATE_HI | ISO15693_3_REQ_FLAG_T4_SELECTED)
+
+// Starts a `protocol` listener on the SLIX2_eas_on image, runs the steps and returns the
+// listener's own image (to be freed by the caller)
+static SlixData* nfc_test_error_run(
+    NfcProtocol protocol,
+    const NfcTestEasStep* steps,
+    size_t step_count,
+    bool* steps_ok) {
+    NfcDevice* nfc_device = nfc_device_alloc();
+    const bool loaded = nfc_device_load(nfc_device, SLIX2_EAS_ON_FIXTURE);
+
+    SlixData* slix_data = slix_alloc();
+    if(loaded) {
+        slix_copy(slix_data, nfc_device_get_data(nfc_device, NfcProtocolSlix));
+    }
+    nfc_device_free(nfc_device);
+
+    *steps_ok = loaded && nfc_test_eas_run(slix_data, protocol, steps, step_count);
+    return slix_data;
+}
+
+// SLIX2 emulation: out-of-range reads answer like the card
+MU_TEST(slix_error_out_of_range_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_EAS_DATA1(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_BLOCK, 0x00, 4),
+        NFC_TEST_EAS_DATA1(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_BLOCK, 0x4F, 4),
+        // Card: 01 0F or silence, at random
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_BLOCK, 0x50, NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_BLOCK, 0xFF, NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_ERR_FLAGS_ADDR_OPT, ISO15693_3_CMD_READ_BLOCK, 0x50, NfcTestEasReplyError),
+        // Card: silence
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_EAS_FLAGS_NONADDR, ISO15693_3_CMD_READ_BLOCK, 0x50, NfcTestEasReplySilence),
+        NFC_TEST_EAS_DATA1(NFC_TEST_EAS_FLAGS_NONADDR, ISO15693_3_CMD_READ_BLOCK, 0x4F, 4),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_SELECT, NfcTestEasReplyOk),
+        // Card: 01 0F or silence, at random
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_ERR_FLAGS_SELECTED, ISO15693_3_CMD_READ_BLOCK, 0x50, NfcTestEasReplyError),
+        NFC_TEST_EAS_DATA1(NFC_TEST_ERR_FLAGS_SELECTED, ISO15693_3_CMD_READ_BLOCK, 0x00, 4),
+        // Cut at the last block, as on the card: blocks 0x46..0x4F
+        NFC_TEST_EAS_DATA2(
+            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_MULTI_BLOCKS, 0x46, 0x0E, 10 * 4),
+        // No reference: ISO15693-3 code
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR,
+            ISO15693_3_CMD_READ_MULTI_BLOCKS,
+            0x50,
+            0x00,
+            NfcTestEasReplyErrorBlockUnavailable),
+        NFC_TEST_EAS_DATA2(
+            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_GET_BLOCKS_SECURITY, 0x40, 0x0F, 16),
+        // Cut at the last block, as on the card (was 01 0F)
+        NFC_TEST_EAS_DATA2(
+            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_GET_BLOCKS_SECURITY, 0x40, 0x10, 16),
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR,
+            ISO15693_3_CMD_GET_BLOCKS_SECURITY,
+            0x50,
+            0x00,
+            NfcTestEasReplyErrorBlockUnavailable),
+        // SLIX has no WRITE MULTIPLE BLOCKS: ISO15693-3 "not supported" (was 01 0F)
+        {NfcTestEasStepRaw,
+         NFC_TEST_EAS_FLAGS_ADDR,
+         ISO15693_3_CMD_WRITE_MULTI_BLOCKS,
+         {0x00, 0x00, 0x11, 0x22, 0x33, 0x44},
+         6,
+         NfcTestEasReplyErrorNotSupported,
+         0},
+    };
+    bool steps_ok = false;
+    SlixData* image = nfc_test_error_run(NfcProtocolSlix, steps, COUNT_OF(steps), &steps_ok);
+    slix_free(image);
+    mu_assert(steps_ok, "SLIX out-of-range reply differs\r\n");
+}
+
+// Plain ISO15693-3 emulation: out-of-range reads answer 01 10 in every mode
+MU_TEST(iso15693_3_error_out_of_range_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_EAS_DATA1(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_BLOCK, 0x00, 4),
+        NFC_TEST_EAS_DATA1(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_BLOCK, 0x4F, 4),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_EAS_FLAGS_ADDR,
+            ISO15693_3_CMD_READ_BLOCK,
+            0x50,
+            NfcTestEasReplyErrorBlockUnavailable),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_EAS_FLAGS_ADDR,
+            ISO15693_3_CMD_READ_BLOCK,
+            0xFF,
+            NfcTestEasReplyErrorBlockUnavailable),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_ERR_FLAGS_ADDR_OPT,
+            ISO15693_3_CMD_READ_BLOCK,
+            0x50,
+            NfcTestEasReplyErrorBlockUnavailable),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_EAS_FLAGS_NONADDR,
+            ISO15693_3_CMD_READ_BLOCK,
+            0x50,
+            NfcTestEasReplyErrorBlockUnavailable),
+        NFC_TEST_EAS_DATA1(NFC_TEST_EAS_FLAGS_NONADDR, ISO15693_3_CMD_READ_BLOCK, 0x4F, 4),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_SELECT, NfcTestEasReplyOk),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_ERR_FLAGS_SELECTED,
+            ISO15693_3_CMD_READ_BLOCK,
+            0x50,
+            NfcTestEasReplyErrorBlockUnavailable),
+        NFC_TEST_EAS_DATA1(NFC_TEST_ERR_FLAGS_SELECTED, ISO15693_3_CMD_READ_BLOCK, 0x00, 4),
+        NFC_TEST_EAS_DATA2(
+            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_MULTI_BLOCKS, 0x46, 0x0E, 10 * 4),
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR,
+            ISO15693_3_CMD_READ_MULTI_BLOCKS,
+            0x50,
+            0x00,
+            NfcTestEasReplyErrorBlockUnavailable),
+        NFC_TEST_EAS_DATA2(
+            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_GET_BLOCKS_SECURITY, 0x40, 0x10, 16),
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR,
+            ISO15693_3_CMD_GET_BLOCKS_SECURITY,
+            0x50,
+            0x00,
+            NfcTestEasReplyErrorBlockUnavailable),
+    };
+    bool steps_ok = false;
+    SlixData* image = nfc_test_error_run(NfcProtocolIso15693_3, steps, COUNT_OF(steps), &steps_ok);
+    slix_free(image);
+    mu_assert(steps_ok, "ISO15693-3 out-of-range reply differs\r\n");
+}
+
+// Locked block / AFI / DSFID, not measured on cards (locking is irreversible): ISO15693-3
+// codes for SLIX and plain ISO15693-3 alike. Failed writes leave the image unchanged.
+static const NfcTestEasStep nfc_test_error_lock_steps[] = {
+    NFC_TEST_EAS_WRITE_BLOCK(NFC_TEST_EAS_FLAGS_ADDR, 0x10, 0xAA, NfcTestEasReplyOk),
+    NFC_TEST_EAS_RAW1(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_LOCK_BLOCK, 0x10, NfcTestEasReplyOk),
+    NFC_TEST_EAS_RAW1(
+        NFC_TEST_EAS_FLAGS_ADDR,
+        ISO15693_3_CMD_LOCK_BLOCK,
+        0x10,
+        NfcTestEasReplyErrorBlockAlreadyLocked),
+    NFC_TEST_EAS_RAW1(
+        NFC_TEST_EAS_FLAGS_NONADDR,
+        ISO15693_3_CMD_LOCK_BLOCK,
+        0x10,
+        NfcTestEasReplyErrorBlockAlreadyLocked),
+    NFC_TEST_EAS_WRITE_BLOCK(NFC_TEST_EAS_FLAGS_ADDR, 0x10, 0x55, NfcTestEasReplyErrorBlockLocked),
+    NFC_TEST_EAS_WRITE_BLOCK(
+        NFC_TEST_EAS_FLAGS_NONADDR,
+        0x10,
+        0x55,
+        NfcTestEasReplyErrorBlockLocked),
+    NFC_TEST_EAS_DATA1(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_BLOCK, 0x10, 4),
+    NFC_TEST_EAS_DATA2(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_GET_BLOCKS_SECURITY, 0x0F, 0x01, 2),
+    NFC_TEST_EAS_RAW1(
+        NFC_TEST_EAS_FLAGS_ADDR,
+        ISO15693_3_CMD_LOCK_BLOCK,
+        0x50,
+        NfcTestEasReplyErrorBlockUnavailable),
+    NFC_TEST_EAS_WRITE_BLOCK(
+        NFC_TEST_EAS_FLAGS_ADDR,
+        0x50,
+        0x55,
+        NfcTestEasReplyErrorBlockUnavailable),
+    NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_LOCK_AFI, NfcTestEasReplyOk),
+    NFC_TEST_EAS_RAW(
+        NFC_TEST_EAS_FLAGS_ADDR,
+        ISO15693_3_CMD_LOCK_AFI,
+        NfcTestEasReplyErrorBlockAlreadyLocked),
+    NFC_TEST_EAS_RAW1(
+        NFC_TEST_EAS_FLAGS_ADDR,
+        ISO15693_3_CMD_WRITE_AFI,
+        0x07,
+        NfcTestEasReplyErrorBlockLocked),
+    NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_LOCK_DSFID, NfcTestEasReplyOk),
+    NFC_TEST_EAS_RAW(
+        NFC_TEST_EAS_FLAGS_ADDR,
+        ISO15693_3_CMD_LOCK_DSFID,
+        NfcTestEasReplyErrorBlockAlreadyLocked),
+    NFC_TEST_EAS_RAW1(
+        NFC_TEST_EAS_FLAGS_ADDR,
+        ISO15693_3_CMD_WRITE_DSFID,
+        0x5A,
+        NfcTestEasReplyErrorBlockLocked),
+};
+
+static void nfc_test_error_lock(NfcProtocol protocol) {
+    bool steps_ok = false;
+    SlixData* image = nfc_test_error_run(
+        protocol, nfc_test_error_lock_steps, COUNT_OF(nfc_test_error_lock_steps), &steps_ok);
+
+    static const uint8_t block_expected[4] = {0xAA, 0xAA, 0xAA, 0xAA};
+    const Iso15693_3Data* data = image->iso15693_3_data;
+    // Without the fixture the image has no blocks: skip the checks, they furi_check the index
+    const bool state_ok =
+        steps_ok && memcmp(iso15693_3_get_block_data(data, 0x10), block_expected, 4) == 0 &&
+        iso15693_3_is_block_locked(data, 0x10) && !iso15693_3_is_block_locked(data, 0x0F) &&
+        data->settings.lock_bits.afi && data->settings.lock_bits.dsfid &&
+        data->system_info.afi == 0x00 && data->system_info.dsfid == 0x01;
+    slix_free(image);
+
+    mu_assert(steps_ok, "locked block reply differs\r\n");
+    mu_assert(state_ok, "locked block image differs\r\n");
+}
+
+MU_TEST(slix_error_locked_test) {
+    nfc_test_error_lock(NfcProtocolSlix);
+}
+
+MU_TEST(iso15693_3_error_locked_test) {
+    nfc_test_error_lock(NfcProtocolIso15693_3);
 }
 
 // ---- INVENTORY: 16 slots, mask (FNFC-01.7) --------------------------------------------
@@ -2760,6 +3044,10 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(slix_write_afi_password_protected_test);
     MU_RUN_TEST(slix_inventory_16_slots_test);
     MU_RUN_TEST(iso15693_3_inventory_16_slots_test);
+    MU_RUN_TEST(slix_error_out_of_range_test);
+    MU_RUN_TEST(iso15693_3_error_out_of_range_test);
+    MU_RUN_TEST(slix_error_locked_test);
+    MU_RUN_TEST(iso15693_3_error_locked_test);
     MU_RUN_TEST(slix_inventory_reset_1_slot_quiet_test);
 
     MU_RUN_TEST(iso15693_signal_encode_equivalence);
