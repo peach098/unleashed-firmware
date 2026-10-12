@@ -84,6 +84,11 @@ SlixError slix_read_signature_response_parse(SlixSignature data, const BitBuffer
 
 SlixError slix_get_random_number_response_parse(SlixRandomNumber* data, const BitBuffer* buf);
 
+// EAS ALARM reply (option flag 0): *active is true only for a non-error frame carrying the
+// 32-byte EAS sequence. Error frame, empty or short reply: *active is false (EAS off cards
+// are silent or answer with an error; both mean "not active").
+SlixError slix_eas_alarm_response_parse(bool* active, const BitBuffer* buf);
+
 // Setters
 void slix_set_password(SlixData* data, SlixPasswordType password_type, SlixPassword password);
 

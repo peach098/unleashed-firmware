@@ -126,6 +126,28 @@ SlixError slix_get_random_number_response_parse(SlixRandomNumber* data, const Bi
     return error;
 }
 
+SlixError slix_eas_alarm_response_parse(bool* active, const BitBuffer* buf) {
+    furi_assert(active);
+    furi_assert(buf);
+
+    *active = false;
+    SlixError error = SlixErrorNone;
+
+    do {
+        if(slix_error_response_parse(&error, buf)) break;
+
+        // flags + EAS sequence (PM3 NxpTestEAS: 32 data bytes = EAS active)
+        if(bit_buffer_get_size_bytes(buf) < 1 + SLIX_EAS_SEQUENCE_SIZE) {
+            error = SlixErrorFormat;
+            break;
+        }
+
+        *active = true;
+    } while(false);
+
+    return error;
+}
+
 void slix_set_password(SlixData* data, SlixPasswordType password_type, SlixPassword password) {
     furi_assert(data);
     furi_assert(password_type < SlixPasswordTypeCount);

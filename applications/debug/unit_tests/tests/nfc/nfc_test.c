@@ -1827,6 +1827,157 @@ MU_TEST(slix_eas_non_slix2_test) {
     slix_eas_test(&initial, steps, COUNT_OF(steps), &expected);
 }
 
+// FNFC-01.6: EAS ALARM reply classification used by the read probe. Only a non-error frame
+// carrying the 32-byte EAS sequence means "EAS on"; an error frame or a short reply is off.
+MU_TEST(slix_eas_alarm_response_parse_test) {
+    static const uint8_t eas_sequence[SLIX_EAS_SEQUENCE_SIZE] = SLIX_EAS_SEQUENCE;
+    BitBuffer* buf = bit_buffer_alloc(64);
+    bool active = true;
+
+    // 00 + EAS sequence -> on
+    bit_buffer_append_byte(buf, ISO15693_3_RESP_FLAG_NONE);
+    bit_buffer_append_bytes(buf, eas_sequence, sizeof(eas_sequence));
+    active = false;
+    const SlixError error_on = slix_eas_alarm_response_parse(&active, buf);
+    const bool on_ok = (error_on == SlixErrorNone) && active;
+
+    // 01 0F -> off
+    bit_buffer_reset(buf);
+    bit_buffer_append_byte(buf, ISO15693_3_RESP_FLAG_ERROR);
+    bit_buffer_append_byte(buf, ISO15693_3_RESP_ERROR_UNKNOWN);
+    active = true;
+    slix_eas_alarm_response_parse(&active, buf);
+    const bool error_ok = !active;
+
+    // 00 + 31 bytes (truncated) -> off
+    bit_buffer_reset(buf);
+    bit_buffer_append_byte(buf, ISO15693_3_RESP_FLAG_NONE);
+    bit_buffer_append_bytes(buf, eas_sequence, sizeof(eas_sequence) - 1);
+    active = true;
+    const SlixError error_short = slix_eas_alarm_response_parse(&active, buf);
+    const bool short_ok = !active && (error_short == SlixErrorFormat);
+
+    // Empty -> off
+    bit_buffer_reset(buf);
+    active = true;
+    slix_eas_alarm_response_parse(&active, buf);
+    const bool empty_ok = !active;
+
+    bit_buffer_free(buf);
+
+    mu_assert(on_ok, "EAS sequence reply must mean EAS on\r\n");
+    mu_assert(error_ok, "Error reply must mean EAS off\r\n");
+    mu_assert(short_ok, "Short reply must mean EAS off (format error)\r\n");
+    mu_assert(empty_ok, "Empty reply must mean EAS off\r\n");
+}
+
+typedef struct {
+    FuriThreadId thread_id;
+    bool ready;
+    bool privacy_requested;
+    SlixError error;
+} NfcTestSlixReadContext;
+
+static NfcCommand nfc_test_slix_read_callback(NfcGenericEvent event, void* context) {
+    furi_check(event.protocol == NfcProtocolSlix);
+    NfcTestSlixReadContext* ctx = context;
+    SlixPollerEvent* slix_event = event.event_data;
+    NfcCommand command = NfcCommandContinue;
+
+    if(slix_event->type == SlixPollerEventTypePrivacyUnlockRequest) {
+        // No privacy password: like the read scene without a dictionary hit
+        ctx->privacy_requested = true;
+        slix_event->data->privacy_password.password_set = false;
+    } else if(slix_event->type == SlixPollerEventTypeReady) {
+        ctx->ready = true;
+        furi_thread_flags_set(ctx->thread_id, NFC_TEST_FLAG_WORKER_DONE);
+        command = NfcCommandStop;
+    } else if(slix_event->type == SlixPollerEventTypeError) {
+        ctx->error = slix_event->data->error;
+        furi_thread_flags_set(ctx->thread_id, NFC_TEST_FLAG_WORKER_DONE);
+        command = NfcCommandStop;
+    }
+
+    return command;
+}
+
+// FNFC-01.6: a full poller read of an emulated SLIX2 takes the EAS mode from the EAS ALARM
+// probe (the listener answers with the EAS sequence when on and is silent when off); the
+// probe outcome never fails the read.
+static void slix_read_eas_test(bool eas_enabled, bool eas_password_protected) {
+    Nfc* poller = nfc_alloc();
+    Nfc* listener = nfc_alloc();
+
+    NfcDevice* nfc_device = nfc_device_alloc();
+    mu_assert(nfc_device_load(nfc_device, SLIX2_EAS_ON_FIXTURE), "nfc_device_load() failed\r\n");
+
+    SlixData* slix_data = slix_alloc();
+    slix_copy(slix_data, nfc_device_get_data(nfc_device, NfcProtocolSlix));
+    slix_set_eas(slix_data, eas_enabled);
+    slix_set_eas_afi_protection(slix_data, eas_password_protected, false);
+
+    NfcListener* slix_listener = nfc_listener_alloc(listener, NfcProtocolSlix, slix_data);
+    nfc_listener_start(slix_listener, NULL, NULL);
+
+    NfcTestSlixReadContext ctx = {
+        .thread_id = furi_thread_get_current_id(),
+        .ready = false,
+        .privacy_requested = false,
+        .error = SlixErrorNone,
+    };
+    SlixData* result = slix_alloc();
+    // Start from the opposite value so a result not taken from the read is caught
+    slix_set_eas(result, !eas_enabled);
+
+    NfcPoller* slix_poller = nfc_poller_alloc(poller, NfcProtocolSlix);
+    nfc_poller_start(slix_poller, nfc_test_slix_read_callback, &ctx);
+
+    uint32_t flag =
+        furi_thread_flags_wait(NFC_TEST_FLAG_WORKER_DONE, FuriFlagWaitAny, FuriWaitForever);
+
+    nfc_poller_stop(slix_poller);
+    if(ctx.ready) {
+        slix_copy(result, nfc_poller_get_data(slix_poller));
+    }
+    nfc_poller_free(slix_poller);
+    nfc_listener_stop(slix_listener);
+    nfc_listener_free(slix_listener);
+
+    const bool same_uid = memcmp(
+                              slix_get_base_data(result)->uid,
+                              slix_get_base_data(slix_data)->uid,
+                              ISO15693_3_UID_SIZE) == 0;
+    const bool type_ok = slix_get_type(result) == SlixTypeSlix2;
+    const bool eas_ok = slix_is_eas_enabled(result) == eas_enabled;
+    const bool signature_ok =
+        memcmp(result->signature, slix_data->signature, sizeof(SlixSignature)) == 0;
+
+    slix_free(result);
+    slix_free(slix_data);
+    nfc_device_free(nfc_device);
+    nfc_free(listener);
+    nfc_free(poller);
+
+    mu_assert(flag == NFC_TEST_FLAG_WORKER_DONE, "Wrong thread flag\r\n");
+    mu_assert(ctx.ready, "SLIX2 read did not complete (EAS probe must not fail it)\r\n");
+    mu_assert(same_uid && type_ok, "Read SLIX2 identity differs\r\n");
+    mu_assert(signature_ok, "Read SLIX2 signature differs\r\n");
+    mu_assert(eas_ok, "Read EAS mode differs from the emulated card\r\n");
+}
+
+MU_TEST(slix_read_eas_on_test) {
+    slix_read_eas_test(true, false);
+}
+
+MU_TEST(slix_read_eas_off_test) {
+    slix_read_eas_test(false, false);
+}
+
+// EAS ALARM is not password protected: EAS on is detected without the EAS/AFI password
+MU_TEST(slix_read_eas_on_password_protected_test) {
+    slix_read_eas_test(true, true);
+}
+
 // AES-CMAC known-answer vectors from RFC 4493 (Appendix D.1), NIST AES-128 key. Exercises
 // the empty / single-complete-block / partial-final / multi-block paths of the CMAC plus the
 // cmac8 odd-index truncation used by MIFARE Plus SL3.
@@ -2103,6 +2254,10 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(slix_eas_lock_test);
     MU_RUN_TEST(slix_eas_lock_protected_test);
     MU_RUN_TEST(slix_eas_non_slix2_test);
+    MU_RUN_TEST(slix_eas_alarm_response_parse_test);
+    MU_RUN_TEST(slix_read_eas_on_test);
+    MU_RUN_TEST(slix_read_eas_off_test);
+    MU_RUN_TEST(slix_read_eas_on_password_protected_test);
 
     MU_RUN_TEST(iso15693_signal_encode_equivalence);
     MU_RUN_TEST(iso15693_signal_tick_exact);
