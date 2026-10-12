@@ -1,0 +1,79 @@
+log info
+Current log level: info
+Use <log ?> to list available log levels
+Press CTRL+C to stop...
+30768 [0;32m[I][Nfc] [0m[PROBE] 12B eof2rx=4169 tx_enter=2321 prepared=2766 fdt_end=7368 seq_tx=7638 dma=9572 (fdt_after_prep=1) us:dma-fdt=34
+30774 [0;32m[I][Nfc] [0m[PROBE3] 12B rx=297 copy=382 run=472 crc=845 handler=1080 send=1829 crc_app=2247 tx_enter=2321
+31326 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4513 tx_enter=2334 prepared=2739 fdt_end=7371 seq_tx=7641 dma=9575 (fdt_after_prep=1) us:dma-fdt=34
+31332 [0;32m[I][Nfc] [0m[PROBE3] 7B rx=345 copy=478 run=568 crc=1074 handler=1398 send=1912 crc_app=2260 tx_enter=2334
+32918 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4374 tx_enter=2334 prepared=2739 fdt_end=7371 seq_tx=7641 dma=9575 (fdt_after_prep=1) us:dma-fdt=34
+32924 [0;32m[I][Nfc] [0m[PROBE3] 7B rx=345 copy=478 run=568 crc=1074 handler=1398 send=1912 crc_app=2260 tx_enter=2334
+34511 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4153 tx_enter=2334 prepared=2739 fdt_end=7371 seq_tx=7641 dma=9575 (fdt_after_prep=1) us:dma-fdt=34
+34517 [0;32m[I][Nfc] [0m[PROBE3] 7B rx=345 copy=478 run=568 crc=1074 handler=1398 send=1912 crc_app=2260 tx_enter=2334
+36101 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4364 tx_enter=2334 prepared=2739 fdt_end=7371 seq_tx=7641 dma=9575 (fdt_after_prep=1) us:dma-fdt=34
+36107 [0;32m[I][Nfc] [0m[PROBE3] 7B rx=345 copy=478 run=568 crc=1074 handler=1398 send=1912 crc_app=2260 tx_enter=2334
+37691 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4153 tx_enter=2334 prepared=2739 fdt_end=7371 seq_tx=7641 dma=9575 (fdt_after_prep=1) us:dma-fdt=34
+37697 [0;32m[I][Nfc] [0m[PROBE3] 7B rx=345 copy=478 run=568 crc=1074 handler=1398 send=1912 crc_app=2260 tx_enter=2334
+39285 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4153 tx_enter=2334 prepared=2739 fdt_end=7371 seq_tx=7641 dma=9575 (fdt_after_prep=1) us:dma-fdt=34
+39291 [0;32m[I][Nfc] [0m[PROBE3] 7B rx=345 copy=478 run=568 crc=1074 handler=1398 send=1912 crc_app=2260 tx_enter=2334
+40880 [0;32m[I][Nfc] [0m[PROBE] 7B eof2rx=4156 tx_enter=2334 prepared=2739 fdt_end=7371 seq_tx=7641 dma=9575 (fdt_after_prep=1) us:dma-fdt=34
+40886 [0;32m[I][Nfc] [0m[PROBE3] 7B rx=345 copy=478 run=568 crc=1074 handler=1398 send=1912 crc_app=2260 tx_enter=2334
+42472 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4369 tx_enter=2943 prepared=3666 fdt_end=7368 seq_tx=7642 dma=9580 (fdt_after_prep=1) us:dma-fdt=34
+42478 [0;32m[I][Nfc] [0m[PROBE3] 35B rx=351 copy=490 run=580 crc=1097 handler=1421 send=2066 crc_app=2869 tx_enter=2943
+44061 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4368 tx_enter=2943 prepared=3666 fdt_end=7368 seq_tx=7642 dma=9580 (fdt_after_prep=1) us:dma-fdt=34
+44067 [0;32m[I][Nfc] [0m[PROBE3] 35B rx=351 copy=490 run=580 crc=1097 handler=1421 send=2066 crc_app=2869 tx_enter=2943
+45648 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4369 tx_enter=2943 prepared=3666 fdt_end=7368 seq_tx=7642 dma=9580 (fdt_after_prep=1) us:dma-fdt=34
+45654 [0;32m[I][Nfc] [0m[PROBE3] 35B rx=351 copy=490 run=580 crc=1097 handler=1421 send=2066 crc_app=2869 tx_enter=2943
+47244 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4365 tx_enter=2943 prepared=3666 fdt_end=7381 seq_tx=7655 dma=9593 (fdt_after_prep=1) us:dma-fdt=34
+47250 [0;32m[I][Nfc] [0m[PROBE3] 35B rx=351 copy=490 run=580 crc=1097 handler=1421 send=2066 crc_app=2869 tx_enter=2943
+48833 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4414 tx_enter=3542 prepared=4408 fdt_end=7367 seq_tx=7640 dma=9578 (fdt_after_prep=1) us:dma-fdt=34
+48839 [0;32m[I][Nfc] [0m[PROBE3] 35B rx=425 copy=589 run=700 crc=1327 handler=1761 send=2557 crc_app=3455 tx_enter=3542
+50423 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4380 tx_enter=2943 prepared=3666 fdt_end=7368 seq_tx=7642 dma=9580 (fdt_after_prep=1) us:dma-fdt=34
+50429 [0;32m[I][Nfc] [0m[PROBE3] 35B rx=351 copy=490 run=580 crc=1097 handler=1421 send=2066 crc_app=2869 tx_enter=2943
+52011 [0;32m[I][Nfc] [0m[PROBE] 35B eof2rx=4368 tx_enter=2943 prepared=3666 fdt_end=7368 seq_tx=7642 dma=9580 (fdt_after_prep=1) us:dma-fdt=34
+52017 [0;32m[I][Nfc] [0m[PROBE3] 35B rx=351 copy=490 run=580 crc=1097 handler=1421 send=2066 crc_app=2869 tx_enter=2943
+53597 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4356 tx_enter=5073 prepared=6900 fdt_end=7370 seq_tx=7646 dma=9584 (fdt_after_prep=1) us:dma-fdt=34
+53603 [0;32m[I][Nfc] [0m[PROBE3] 131B rx=351 copy=490 run=580 crc=1100 handler=1424 send=2645 crc_app=4999 tx_enter=5073
+54162 [0;32m[I][Dolphin] [0mFlush stats
+54163 [0;32m[I][SavedStruct] [0mSaving "/int/.dolphin.state"
+54191 [0;32m[I][DolphinState] [0mState saved
+55181 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4363 tx_enter=5278 prepared=7775 fdt_end=7814 seq_tx=8083 dma=10017 (fdt_after_prep=0) us:dma-fdt=34
+55188 [0;32m[I][Nfc] [0m[PROBE3] 131B rx=351 copy=490 run=580 crc=1100 handler=1424 send=2645 crc_app=5204 tx_enter=5278
+56763 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=5355 tx_enter=5563 prepared=7821 fdt_end=7860 seq_tx=8136 dma=10070 (fdt_after_prep=0) us:dma-fdt=34
+56769 [0;32m[I][Nfc] [0m[PROBE3] 131B rx=457 copy=613 run=715 crc=1337 handler=1750 send=3135 crc_app=5489 tx_enter=5563
+58358 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4368 tx_enter=5073 prepared=6900 fdt_end=7370 seq_tx=7646 dma=9584 (fdt_after_prep=1) us:dma-fdt=34
+58364 [0;32m[I][Nfc] [0m[PROBE3] 131B rx=351 copy=490 run=580 crc=1100 handler=1424 send=2645 crc_app=4999 tx_enter=5073
+59952 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4368 tx_enter=5073 prepared=6900 fdt_end=7370 seq_tx=7646 dma=9584 (fdt_after_prep=1) us:dma-fdt=34
+59958 [0;32m[I][Nfc] [0m[PROBE3] 131B rx=351 copy=490 run=580 crc=1100 handler=1424 send=2645 crc_app=4999 tx_enter=5073
+61536 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4352 tx_enter=5073 prepared=6900 fdt_end=7370 seq_tx=7646 dma=9584 (fdt_after_prep=1) us:dma-fdt=34
+61542 [0;32m[I][Nfc] [0m[PROBE3] 131B rx=351 copy=490 run=580 crc=1100 handler=1424 send=2645 crc_app=4999 tx_enter=5073
+63123 [0;32m[I][Nfc] [0m[PROBE] 131B eof2rx=4372 tx_enter=5073 prepared=6900 fdt_end=7370 seq_tx=7646 dma=9584 (fdt_after_prep=1) us:dma-fdt=34
+63129 [0;32m[I][Nfc] [0m[PROBE3] 131B rx=351 copy=490 run=580 crc=1100 handler=1424 send=2645 crc_app=4999 tx_enter=5073
+64715 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4362 tx_enter=8328 prepared=11631 fdt_end=11670 seq_tx=11946 dma=13893 (fdt_after_prep=0) us:dma-fdt=34
+64722 [0;32m[I][Nfc] [0m[PROBE3] 259B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3413 crc_app=8243 tx_enter=8328
+66309 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4374 tx_enter=8328 prepared=11631 fdt_end=11670 seq_tx=11946 dma=13893 (fdt_after_prep=0) us:dma-fdt=34
+66316 [0;32m[I][Nfc] [0m[PROBE3] 259B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3413 crc_app=8243 tx_enter=8328
+67903 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4372 tx_enter=8580 prepared=11883 fdt_end=11922 seq_tx=12193 dma=14136 (fdt_after_prep=0) us:dma-fdt=34
+67909 [0;32m[I][Nfc] [0m[PROBE3] 259B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3413 crc_app=8495 tx_enter=8580
+69496 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4718 tx_enter=8328 prepared=11631 fdt_end=11670 seq_tx=11946 dma=13893 (fdt_after_prep=0) us:dma-fdt=34
+69503 [0;32m[I][Nfc] [0m[PROBE3] 259B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3413 crc_app=8243 tx_enter=8328
+71088 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4374 tx_enter=8675 prepared=11978 fdt_end=12017 seq_tx=12293 dma=14236 (fdt_after_prep=0) us:dma-fdt=34
+71094 [0;32m[I][Nfc] [0m[PROBE3] 259B rx=351 copy=490 run=580 crc=1100 handler=1781 send=3772 crc_app=8590 tx_enter=8675
+72680 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4726 tx_enter=8328 prepared=11631 fdt_end=11670 seq_tx=11946 dma=13893 (fdt_after_prep=0) us:dma-fdt=34
+72687 [0;32m[I][Nfc] [0m[PROBE3] 259B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3413 crc_app=8243 tx_enter=8328
+74275 [0;32m[I][Nfc] [0m[PROBE] 259B eof2rx=4384 tx_enter=8328 prepared=11631 fdt_end=11670 seq_tx=11946 dma=13893 (fdt_after_prep=0) us:dma-fdt=34
+74282 [0;32m[I][Nfc] [0m[PROBE3] 259B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3413 crc_app=8243 tx_enter=8328
+75867 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4388 tx_enter=9712 prepared=13751 fdt_end=13790 seq_tx=14070 dma=16017 (fdt_after_prep=0) us:dma-fdt=34
+75873 [0;32m[I][Nfc] [0m[PROBE3] 323B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3797 crc_app=9627 tx_enter=9712
+77456 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4397 tx_enter=9712 prepared=13751 fdt_end=13790 seq_tx=14070 dma=16017 (fdt_after_prep=0) us:dma-fdt=34
+77462 [0;32m[I][Nfc] [0m[PROBE3] 323B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3797 crc_app=9627 tx_enter=9712
+79043 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4601 tx_enter=9709 prepared=13748 fdt_end=13787 seq_tx=14067 dma=16014 (fdt_after_prep=0) us:dma-fdt=34
+79049 [0;32m[I][Nfc] [0m[PROBE3] 323B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3797 crc_app=9624 tx_enter=9709
+80634 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4394 tx_enter=9709 prepared=13948 fdt_end=13987 seq_tx=14263 dma=16197 (fdt_after_prep=0) us:dma-fdt=34
+80640 [0;32m[I][Nfc] [0m[PROBE3] 323B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3797 crc_app=9624 tx_enter=9709
+82227 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4384 tx_enter=9709 prepared=13748 fdt_end=13787 seq_tx=14067 dma=16014 (fdt_after_prep=0) us:dma-fdt=34
+82234 [0;32m[I][Nfc] [0m[PROBE3] 323B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3797 crc_app=9624 tx_enter=9709
+83818 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4371 tx_enter=9712 prepared=13751 fdt_end=13790 seq_tx=14070 dma=16017 (fdt_after_prep=0) us:dma-fdt=34
+83825 [0;32m[I][Nfc] [0m[PROBE3] 323B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3797 crc_app=9627 tx_enter=9712
+85413 [0;32m[I][Nfc] [0m[PROBE] 323B eof2rx=4627 tx_enter=9733 prepared=14016 fdt_end=14055 seq_tx=14322 dma=16265 (fdt_after_prep=0) us:dma-fdt=34
+85420 [0;32m[I][Nfc] [0m[PROBE3] 323B rx=351 copy=490 run=580 crc=1100 handler=1424 send=3797 crc_app=9648 tx_enter=9733

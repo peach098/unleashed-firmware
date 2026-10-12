@@ -1,0 +1,47 @@
+reset reset_rd1_1.trace: len=7 crc=True data=EQUAL sof_delay_us=217.1
+reset reset_rd1_2.trace: len=7 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rd1_3.trace: len=7 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rd1_4.trace: len=7 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rd1_5.trace: len=7 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rd1_6.trace: len=7 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rd1_7.trace: len=7 crc=True data=EQUAL sof_delay_us=207.7
+reset reset_rdm8_1.trace: len=35 crc=True data=EQUAL sof_delay_us=217.1
+reset reset_rdm8_2.trace: len=35 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rdm8_3.trace: len=35 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rdm8_4.trace: len=35 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rdm8_5.trace: len=35 crc=True data=EQUAL sof_delay_us=217.1
+reset reset_rdm8_6.trace: len=35 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rdm8_7.trace: len=35 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rdm32_1.trace: len=131 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rdm32_2.trace: len=131 crc=True data=EQUAL sof_delay_us=221.8
+reset reset_rdm32_3.trace: len=131 crc=True data=EQUAL sof_delay_us=240.7
+reset reset_rdm32_4.trace: len=131 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rdm32_5.trace: len=131 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rdm32_6.trace: len=131 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rdm32_7.trace: len=131 crc=True data=EQUAL sof_delay_us=212.4
+reset reset_rdm64_1.trace: len=259 crc=True data=EQUAL sof_delay_us=283.2
+reset reset_rdm64_2.trace: len=259 crc=True data=EQUAL sof_delay_us=283.2
+reset reset_rdm64_3.trace: len=259 crc=True data=EQUAL sof_delay_us=287.9
+reset reset_rdm64_4.trace: len=259 crc=True data=EQUAL sof_delay_us=287.9
+reset reset_rdm64_5.trace: len=259 crc=True data=EQUAL sof_delay_us=287.9
+reset reset_rdm64_6.trace: len=259 crc=True data=EQUAL sof_delay_us=287.9
+reset reset_rdm64_7.trace: len=259 crc=True data=EQUAL sof_delay_us=283.2
+reset reset_rdm80_1.trace: len=323 crc=True data=EQUAL sof_delay_us=316.2
+reset reset_rdm80_2.trace: len=323 crc=True data=EQUAL sof_delay_us=316.2
+reset reset_rdm80_3.trace: len=323 crc=True data=EQUAL sof_delay_us=320.9
+reset reset_rdm80_4.trace: len=323 crc=True data=EQUAL sof_delay_us=316.2
+reset reset_rdm80_5.trace: len=323 crc=True data=EQUAL sof_delay_us=316.2
+reset reset_rdm80_6.trace: len=323 crc=True data=EQUAL sof_delay_us=316.2
+reset reset_rdm80_7.trace: len=323 crc=True data=EQUAL sof_delay_us=320.9
+
+### reset
+
+| blocks | decoded | median us | min us | max us | median - 316 us |
+|---|---|---|---|---|---|
+| 1 | 7/7 | 212.4 | 207.7 | 217.1 | -103.6 |
+| 8 | 7/7 | 212.4 | 212.4 | 217.1 | -103.6 |
+| 32 | 7/7 | 212.4 | 212.4 | 240.7 | -103.6 |
+| 64 | 7/7 | 287.9 | 283.2 | 287.9 | -28.1 |
+| 80 | 7/7 | 316.2 | 316.2 | 320.9 | +0.2 |
+
+all lengths: min 207.7 us, max 320.9 us; 80/1 = 1.489
