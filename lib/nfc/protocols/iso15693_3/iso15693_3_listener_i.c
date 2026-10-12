@@ -420,7 +420,7 @@ static Iso15693_3Error iso15693_3_listener_write_afi_handler(
 
         instance->session_state.wait_for_eof = flags & ISO15693_3_REQ_FLAG_T4_OPTION;
 
-        if(data_size <= sizeof(Iso15693_3WriteAfiRequestLayout)) {
+        if(data_size != sizeof(Iso15693_3WriteAfiRequestLayout)) {
             error = Iso15693_3ErrorFormat;
             break;
         } else if(instance->data->settings.lock_bits.afi) {
@@ -483,7 +483,7 @@ static Iso15693_3Error iso15693_3_listener_write_dsfid_handler(
 
         instance->session_state.wait_for_eof = flags & ISO15693_3_REQ_FLAG_T4_OPTION;
 
-        if(data_size <= sizeof(Iso15693_3WriteDsfidRequestLayout)) {
+        if(data_size != sizeof(Iso15693_3WriteDsfidRequestLayout)) {
             error = Iso15693_3ErrorFormat;
             break;
         } else if(instance->data->settings.lock_bits.dsfid) {
