@@ -1233,17 +1233,19 @@ static void nfc_test_read_multi_run(
 
 static void nfc_test_read_multi(bool read_protected_low) {
     static const NfcTestReadMultiCase cases[] = {
-        {0, 0, false}, // 1 block
-        {0, 7, false}, // 8 blocks
-        {0, 14, false}, // 15 blocks (mock frame limit)
-        {32, 14, false}, // above the protection pointer
-        {70, 14, false}, // clamped to the last block, includes the counter block
-        {79, 0, false}, // counter block only
-        {80, 0, false}, // first block == block count: flags only
-        {81, 0, false}, // out of range: no reply
-        {0, 0, true}, // with block security
-        {20, 11, true}, // 12 blocks with block security, across the protection pointer
-        {75, 9, true}, // clamped, with block security
+        {0, 0, false, NfcTestRequestReadMulti}, // 1 block
+        {0, 7, false, NfcTestRequestReadMulti}, // 8 blocks
+        {0, 14, false, NfcTestRequestReadMulti}, // 15 blocks (mock frame limit)
+        {32, 14, false, NfcTestRequestReadMulti}, // above the protection pointer
+        // clamped to the last block, includes the counter block
+        {70, 14, false, NfcTestRequestReadMulti},
+        {79, 0, false, NfcTestRequestReadMulti}, // counter block only
+        {80, 0, false, NfcTestRequestReadMulti}, // first block == block count: flags only
+        {81, 0, false, NfcTestRequestReadMulti}, // out of range: no reply
+        {0, 0, true, NfcTestRequestReadMulti}, // with block security
+        // 12 blocks with block security, across the protection pointer
+        {20, 11, true, NfcTestRequestReadMulti},
+        {75, 9, true, NfcTestRequestReadMulti}, // clamped, with block security
     };
     nfc_test_read_multi_run(read_protected_low, cases, COUNT_OF(cases));
 }
@@ -1262,16 +1264,16 @@ MU_TEST(iso15693_3_listener_read_multi_blocks_read_protected_test) {
 // Blocks below the protection pointer (32 in the fixture) are read protected here.
 MU_TEST(iso15693_3_listener_short_after_long_test) {
     static const NfcTestReadMultiCase cases[] = {
-        {32, 14, false}, // 15 blocks: 61 B
+        {32, 14, false, NfcTestRequestReadMulti}, // 15 blocks: 61 B
         {33, 0, false, NfcTestRequestReadSingle}, // 5 B
-        {40, 11, true}, // 12 blocks with block security: 61 B
+        {40, 11, true, NfcTestRequestReadMulti}, // 12 blocks with block security: 61 B
         {41, 0, true, NfcTestRequestReadSingle}, // with block security: 6 B
-        {32, 14, false}, // 61 B
-        {0, 0, false}, // read protected: error reply, 2 B
-        {32, 14, false}, // 61 B
+        {32, 14, false, NfcTestRequestReadMulti}, // 61 B
+        {0, 0, false, NfcTestRequestReadMulti}, // read protected: error reply, 2 B
+        {32, 14, false, NfcTestRequestReadMulti}, // 61 B
         {0, 0, false, NfcTestRequestGetRandom}, // SLIX extension: 3 B
-        {32, 14, false}, // 61 B
-        {80, 0, false}, // first block == block count: flags only, 1 B
+        {32, 14, false, NfcTestRequestReadMulti}, // 61 B
+        {80, 0, false, NfcTestRequestReadMulti}, // first block == block count: flags only, 1 B
         {33, 0, false, NfcTestRequestReadSingle}, // 5 B after 1 B: no stale bytes either way
     };
     nfc_test_read_multi_run(true, cases, COUNT_OF(cases));
