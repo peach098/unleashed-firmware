@@ -46,9 +46,11 @@
 // EOF is detected by the ISR exactly like in 1-of-4, but a 1-of-256 byte is 64 sample bytes, two
 // whole parser chunks, so the worker has nothing left to decode, while a 1-of-4 request leaves up
 // to 31 symbols to decode after the EOF. Measured with DWT (FNFC-01.14, read single block, ISR EOF
-// -> RxEnd): 1-of-4 71.6 us, 1-of-256 53.3 us (constant: nothing to decode for any length).
-// The same t1 needs the timer longer by the difference:
-//   COMP_1OF256 = COMP - (t_rx(1-of-4) - t_rx(1-of-256)) * fc = 1385 - 18.3 us * 13.56 MHz = 1137 fc
+// -> RxEnd): 1-of-4 71.6 us, 1-of-256 53.3 us (typically constant: nothing to decode for any
+// length while the worker keeps up with whole chunks; if it falls behind, RxEnd and the reply
+// come later, never earlier). The same t1 needs the timer longer by the difference:
+//   COMP_1OF256 = COMP - (t_rx(1-of-4) - t_rx(1-of-256)) * fc
+//               = 1385 - 18.3 us * 13.56 MHz = 1137 fc
 #define FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_1OF256_FC (1137)
 
 #define BITS_IN_BYTE (8U)
