@@ -12,6 +12,8 @@
 #define ISO15693_PARSER_BITSTREAM_CHUNK         (32)
 #define ISO15693_PARSER_BITSTREAM_BUFF_SIZE     (2 * ISO15693_PARSER_BITSTREAM_CHUNK)
 #define ISO15693_PARSER_BITRATE_F64MHZ          (603U)
+// 1-of-256: a data byte is 256 slots of 2 half slots, one sample per half slot, i.e. 64 sample bytes
+#define ISO15693_PARSER_1OF256_BYTE_SYMBOLS     (64U)
 
 #define TAG "Iso15693Parser"
 
@@ -42,13 +44,12 @@ struct Iso15693Parser {
     bool signal_detected;
     bool bit_offset_calculated;
     uint8_t bit_offset;
-    size_t byte_idx;
     volatile size_t bytes_to_process; // written by the ISR, consumed by the thread
-    size_t symbols_received; // 1-of-4 data symbols since SOF (ISR)
+    size_t symbols_received; // data symbols (1-of-256: sample bytes) since SOF (ISR)
 
     uint8_t next_byte;
     uint16_t next_byte_part;
-    bool zero_found;
+    bool pause_found; // 1-of-256: the pause of the current byte has been seen
 
     BitBuffer* parsed_frame;
     volatile bool eof_received; // set by the ISR
@@ -66,6 +67,10 @@ typedef enum {
 } Iso15693ParserCommand;
 
 typedef Iso15693ParserCommand (*Iso15693ParserStateHandler)(Iso15693Parser* instance);
+
+// 1-of-256 sample byte (4 slots, bit = sample, LSB first) holding the pause of the byte: one pause
+// in the second half of a slot, the same patterns as the 1-of-4 symbols
+static const uint8_t iso15693_parser_1_out_of_256_pause_patterns[] = {0x02, 0x08, 0x20, 0x80};
 
 Iso15693Parser* iso15693_parser_alloc(const GpioPin* pin, size_t max_frame_size) {
     Iso15693Parser* instance = malloc(sizeof(Iso15693Parser));
@@ -102,14 +107,13 @@ void iso15693_parser_reset(Iso15693Parser* instance) {
     instance->next_byte_part = 0;
 
     instance->bit_offset = 0;
-    instance->byte_idx = 0;
     instance->bytes_to_process = 0;
     instance->symbols_received = 0;
     instance->signal_detected = false;
     instance->bit_offset_calculated = false;
 
     instance->last_byte = 0x00;
-    instance->zero_found = false;
+    instance->pause_found = false;
     instance->eof_received = false;
 
     bit_buffer_reset(instance->parsed_frame);
@@ -177,6 +181,8 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
     } else {
         const bool frame_1_out_of_4 = (instance->state == Iso15693ParserStateParseFrame) &&
                                       (instance->mode == Iso15693ParserMode1OutOf4);
+        const bool frame_1_out_of_256 = (instance->state == Iso15693ParserStateParseFrame) &&
+                                        (instance->mode == Iso15693ParserMode1OutOf256);
         if(frame_1_out_of_4 && (event.data->data[0] == eof)) {
             instance->eof_received = true;
             instance->callback(Iso15693ParserEventDataReceived, instance->context);
@@ -186,6 +192,14 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
             // Every 1-of-4 symbol has exactly one pause, so a symbol slot without one after a
             // whole byte means the reader has stopped modulating: its EOF pause was not sampled.
             // End the frame here; the CRC check of the frame still applies.
+            instance->eof_received = true;
+            instance->callback(Iso15693ParserEventDataReceived, instance->context);
+        } else if(
+            frame_1_out_of_256 && (event.data->data[0] == eof) &&
+            (instance->symbols_received % ISO15693_PARSER_1OF256_BYTE_SYMBOLS == 0)) {
+            // 1-of-256 EOF can only follow a whole byte (a pause in the first half of a slot is
+            // invalid data). End the frame here: the thread is only woken every
+            // ISO15693_PARSER_BITSTREAM_CHUNK sample bytes (2.4 ms in 1-of-256), far beyond t1.
             instance->eof_received = true;
             instance->callback(Iso15693ParserEventDataReceived, instance->context);
         } else {
@@ -263,46 +277,52 @@ static Iso15693ParserCommand iso15693_parser_parse_1_out_of_4(Iso15693Parser* in
     return command;
 }
 
+// 1-of-256: a byte is 64 sample bytes with exactly one pause, in the second half of slot `value`.
+// Each sample byte is either empty or one 1-of-4 pattern; anything else, a second pause or a byte
+// without a pause fails the frame. EOF is detected by the ISR on a byte boundary.
 static Iso15693ParserCommand iso15693_parser_parse_1_out_of_256(Iso15693Parser* instance) {
     Iso15693ParserCommand command = Iso15693ParserCommandWaitData;
-    const uint8_t eof = 0x04;
+    // EOF first: once it is seen, the ISR has already appended every symbol of the frame
+    const bool eof_received = instance->eof_received;
     const size_t count = instance->bytes_to_process;
 
-    for(size_t i = instance->byte_idx; i < count; i++) {
-        // Check EoF
-        if(instance->next_byte_part == 0) {
-            if(instance->bitstream_buff[i] == eof) {
-                instance->frame_parsed = true;
-                command = Iso15693ParserCommandSuccess;
-                break;
+    for(size_t i = 0; i < count; i++) {
+        const uint8_t symbol = instance->bitstream_buff[i];
+        if(symbol != 0x00) {
+            size_t j = 0;
+            for(j = 0; j < COUNT_OF(iso15693_parser_1_out_of_256_pause_patterns); j++) {
+                if(symbol == iso15693_parser_1_out_of_256_pause_patterns[j]) break;
             }
-        }
-
-        if(instance->zero_found) {
-            if(instance->bitstream_buff[i] != 0x00) {
+            if(instance->pause_found ||
+               (j == COUNT_OF(iso15693_parser_1_out_of_256_pause_patterns))) {
                 command = Iso15693ParserCommandFail;
                 break;
             }
-        } else {
-            if(instance->bitstream_buff[i] != 0x00) {
-                for(size_t j = 0; j < 8; j++) {
-                    if(FURI_BIT(instance->bitstream_buff[i], j) == 1) {
-                        // Overlong frame (noise): drop it instead of overflowing parsed_frame
-                        if(bit_buffer_get_size_bytes(instance->parsed_frame) >=
-                           bit_buffer_get_capacity_bytes(instance->parsed_frame))
-                            return Iso15693ParserCommandFail;
-                        bit_buffer_append_byte(
-                            instance->parsed_frame, instance->next_byte_part * 4 + j / 2);
-                    }
-                }
-            } else {
-                instance->zero_found = true;
-            }
+            instance->next_byte = instance->next_byte_part * 4 + j;
+            instance->pause_found = true;
         }
-        instance->next_byte_part = (instance->next_byte_part + 1) % 64;
+        instance->next_byte_part++;
+        if(instance->next_byte_part == ISO15693_PARSER_1OF256_BYTE_SYMBOLS) {
+            // Byte without a pause, or overlong frame (noise): drop it
+            if(!instance->pause_found || (bit_buffer_get_size_bytes(instance->parsed_frame) >=
+                                          bit_buffer_get_capacity_bytes(instance->parsed_frame))) {
+                command = Iso15693ParserCommandFail;
+                break;
+            }
+            bit_buffer_append_byte(instance->parsed_frame, instance->next_byte);
+            instance->next_byte = 0;
+            instance->next_byte_part = 0;
+            instance->pause_found = false;
+        }
     }
-    iso15693_parser_consume(instance, count);
-    instance->byte_idx = 0;
+
+    if((command != Iso15693ParserCommandFail) && eof_received) {
+        command = Iso15693ParserCommandSuccess;
+        instance->frame_parsed = true;
+    }
+
+    // As in 1-of-4, only an incomplete frame hands the buffer back
+    if(command == Iso15693ParserCommandWaitData) iso15693_parser_consume(instance, count);
 
     return command;
 }
