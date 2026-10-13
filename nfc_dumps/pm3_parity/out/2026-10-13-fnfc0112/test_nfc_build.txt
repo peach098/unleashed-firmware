@@ -1,0 +1,1 @@
+83b878d86 signal_reader: iso15693 parser: wrap comments to the column limit
