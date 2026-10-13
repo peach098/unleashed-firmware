@@ -23,11 +23,17 @@ SLIX-specific changed.
 
 ## Fix (`lib/nfc/protocols/iso15693_3/`)
 - `iso15693_3_listener.c`: the size-only `tx_buffer` reset moved into the valid-CRC branch (right before
-  `process_request`); the single-EOF branch now sends what the request left. `NfcEventTypeFieldOff`
-  clears `wait_for_eof`.
+  `process_request`); the single-EOF branch now sends what the request left. A `NfcEventTypeFieldOff`
+  branch clearing `wait_for_eof` was added as a safeguard only: the F7 ISO15693 HAL
+  (`furi_hal_nfc_iso15693_wait_event` returns only RxEnd or Abort) and nfc_mock never report FieldOff,
+  so it does not fire today. The reset in the request branch is redundant with the one in
+  `handle_standard_request` (other request paths do not send) and is kept as a cheap guard.
 - `iso15693_3_listener_i.c`: `process_request()` clears `wait_for_eof` first (any request drops a pending
   deferred reply; Write/Lock with the option flag set it again); Format/Ignore clear it (no reply now, no
   reply after the EOF).
+- Conscious choice: a frame with a wrong CRC is not a request and does not drop a pending reply, so
+  request-with-option -> corrupted frame -> EOF still sends the deferred reply. Only a valid request
+  (or, once the HAL reports it, field off) drops it.
 - `process_single_eof()` unchanged: sends only if `wait_for_eof` is set, otherwise
   `Iso15693_3ErrorUnexpectedResponse` -> `Iso15693_3ListenerEventTypeSingleEof` callback, no reply.
 - Replies to requests are built exactly as before. `api_symbols.csv` unchanged.
