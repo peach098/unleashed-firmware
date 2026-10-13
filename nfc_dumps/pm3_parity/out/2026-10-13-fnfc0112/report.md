@@ -1,6 +1,6 @@
 # FNFC-01.12: rare missed short reply in `hf 15 dump` — root cause and fix (2026-10-13, final)
 
-Supersedes the interim report.md (6b731e4ab). Plain text because subagents cannot write .md report files.
+Supersedes the interim report (6b731e4ab).
 
 ## Result in short
 - Root cause is on the Flipper side: H2, a request that was received but dropped by the ISO15693 parser
