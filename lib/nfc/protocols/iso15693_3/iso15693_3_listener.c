@@ -68,10 +68,11 @@ NfcCommand iso15693_3_listener_run(NfcGenericEvent event, void* context) {
         if(iso13239_crc_check(Iso13239CrcTypeDefault, rx_buffer)) {
             iso13239_crc_trim(rx_buffer);
 
-            // Size-only reset: bit_buffer_reset() clears the whole 1027 B capacity (~120 us),
-            // and the reply is only ever built with append_byte(s), which never reads old bytes.
-            // Only a request resets it: a single EOF sends the reply a Write/Lock request with
-            // the option flag left here.
+            // A request never sees an old reply. handle_standard_request() resets the buffer
+            // again and the other request paths do not send it, so this is only a cheap guard.
+            // Size-only: bit_buffer_reset() clears the whole 1027 B capacity (~120 us), and
+            // replies are built with append_byte(s) only. Not done for a single EOF: it sends
+            // the reply that a Write/Lock request with the option flag left in the buffer.
             bit_buffer_set_size(instance->tx_buffer, 0);
 
             const Iso15693_3Error error = iso15693_3_listener_process_request(instance, rx_buffer);
@@ -101,7 +102,9 @@ NfcCommand iso15693_3_listener_run(NfcGenericEvent event, void* context) {
                 TAG, "Wrong CRC, buffer size: %zu", bit_buffer_get_size(nfc_event->data.buffer));
         }
     } else if(nfc_event->type == NfcEventTypeFieldOff) {
-        // A reply waiting for a single EOF does not survive the field going off
+        // Safeguard: drop a reply waiting for a single EOF when the field goes off. The F7
+        // ISO15693 HAL does not report FieldOff today (its wait_event returns only RxEnd or
+        // Abort), so this does not fire yet
         instance->session_state.wait_for_eof = false;
     }
 

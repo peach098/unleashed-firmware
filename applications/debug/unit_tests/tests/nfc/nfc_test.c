@@ -1380,8 +1380,9 @@ NfcCommand nfc_test_opt_callback(NfcGenericEvent event, void* context) {
             if(!nfc_test_opt_trx(ctx->nfc, &ctx->steps[i], tx, rx, captured)) {
                 ctx->failed_step = i;
                 ctx->failed_rx_size = bit_buffer_get_size_bytes(rx);
-                bit_buffer_write_bytes(
-                    rx, ctx->failed_rx, MIN(ctx->failed_rx_size, sizeof(ctx->failed_rx)));
+                // Only the first bytes: bit_buffer_write_bytes() wants room for the whole reply
+                bit_buffer_write_bytes_mid(
+                    rx, ctx->failed_rx, 0, MIN(ctx->failed_rx_size, sizeof(ctx->failed_rx)));
                 break;
             }
             ctx->steps_passed++;
