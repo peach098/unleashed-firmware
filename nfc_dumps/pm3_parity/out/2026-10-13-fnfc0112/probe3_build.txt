@@ -1,0 +1,7 @@
+6b731e4ab nfc_dumps: FNFC-01.12 interim report (3/30 aborts reproduced, probe v2 pending, HW blocker)
+ lib/digital_signal/digital_sequence.c              |   8 ++
+ lib/nfc/nfc.c                                      | 145 +++++++++++++++++++++
+ .../parsers/iso15693/iso15693_parser.c             |  91 +++++++++++++
+ targets/f7/furi_hal/furi_hal_nfc_iso15693.c        |   8 ++
+ 4 files changed, 252 insertions(+)
+defines: --extra-define=NFC_RX_MISS_PROBE (probe v3)

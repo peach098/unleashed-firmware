@@ -23,3 +23,10 @@ FNFC-01.12 hardware blocker, 2026-10-13 (times MSK)
 Needed from a human: look at the Flipper screen (crash / updater screen?), then unplug and replug the Flipper
 USB (if it does not boot, hold Left+Back to reboot). Nothing needs to change on the antenna (only the Flipper is
 on it; no real card involved yet).
+
+Second hang, 2026-10-13 ~14:53 (after the human replug at ~12:35):
+  probe v8 on efbbf22af (rx_miss_probe_v8_final.patch) flashed OK (boot 14:52:50), emulation opened, `log info`
+  attached (series.sh LOG=1), `hf 15 reader` answered, then no [P12] line was ever printed, every following
+  read got no answer, and every write to the Flipper CDC times out (no re-enumeration). The same probe on
+  b81a96abf ran the same series an hour earlier without trouble; release efbbf22af ran 163 dumps fine.
+  Needs a replug.

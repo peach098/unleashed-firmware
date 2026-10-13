@@ -1,0 +1,44 @@
+	SDKCHK	targets/f7/api_symbols.csv
+[32mAPI version 88.17 is up to date[0m
+	CDB	build/f7-firmware-C/compile_commands.json
+[32mLinking build/f7-firmware-C as latest built dir (./build/latest/)[0m
+	CC	lib/nfc/nfc.c
+	CC	lib/signal_reader/parsers/iso15693/iso15693_parser.c
+	AR	build/f7-updater-C/signal_reader/libsignal_reader.a
+	AR	build/f7-updater-C/nfc/libnfc.a
+	RANLIB	build/f7-updater-C/signal_reader/libsignal_reader.a
+	INSTALL	build/f7-updater-C/lib/libsignal_reader.a
+	RANLIB	build/f7-updater-C/nfc/libnfc.a
+	INSTALL	build/f7-updater-C/lib/libnfc.a
+	LINK	build/f7-updater-C/updater.elf
+	INFO	
+Loaded 275 app definitions.
+[1;32mFirmware modules configuration:[0m
+[32mService:
+	[0m gui, input, notification, storage, updater
+[32mSettings:
+	[0m storage_settings
+[32mStartupHook:
+	[0m storage_start
+[32mExtSettings:
+	[0m input_settings, notification_settings
+Firmware size
+.text         101924 ( 99.54 K)
+.rodata        17104 ( 16.70 K)
+.data            204 (  0.20 K)
+.bss            4168 (  4.07 K)
+	DIST	dist_updater_package
+2026-10-13 12:46:24,608 [INFO] [1;32mFirmware binaries can be found at:
+	dist/f7-C[0m
+2026-10-13 12:46:24,610 [INFO] Using guessed radio address 0x080D7000, verify with Release_Notes or specify --radioaddr[0m
+2026-10-13 12:46:26,317 [INFO] Resources compression ratio: 44.14%[0m
+2026-10-13 12:46:26,365 [INFO] [1;32mUse this directory to self-update your Flipper:
+	dist/f7-C/f7-update-local[0m
+2026-10-13 12:46:26,525 [INFO] Bundling SDK[0m
+2026-10-13 12:46:29,009 [INFO] [1;32mSDK bundle can be found at:
+	dist/f7-C/flipper-z-f7-sdk-local.zip[0m
+python3 scripts/selfupdate.py -p /dev/serial/by-id/usb-Flipper_Devices_Inc._Flipper_E17ana_flip_E17ana-if00 dist/f7-C/f7-update-local/update.fuf
+2026-10-13 12:46:29,080 [INFO] Installing "f7-update-local" from /ext/update/f7-update-local[0m
+2026-10-13 12:46:31,441 [INFO] Sending "/opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/dist/f7-C/f7-update-local/firmware.dfu" to "/ext/update/f7-update-local/firmware.dfu"[0m
+<  1%, chunk  1 of 107 @ 50.44 kb/s<  2%, chunk  2 of 107 @ 59.27 kb/s<  3%, chunk  3 of 107 @ 67.37 kb/s<  4%, chunk  4 of 107 @ 73.28 kb/s<  5%, chunk  5 of 107 @ 76.40 kb/s<  6%, chunk  6 of 107 @ 74.80 kb/s<  7%, chunk  7 of 107 @ 77.40 kb/s<  8%, chunk  8 of 107 @ 79.37 kb/s<  9%, chunk  9 of 107 @ 80.21 kb/s< 10%, chunk 10 of 107 @ 82.25 kb/s< 11%, chunk 11 of 107 @ 80.88 kb/s< 12%, chunk 12 of 107 @ 81.40 kb/s< 13%, chunk 13 of 107 @ 82.53 kb/s< 14%, chunk 14 of 107 @ 82.89 kb/s< 15%, chunk 15 of 107 @ 83.57 kb/s< 16%, chunk 16 of 107 @ 84.14 kb/s< 16%, chunk 17 of 107 @ 83.02 kb/s< 17%, chunk 18 of 107 @ 83.77 kb/s< 18%, chunk 19 of 107 @ 84.08 kb/s< 19%, chunk 20 of 107 @ 84.72 kb/s< 20%, chunk 21 of 107 @ 85.26 kb/s< 21%, chunk 22 of 107 @ 84.17 kb/s< 22%, chunk 23 of 107 @ 84.52 kb/s< 23%, chunk 24 of 107 @ 85.18 kb/s< 24%, chunk 25 of 107 @ 85.25 kb/s< 25%, chunk 26 of 107 @ 85.30 kb/s< 26%, chunk 27 of 107 @ 85.83 kb/s< 27%, chunk 28 of 107 @ 85.23 kb/s< 28%, chunk 29 of 107 @ 85.45 kb/s< 29%, chunk 30 of 107 @ 85.70 kb/s< 30%, chunk 31 of 107 @ 86.07 kb/s< 31%, chunk 32 of 107 @ 86.33 kb/s< 32%, chunk 33 of 107 @ 85.81 kb/s< 32%, chunk 34 of 107 @ 85.98 kb/s< 33%, chunk 35 of 107 @ 86.26 kb/s< 34%, chunk 36 of 107 @ 86.15 kb/s< 35%, chunk 37 of 107 @ 86.35 kb/s< 36%, chunk 38 of 107 @ 86.72 kb/s< 37%, chunk 39 of 107 @ 86.17 kb/s< 38%, chunk 40 of 107 @ 86.16 kb/s< 39%, chunk 41 of 107 @ 86.54 kb/s< 40%, chunk 42 of 107 @ 86.81 kb/s< 41%, chunk 43 of 107 @ 86.91 kb/s< 42%, chunk 44 of 107 @ 87.03 kb/s< 43%, chunk 45 of 107 @ 86.67 kb/s< 44%, chunk 46 of 107 @ 86.84 kb/s< 45%, chunk 47 of 107 @ 86.77 kb/s< 46%, chunk 48 of 107 @ 87.12 kb/s< 47%, chunk 49 of 107 @ 87.26 kb/s< 48%, chunk 50 of 107 @ 86.67 kb/s< 48%, chunk 51 of 107 @ 86.86 kb/s< 49%, chunk 52 of 107 @ 87.10 kb/s< 50%, chunk 53 of 107 @ 87.23 kb/s< 51%, chunk 54 of 107 @ 87.24 kb/s< 52%, chunk 55 of 107 @ 87.49 kb/s< 53%, chunk 56 of 107 @ 87.10 kb/s< 54%, chunk 57 of 107 @ 87.15 kb/s< 55%, chunk 58 of 107 @ 87.34 kb/s< 56%, chunk 59 of 107 @ 87.38 kb/s< 57%, chunk 60 of 107 @ 87.45 kb/s< 58%, chunk 61 of 107 @ 87.02 kb/s< 59%, chunk 62 of 107 @ 87.25 kb/s< 60%, chunk 63 of 107 @ 87.40 kb/s< 61%, chunk 64 of 107 @ 87.44 kb/s< 62%, chunk 65 of 107 @ 87.52 kb/s< 63%, chunk 66 of 107 @ 87.69 kb/s< 64%, chunk 67 of 107 @ 87.28 kb/s< 64%, chunk 68 of 107 @ 87.36 kb/s< 65%, chunk 69 of 107 @ 87.49 kb/s< 66%, chunk 70 of 107 @ 87.29 kb/s< 67%, chunk 71 of 107 @ 87.33 kb/s< 68%, chunk 72 of 107 @ 87.07 kb/s< 69%, chunk 73 of 107 @ 87.22 kb/s< 70%, chunk 74 of 107 @ 87.25 kb/s< 71%, chunk 75 of 107 @ 87.34 kb/s< 72%, chunk 76 of 107 @ 87.51 kb/s< 73%, chunk 77 of 107 @ 87.63 kb/s< 74%, chunk 78 of 107 @ 87.21 kb/s< 75%, chunk 79 of 107 @ 87.37 kb/s< 76%, chunk 80 of 107 @ 87.49 kb/s< 77%, chunk 81 of 107 @ 87.39 kb/s< 78%, chunk 82 of 107 @ 87.47 kb/s< 79%, chunk 83 of 107 @ 87.22 kb/s< 80%, chunk 84 of 107 @ 87.33 kb/s< 80%, chunk 85 of 107 @ 87.35 kb/s< 81%, chunk 86 of 107 @ 87.52 kb/s< 82%, chunk 87 of 107 @ 87.65 kb/s< 83%, chunk 88 of 107 @ 87.66 kb/s< 84%, chunk 89 of 107 @ 87.39 kb/s< 85%, chunk 90 of 107 @ 87.53 kb/s< 86%, chunk 91 of 107 @ 87.61 kb/s< 87%, chunk 92 of 107 @ 87.51 kb/s< 88%, chunk 93 of 107 @ 87.66 kb/s< 89%, chunk 94 of 107 @ 87.41 kb/s< 90%, chunk 95 of 107 @ 87.45 kb/s< 91%, chunk 96 of 107 @ 87.56 kb/s< 92%, chunk 97 of 107 @ 87.64 kb/s< 93%, chunk 98 of 107 @ 87.69 kb/s< 94%, chunk 99 of 107 @ 87.70 kb/s< 95%, chunk 100 of 107 @ 87.53 kb/s< 96%, chunk 101 of 107 @ 87.64 kb/s< 96%, chunk 102 of 107 @ 87.66 kb/s< 97%, chunk 103 of 107 @ 87.65 kb/s< 98%, chunk 104 of 107 @ 87.76 kb/s< 99%, chunk 105 of 107 @ 87.55 kb/s<100%, chunk 106 of 107 @ 87.60 kb/s<100%, chunk 107 of 107 @ 87.52 kb/s
+Touch("build/usbinstall.flag")

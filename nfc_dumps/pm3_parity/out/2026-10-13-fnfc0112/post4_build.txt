@@ -1,0 +1,1 @@
+efbbf22af signal_reader: iso15693 parser: no hand-back critical section when the frame is complete

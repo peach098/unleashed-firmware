@@ -1,0 +1,1 @@
+b81a96abf signal_reader: iso15693 parser: end a 1-of-4 frame on a pause-less symbol, ignore the carrier after EOF

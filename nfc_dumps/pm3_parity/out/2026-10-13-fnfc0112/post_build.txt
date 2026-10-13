@@ -1,0 +1,2 @@
+3cd724652 signal_reader: iso15693 parser: lossless ISR -> thread symbol hand-off
+ D nfc_dumps/pm3_parity/out/2026-10-13-fnfc0112/.probe_logstop

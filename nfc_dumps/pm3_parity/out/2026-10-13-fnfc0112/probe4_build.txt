@@ -1,0 +1,7 @@
+3cd724652 signal_reader: iso15693 parser: lossless ISR -> thread symbol hand-off
+ lib/digital_signal/digital_sequence.c              |   8 ++
+ lib/nfc/nfc.c                                      | 148 +++++++++++++++++++++
+ .../parsers/iso15693/iso15693_parser.c             |  86 ++++++++++++
+ targets/f7/furi_hal/furi_hal_nfc_iso15693.c        |   8 ++
+ 4 files changed, 250 insertions(+)
+defines: --extra-define=NFC_RX_MISS_PROBE (probe v4 on fix)

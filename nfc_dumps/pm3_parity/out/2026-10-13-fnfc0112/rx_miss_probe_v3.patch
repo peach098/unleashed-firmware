@@ -1,0 +1,387 @@
+FNFC-01.12 RX-miss probe v3 = v2 (rx_miss_probe.patch, see its header for the [P12] fields) plus four fields
+(temporary, NOT for commit). Applies on fnfc-01.11-fdt-t1; build with --extra-define=NFC_RX_MISS_PROBE.
+  gapmax / gapmin = max / min interval between signal-reader ISR events inside a frame, us (nominal 75.5)
+  ovfdt  = when the ISR found the 32-symbol buffer still full: ISR time - "buffer full" time, us
+  done   = "buffer full" -> thread has consumed the buffer (bytes_to_process reset), max, us
+
+diff --git a/lib/digital_signal/digital_sequence.c b/lib/digital_signal/digital_sequence.c
+index 0090dab20..e909cd10c 100644
+--- a/lib/digital_signal/digital_sequence.c
++++ b/lib/digital_signal/digital_sequence.c
+@@ -195,8 +195,16 @@ void digital_sequence_set_prefill_size(DigitalSequence* sequence, uint32_t prefi
+     sequence->prefill_size = MIN(prefill_size, DIGITAL_SEQUENCE_RING_BUFFER_PREFILL_SIZE_MAX);
+ }
+ 
++#ifdef NFC_RX_MISS_PROBE
++// FNFC-01.12 probe: DWT->CYCCNT when the first DMA transfer of a frame is started
++volatile uint32_t digital_sequence_probe_dma_start_cyc = 0;
++#endif
++
+ static inline void digital_sequence_start_dma(DigitalSequence* sequence) {
+     furi_assert(sequence);
++#ifdef NFC_RX_MISS_PROBE
++    digital_sequence_probe_dma_start_cyc = DWT->CYCCNT;
++#endif
+ 
+     LL_DMA_Init(DMA1, LL_DMA_CHANNEL_1, &sequence->dma_config_gpio);
+     LL_DMA_Init(DMA1, LL_DMA_CHANNEL_2, &sequence->dma_config_timer);
+diff --git a/lib/nfc/nfc.c b/lib/nfc/nfc.c
+index 20cbbde27..bac697997 100644
+--- a/lib/nfc/nfc.c
++++ b/lib/nfc/nfc.c
+@@ -12,6 +12,97 @@
+ #define NFC_FELICA_LISTENER_RESPONSE_TIME_A_FC (512 * 64)
+ #define NFC_FELICA_LISTENER_RESPONSE_TIME_B_FC (256 * 64)
+ 
++#ifdef NFC_RX_MISS_PROBE
++// FNFC-01.12 probe (temporary, not for commit), build with --extra-define=NFC_RX_MISS_PROBE.
++// One record per listener RxEnd. The worker only queues it (non-blocking) right after the receiver is
++// re-armed for the next frame; a Low priority thread prints it as a [P12] Info line, so the USB log never
++// delays the worker. Cycles are DWT->CYCCNT @64 MHz (64 = 1 us).
++#include <stm32wbxx.h>
++#include "helpers/iso13239_crc.h"
++extern volatile uint32_t digital_sequence_probe_dma_start_cyc;
++extern volatile uint32_t iso15693_parser_probe_start_cyc, iso15693_parser_probe_sof_cyc,
++    iso15693_parser_probe_eof_cyc, iso15693_parser_probe_max_wake, iso15693_parser_probe_fail_sof,
++    iso15693_parser_probe_fail_parse, iso15693_parser_probe_overflow,
++    iso15693_parser_probe_max_bytes, iso15693_parser_probe_restarts,
++    iso15693_parser_probe_fail_cyc, iso15693_parser_probe_max_restart,
++    iso15693_parser_probe_max_gap, iso15693_parser_probe_min_gap, iso15693_parser_probe_ovf_dt,
++    iso15693_parser_probe_max_done;
++extern volatile uint8_t iso15693_parser_probe_bad_byte;
++typedef struct {
++    uint32_t seq;
++    uint32_t rx_end_cyc, eof_cyc, sof_cyc, armed_cyc; // armed = last parser (re)start before this frame
++    uint32_t prev_tx_end_cyc; // end of the previous reply (DMA done, sequence finished)
++    uint32_t last_fail_cyc; // last spurious trigger detected (Fail) before this frame
++    uint16_t len;
++    uint8_t b0, cmd, blk;
++    bool crc_ok;
++    uint32_t tx_bytes, tx_dma_cyc, tx_end_cyc, tx_n, rearm_cyc;
++    uint32_t fail_sof, fail_parse, overflow, max_bytes, max_wake, restarts, max_restart;
++    uint8_t bad_byte;
++    uint32_t max_gap, min_gap, ovf_dt, max_done;
++} NfcProbeRec;
++static NfcProbeRec nfc_probe;
++static bool nfc_probe_pending;
++static uint32_t nfc_probe_last_tx_end_cyc, nfc_probe_dropped;
++static FuriMessageQueue* nfc_probe_queue;
++static FuriThread* nfc_probe_thread;
++
++static int32_t nfc_probe_printer(void* context) {
++    UNUSED(context);
++    NfcProbeRec r;
++    while(true) {
++        if(furi_message_queue_get(nfc_probe_queue, &r, FuriWaitForever) != FuriStatusOk) continue;
++        FURI_LOG_I(
++            TAG,
++            "[P12] n=%lu len=%u b0=%02X cmd=%02X blk=%u crc=%d tx=%lu/%luB eof2dma=%lu "
++            "txend2arm=%ld armed2sof=%ld fail2sof=%ld rearm=%lu sofail=%lu pfail=%lu restarts=%lu "
++            "maxrestart=%lu ovf=%lu maxb=%lu wake=%lu bad=%02X drop=%lu gapmax=%lu gapmin=%lu ovfdt=%lu "
++            "done=%lu",
++            r.seq,
++            r.len,
++            r.b0,
++            r.cmd,
++            r.blk,
++            r.crc_ok,
++            r.tx_n,
++            r.tx_bytes,
++            r.tx_n ? (r.tx_dma_cyc - r.eof_cyc) / 64 : 0,
++            (int32_t)(r.armed_cyc - r.prev_tx_end_cyc) / 64,
++            (int32_t)(r.sof_cyc - r.armed_cyc) / 64,
++            (int32_t)(r.sof_cyc - r.last_fail_cyc) / 64,
++            r.tx_n ? (r.rearm_cyc - r.tx_end_cyc) / 64 : 0,
++            r.fail_sof,
++            r.fail_parse,
++            r.restarts,
++            r.max_restart / 64,
++            r.overflow,
++            r.max_bytes,
++            r.max_wake / 64,
++            r.bad_byte,
++            nfc_probe_dropped,
++            r.max_gap / 64,
++            r.min_gap == 0xFFFFFFFF ? 0 : r.min_gap / 64,
++            r.ovf_dt / 64,
++            r.max_done / 64);
++    }
++    return 0;
++}
++
++void nfc_probe_flush(void) {
++    if(!nfc_probe_pending) return;
++    nfc_probe_pending = false;
++    nfc_probe.rearm_cyc = iso15693_parser_probe_start_cyc;
++    if(!nfc_probe_queue) {
++        nfc_probe_queue = furi_message_queue_alloc(128, sizeof(NfcProbeRec));
++        nfc_probe_thread =
++            furi_thread_alloc_ex("NfcProbeLog", 2048, nfc_probe_printer, NULL);
++        furi_thread_set_priority(nfc_probe_thread, FuriThreadPriorityLow);
++        furi_thread_start(nfc_probe_thread);
++    }
++    if(furi_message_queue_put(nfc_probe_queue, &nfc_probe, 0) != FuriStatusOk) nfc_probe_dropped++;
++}
++#endif
++
+ typedef enum {
+     NfcStateIdle,
+     NfcStateRunning,
+@@ -142,11 +233,58 @@ static int32_t nfc_worker_listener(void* context) {
+         }
+         if(event & FuriHalNfcEventRxEnd) {
+             furi_hal_nfc_timer_block_tx_start(instance->fdt_listen_fc);
++#ifdef NFC_RX_MISS_PROBE
++            const uint32_t probe_rx_end_cyc = DWT->CYCCNT;
++#endif
+ 
+             nfc_event.type = NfcEventTypeRxEnd;
+             furi_hal_nfc_listener_rx(
+                 instance->rx_buffer, sizeof(instance->rx_buffer), &instance->rx_bits);
+             bit_buffer_copy_bits(event_data.buffer, instance->rx_buffer, instance->rx_bits);
++#ifdef NFC_RX_MISS_PROBE
++            nfc_probe_flush(); // normally already printed
++            nfc_probe.seq++;
++            nfc_probe.rx_end_cyc = probe_rx_end_cyc;
++            nfc_probe.eof_cyc = iso15693_parser_probe_eof_cyc;
++            nfc_probe.sof_cyc = iso15693_parser_probe_sof_cyc;
++            nfc_probe.armed_cyc = iso15693_parser_probe_start_cyc;
++            nfc_probe.prev_tx_end_cyc = nfc_probe_last_tx_end_cyc;
++            nfc_probe.last_fail_cyc = iso15693_parser_probe_fail_cyc;
++            nfc_probe.max_restart = iso15693_parser_probe_max_restart;
++            iso15693_parser_probe_max_restart = 0;
++            nfc_probe.max_gap = iso15693_parser_probe_max_gap;
++            nfc_probe.min_gap = iso15693_parser_probe_min_gap;
++            nfc_probe.ovf_dt = iso15693_parser_probe_ovf_dt;
++            nfc_probe.max_done = iso15693_parser_probe_max_done;
++            iso15693_parser_probe_max_gap = 0;
++            iso15693_parser_probe_min_gap = 0xFFFFFFFF;
++            iso15693_parser_probe_ovf_dt = 0;
++            iso15693_parser_probe_max_done = 0;
++            nfc_probe.len = instance->rx_bits / 8;
++            nfc_probe.b0 = instance->rx_bits >= 8 ? instance->rx_buffer[0] : 0xFF;
++            nfc_probe.cmd = instance->rx_bits >= 16 ? instance->rx_buffer[1] : 0xFF;
++            nfc_probe.blk = instance->rx_bits >= 88 ? instance->rx_buffer[10] :
++                            instance->rx_bits >= 24 ? instance->rx_buffer[2] :
++                                                      0xFF;
++            nfc_probe.crc_ok = iso13239_crc_check(Iso13239CrcTypeDefault, event_data.buffer);
++            nfc_probe.tx_n = 0;
++            nfc_probe.tx_bytes = 0;
++            nfc_probe.fail_sof = iso15693_parser_probe_fail_sof;
++            nfc_probe.fail_parse = iso15693_parser_probe_fail_parse;
++            nfc_probe.restarts = iso15693_parser_probe_restarts;
++            nfc_probe.overflow = iso15693_parser_probe_overflow;
++            nfc_probe.max_bytes = iso15693_parser_probe_max_bytes;
++            nfc_probe.max_wake = iso15693_parser_probe_max_wake;
++            nfc_probe.bad_byte = iso15693_parser_probe_bad_byte;
++            iso15693_parser_probe_fail_sof = 0;
++            iso15693_parser_probe_fail_parse = 0;
++            iso15693_parser_probe_restarts = 0;
++            iso15693_parser_probe_overflow = 0;
++            iso15693_parser_probe_max_bytes = 0;
++            iso15693_parser_probe_max_wake = 0;
++            iso15693_parser_probe_bad_byte = 0;
++            nfc_probe_pending = true;
++#endif
+             command = instance->callback(nfc_event, instance->context);
+             if(command == NfcCommandStop) {
+                 break;
+@@ -360,6 +498,13 @@ NfcError nfc_listener_tx(Nfc* instance, const BitBuffer* tx_buffer) {
+         }
+ 
+         error = furi_hal_nfc_listener_tx(tx_data, tx_bits);
++#ifdef NFC_RX_MISS_PROBE
++        nfc_probe_last_tx_end_cyc = DWT->CYCCNT;
++        nfc_probe.tx_n++;
++        nfc_probe.tx_bytes = tx_bits / 8;
++        nfc_probe.tx_dma_cyc = digital_sequence_probe_dma_start_cyc;
++        nfc_probe.tx_end_cyc = nfc_probe_last_tx_end_cyc;
++#endif
+         if(error != FuriHalNfcErrorNone) {
+             FURI_LOG_D(TAG, "Failed in listener TX");
+             ret = nfc_process_hal_error(error);
+diff --git a/lib/signal_reader/parsers/iso15693/iso15693_parser.c b/lib/signal_reader/parsers/iso15693/iso15693_parser.c
+index b493def94..ef58bd22d 100644
+--- a/lib/signal_reader/parsers/iso15693/iso15693_parser.c
++++ b/lib/signal_reader/parsers/iso15693/iso15693_parser.c
+@@ -10,6 +10,31 @@
+ 
+ #define TAG "Iso15693Parser"
+ 
++#ifdef NFC_RX_MISS_PROBE
++#include <stm32wbxx.h>
++// FNFC-01.12 probe (temporary, not for commit). DWT->CYCCNT stamps @64 MHz and counters,
++// read and reset by the [P12] log in nfc.c
++volatile uint32_t iso15693_parser_probe_start_cyc = 0; // signal reader (re)started
++volatile uint32_t iso15693_parser_probe_sof_cyc = 0; // SOF pattern seen (ISR)
++volatile uint32_t iso15693_parser_probe_eof_cyc = 0; // EOF pattern seen (ISR)
++volatile uint32_t iso15693_parser_probe_full_cyc = 0; // 32-symbol buffer full (ISR)
++volatile uint32_t iso15693_parser_probe_max_wake = 0; // max ISR "buffer full" -> thread parse, cycles
++volatile uint32_t iso15693_parser_probe_fail_sof = 0; // first byte after an edge not SOF/EOF
++volatile uint32_t iso15693_parser_probe_fail_parse = 0; // invalid 1-of-4 symbol inside a frame
++volatile uint32_t iso15693_parser_probe_overflow = 0; // ISR found bytes_to_process >= buffer size
++volatile uint32_t iso15693_parser_probe_max_bytes = 0; // max bytes_to_process seen by the ISR
++volatile uint32_t iso15693_parser_probe_restarts = 0; // parser restarts after a failure
++volatile uint8_t iso15693_parser_probe_bad_byte = 0; // last non-SOF first byte / bad symbol
++volatile uint32_t iso15693_parser_probe_fail_cyc = 0; // ISR set the Fail state (spurious trigger)
++volatile uint32_t iso15693_parser_probe_max_restart = 0;
++// v3: ISR event gap inside a frame, ISR overrun time, thread "buffer handed back" time
++volatile uint32_t iso15693_parser_probe_last_evt_cyc = 0;
++volatile uint32_t iso15693_parser_probe_max_gap = 0; // max interval between ISR events inside a frame
++volatile uint32_t iso15693_parser_probe_min_gap = 0xFFFFFFFF; // min interval between ISR events inside a frame
++volatile uint32_t iso15693_parser_probe_ovf_dt = 0; // overrun: ISR time - "buffer full" time
++volatile uint32_t iso15693_parser_probe_max_done = 0; // "buffer full" -> thread reset bytes_to_process // max Fail (ISR) -> restart (thread), cycles
++#endif
++
+ typedef enum {
+     Iso15693ParserStateParseSoF,
+     Iso15693ParserStateParseFrame,
+@@ -122,8 +147,22 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
+     const uint8_t eof_single = 0x01;
+     const uint8_t eof = 0x04;
+ 
++#ifdef NFC_RX_MISS_PROBE
++    {
++        const uint32_t now = DWT->CYCCNT;
++        if(instance->state == Iso15693ParserStateParseFrame) {
++            const uint32_t gap = now - iso15693_parser_probe_last_evt_cyc;
++            if(gap > iso15693_parser_probe_max_gap) iso15693_parser_probe_max_gap = gap;
++            if(gap < iso15693_parser_probe_min_gap) iso15693_parser_probe_min_gap = gap;
++        }
++        iso15693_parser_probe_last_evt_cyc = now;
++    }
++#endif
+     if(instance->state == Iso15693ParserStateParseSoF) {
+         if(event.data->data[0] == sof_1_out_of_4) {
++#ifdef NFC_RX_MISS_PROBE
++            iso15693_parser_probe_sof_cyc = DWT->CYCCNT;
++#endif
+             if(instance->detect_mode) instance->mode = Iso15693ParserMode1OutOf4;
+             instance->state = Iso15693ParserStateParseFrame;
+         } else if(event.data->data[0] == sof_1_out_of_256) {
+@@ -134,17 +173,41 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
+             instance->callback(Iso15693ParserEventDataReceived, instance->context);
+         } else {
+             instance->state = Iso15693ParserStateFail;
++#ifdef NFC_RX_MISS_PROBE
++            iso15693_parser_probe_fail_sof++;
++            iso15693_parser_probe_fail_cyc = DWT->CYCCNT;
++            iso15693_parser_probe_bad_byte = event.data->data[0];
++#endif
+             instance->callback(Iso15693ParserEventDataReceived, instance->context);
+         }
+     } else {
+         if(instance->mode == Iso15693ParserMode1OutOf4) {
+             if(event.data->data[0] == eof) {
+                 instance->eof_received = true;
++#ifdef NFC_RX_MISS_PROBE
++                iso15693_parser_probe_eof_cyc = DWT->CYCCNT;
++#endif
+                 instance->callback(Iso15693ParserEventDataReceived, instance->context);
+             } else {
++#ifdef NFC_RX_MISS_PROBE
++                {
++                    // volatile read: keep the compiler from deriving a range for the store below
++                    const size_t probe_n = *(volatile size_t*)&instance->bytes_to_process;
++                    if(probe_n >= ISO15693_PARSER_BITSTREAM_BUFF_SIZE) {
++                        iso15693_parser_probe_overflow++;
++                        iso15693_parser_probe_ovf_dt = DWT->CYCCNT - iso15693_parser_probe_full_cyc;
++                    }
++                    if(probe_n + 1 > iso15693_parser_probe_max_bytes) {
++                        iso15693_parser_probe_max_bytes = probe_n + 1;
++                    }
++                }
++#endif
+                 instance->bitstream_buff[instance->bytes_to_process] = event.data->data[0];
+                 instance->bytes_to_process++;
+                 if(instance->bytes_to_process == ISO15693_PARSER_BITSTREAM_BUFF_SIZE) {
++#ifdef NFC_RX_MISS_PROBE
++                    iso15693_parser_probe_full_cyc = DWT->CYCCNT;
++#endif
+                     instance->callback(Iso15693ParserEventDataReceived, instance->context);
+                 }
+             }
+@@ -159,6 +222,9 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
+ }
+ 
+ static void iso15693_parser_start_signal_reader(Iso15693Parser* instance) {
++#ifdef NFC_RX_MISS_PROBE
++    iso15693_parser_probe_start_cyc = DWT->CYCCNT;
++#endif
+     iso15693_parser_reset(instance);
+     signal_reader_start(instance->signal_reader, signal_reader_callback, instance);
+ }
+@@ -205,6 +271,9 @@ static Iso15693ParserCommand iso15693_parser_parse_1_out_of_4(Iso15693Parser* in
+             }
+         }
+         if(j == COUNT_OF(bit_patterns_1_out_of_4)) {
++#ifdef NFC_RX_MISS_PROBE
++            iso15693_parser_probe_bad_byte = instance->bitstream_buff[i];
++#endif
+             command = Iso15693ParserCommandFail;
+             break;
+         }
+@@ -271,7 +340,19 @@ static const Iso15693ParserStateHandler iso15693_parser_state_handlers[Iso15693P
+ };
+ 
+ bool iso15693_parser_run(Iso15693Parser* instance) {
++#ifdef NFC_RX_MISS_PROBE
++    const bool probe_full_run = instance->bytes_to_process >= ISO15693_PARSER_BITSTREAM_BUFF_SIZE;
++    if(probe_full_run) {
++        const uint32_t wake = DWT->CYCCNT - iso15693_parser_probe_full_cyc;
++        if(wake > iso15693_parser_probe_max_wake) iso15693_parser_probe_max_wake = wake;
++    }
++#endif
+     if(instance->state == Iso15693ParserStateFail) {
++#ifdef NFC_RX_MISS_PROBE
++        iso15693_parser_probe_restarts++;
++        const uint32_t restart = DWT->CYCCNT - iso15693_parser_probe_fail_cyc;
++        if(restart > iso15693_parser_probe_max_restart) iso15693_parser_probe_max_restart = restart;
++#endif
+         iso15693_parser_stop(instance);
+         iso15693_parser_start_signal_reader(instance);
+     } else if((instance->state == Iso15693ParserStateParseSoF) && (instance->eof_received)) {
+@@ -281,8 +362,18 @@ bool iso15693_parser_run(Iso15693Parser* instance) {
+         while(command == Iso15693ParserCommandProcessed) {
+             command = iso15693_parser_state_handlers[instance->mode](instance);
+         }
++#ifdef NFC_RX_MISS_PROBE
++        if(probe_full_run) {
++            const uint32_t done = DWT->CYCCNT - iso15693_parser_probe_full_cyc;
++            if(done > iso15693_parser_probe_max_done) iso15693_parser_probe_max_done = done;
++        }
++#endif
+ 
+         if(command == Iso15693ParserCommandFail) {
++#ifdef NFC_RX_MISS_PROBE
++            iso15693_parser_probe_fail_parse++;
++            iso15693_parser_probe_restarts++;
++#endif
+             iso15693_parser_stop(instance);
+             iso15693_parser_start_signal_reader(instance);
+             FURI_LOG_D(TAG, "Frame parse failed");
+diff --git a/targets/f7/furi_hal/furi_hal_nfc_iso15693.c b/targets/f7/furi_hal/furi_hal_nfc_iso15693.c
+index ab38a25fe..ad124c0dd 100644
+--- a/targets/f7/furi_hal/furi_hal_nfc_iso15693.c
++++ b/targets/f7/furi_hal/furi_hal_nfc_iso15693.c
+@@ -377,12 +377,20 @@ static void furi_hal_nfc_iso15693_parser_callback(Iso15693ParserEvent event, voi
+     }
+ }
+ 
++#ifdef NFC_RX_MISS_PROBE
++void nfc_probe_flush(void);
++#endif
++
+ static FuriHalNfcEvent furi_hal_nfc_iso15693_wait_event(uint32_t timeout_ms) {
+     FuriHalNfcEvent event = 0;
+ 
+     FuriThreadId thread_id = furi_thread_get_current_id();
+     iso15693_parser_start(
+         furi_hal_nfc_iso15693_listener->parser, furi_hal_nfc_iso15693_parser_callback, thread_id);
++#ifdef NFC_RX_MISS_PROBE
++    // log the previous request only after the receiver is armed again
++    nfc_probe_flush();
++#endif
+ 
+     while(true) {
+         uint32_t flag = furi_thread_flags_wait(
