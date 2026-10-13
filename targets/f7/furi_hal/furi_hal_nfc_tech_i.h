@@ -114,6 +114,13 @@ typedef struct {
  */
 typedef struct {
     int32_t fdt; /**< Frame delay time compensation, in carrier cycles. */
+    /**
+     * Optional pointer to a function returning the frame delay time compensation
+     * for the frame just received, in carrier cycles (NULL: fdt is used).
+     *
+     * For technologies whose receive latency depends on how the request was coded.
+     */
+    int32_t (*get_fdt)(void);
 } FuriHalNfcListenerCompensation;
 
 /**

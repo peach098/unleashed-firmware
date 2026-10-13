@@ -386,6 +386,12 @@ void iso15693_parser_force_1outof4(Iso15693Parser* instance) {
     instance->mode = Iso15693ParserMode1OutOf4;
 }
 
+bool iso15693_parser_is_1outof256(Iso15693Parser* instance) {
+    furi_assert(instance);
+
+    return instance->mode == Iso15693ParserMode1OutOf256;
+}
+
 void iso15693_parser_force_1outof256(Iso15693Parser* instance) {
     furi_assert(instance);
 

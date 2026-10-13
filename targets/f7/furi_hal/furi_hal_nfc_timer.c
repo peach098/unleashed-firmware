@@ -123,7 +123,7 @@ static int32_t furi_hal_nfc_timer_get_compensation(FuriHalNfcTimer timer) {
 
     } else if(furi_hal_nfc.mode == FuriHalNfcModeListener) {
         const FuriHalNfcListenerCompensation* comp = &current_tech->listener.compensation;
-        if(timer == FuriHalNfcTimerBlockTx) return comp->fdt;
+        if(timer == FuriHalNfcTimerBlockTx) return comp->get_fdt ? comp->get_fdt() : comp->fdt;
     }
 
     return 0;
