@@ -1,0 +1,2 @@
+e13952dce signal_reader: iso15693_parser: decode 1-of-256 requests (FNFC-01.14)
+fbt args: 

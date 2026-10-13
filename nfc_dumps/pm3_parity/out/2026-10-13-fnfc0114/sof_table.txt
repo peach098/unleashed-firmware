@@ -1,0 +1,212 @@
+after after_rd1_1.trace: len=7 crc=True data=EQUAL sof_delay_us=297.3
+after after_rd1_2.trace: len=7 crc=True data=EQUAL sof_delay_us=302.1
+after after_rd1_3.trace: len=7 crc=True data=EQUAL sof_delay_us=297.3
+after after_rd1_4.trace: len=7 crc=True data=EQUAL sof_delay_us=302.1
+after after_rd1_5.trace: len=7 crc=True data=EQUAL sof_delay_us=297.3
+after after_rd1_6.trace: len=7 crc=True data=EQUAL sof_delay_us=297.3
+after after_rd1_7.trace: len=7 crc=True data=EQUAL sof_delay_us=292.6
+after after_rd1_8.trace: len=7 crc=True data=EQUAL sof_delay_us=302.1
+after after_rd1_9.trace: len=7 crc=True data=EQUAL sof_delay_us=297.3
+after after_rd1_10.trace: len=7 crc=True data=EQUAL sof_delay_us=297.3
+after after_rdm8_1.trace: len=35 crc=True data=EQUAL sof_delay_us=297.3
+after after_rdm8_2.trace: len=35 crc=True data=EQUAL sof_delay_us=292.6
+after after_rdm8_3.trace: len=35 crc=True data=EQUAL sof_delay_us=302.1
+after after_rdm8_4.trace: len=35 crc=True data=EQUAL sof_delay_us=297.3
+after after_rdm8_5.trace: len=35 crc=True data=EQUAL sof_delay_us=297.3
+after after_rdm8_6.trace: len=35 crc=True data=EQUAL sof_delay_us=302.1
+after after_rdm8_7.trace: len=35 crc=True data=EQUAL sof_delay_us=302.1
+after after_rdm8_8.trace: len=35 crc=True data=EQUAL sof_delay_us=297.3
+after after_rdm8_9.trace: len=35 crc=True data=EQUAL sof_delay_us=297.3
+after after_rdm8_10.trace: len=35 crc=True data=EQUAL sof_delay_us=297.3
+after4 after4_rd1_1.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rd1_2.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+after4 after4_rd1_3.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rd1_4.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rd1_5.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rd1_6.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rd1_7.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rd1_8.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rd1_9.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rd1_10.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rdm8_1.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+after4 after4_rdm8_2.trace: len=35 crc=True data=EQUAL sof_delay_us=325.7
+after4 after4_rdm8_3.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+after4 after4_rdm8_4.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+after4 after4_rdm8_5.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+after4 after4_rdm8_6.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rdm8_7.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+after4 after4_rdm8_8.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+after4 after4_rdm8_9.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+after4 after4_rdm8_10.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2 fix2_rd1_1.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+fix2 fix2_rd1_2.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rd1_3.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rd1_4.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rd1_5.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+fix2 fix2_rd1_6.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rd1_7.trace: len=7 crc=True data=EQUAL sof_delay_us=330.4
+fix2 fix2_rd1_8.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+fix2 fix2_rd1_9.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rd1_10.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rdm8_1.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2 fix2_rdm8_2.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rdm8_3.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rdm8_4.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rdm8_5.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rdm8_6.trace: len=35 crc=True data=EQUAL sof_delay_us=330.4
+fix2 fix2_rdm8_7.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rdm8_8.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+fix2 fix2_rdm8_9.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2 fix2_rdm8_10.trace: len=35 crc=True data=EQUAL sof_delay_us=316.2
+fix2c4 fix2c4_rd1_1.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2c4 fix2c4_rd1_2.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2c4 fix2c4_rd1_3.trace: len=7 crc=True data=EQUAL sof_delay_us=325.7
+fix2c4 fix2c4_rd1_4.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2c4 fix2c4_rd1_5.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2c4 fix2c4_rd1_6.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2c4 fix2c4_rd1_7.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2c4 fix2c4_rd1_8.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+fix2c4 fix2c4_rd1_9.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2c4 fix2c4_rd1_10.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+fix2c4 fix2c4_rdm8_1.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2c4 fix2c4_rdm8_2.trace: len=35 crc=True data=EQUAL sof_delay_us=325.7
+fix2c4 fix2c4_rdm8_3.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2c4 fix2c4_rdm8_4.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2c4 fix2c4_rdm8_5.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2c4 fix2c4_rdm8_6.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2c4 fix2c4_rdm8_7.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2c4 fix2c4_rdm8_8.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2c4 fix2c4_rdm8_9.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+fix2c4 fix2c4_rdm8_10.trace: len=35 crc=True data=EQUAL sof_delay_us=320.9
+long256 long256_rd1_1.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_2.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_3.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_4.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_5.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+long256 long256_rd1_6.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_7.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_8.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_9.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+long256 long256_rd1_10.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_11.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_12.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_13.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+long256 long256_rd1_14.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_15.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_16.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_17.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+long256 long256_rd1_18.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+long256 long256_rd1_19.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_20.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+long256 long256_rd1_21.trace: len=7 crc=True data=EQUAL sof_delay_us=325.7
+long256 long256_rd1_22.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+long256 long256_rd1_23.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_24.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_25.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_26.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+long256 long256_rd1_27.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_28.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_29.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long256 long256_rd1_30.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_1.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_2.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_3.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+long4 long4_rd1_4.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_5.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_6.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+long4 long4_rd1_7.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_8.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_9.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_10.trace: len=7 crc=True data=EQUAL sof_delay_us=311.5
+long4 long4_rd1_11.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_12.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_13.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_14.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_15.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_16.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_17.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_18.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_19.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+long4 long4_rd1_20.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+long4 long4_rd1_21.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_22.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+long4 long4_rd1_23.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_24.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_25.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_26.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_27.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_28.trace: len=7 crc=True data=EQUAL sof_delay_us=320.9
+long4 long4_rd1_29.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+long4 long4_rd1_30.trace: len=7 crc=True data=EQUAL sof_delay_us=316.2
+
+### after
+
+| blocks | decoded | median us | min us | max us | median - 316 us |
+|---|---|---|---|---|---|
+| 1 | 10/10 | 297.3 | 292.6 | 302.1 | -18.7 |
+| 8 | 10/10 | 297.3 | 292.6 | 302.1 | -18.7 |
+| 32 | 0/0 | - | - | - | - |
+| 64 | 0/0 | - | - | - | - |
+| 80 | 0/0 | - | - | - | - |
+
+all lengths: min 292.6 us, max 302.1 us
+
+### after4
+
+| blocks | decoded | median us | min us | max us | median - 316 us |
+|---|---|---|---|---|---|
+| 1 | 10/10 | 316.2 | 311.5 | 316.2 | +0.2 |
+| 8 | 10/10 | 320.9 | 316.2 | 325.7 | +4.9 |
+| 32 | 0/0 | - | - | - | - |
+| 64 | 0/0 | - | - | - | - |
+| 80 | 0/0 | - | - | - | - |
+
+all lengths: min 311.5 us, max 325.7 us
+
+### fix2
+
+| blocks | decoded | median us | min us | max us | median - 316 us |
+|---|---|---|---|---|---|
+| 1 | 10/10 | 316.2 | 311.5 | 330.4 | +0.2 |
+| 8 | 10/10 | 316.2 | 316.2 | 330.4 | +0.2 |
+| 32 | 0/0 | - | - | - | - |
+| 64 | 0/0 | - | - | - | - |
+| 80 | 0/0 | - | - | - | - |
+
+all lengths: min 311.5 us, max 330.4 us
+
+### fix2c4
+
+| blocks | decoded | median us | min us | max us | median - 316 us |
+|---|---|---|---|---|---|
+| 1 | 10/10 | 316.2 | 316.2 | 325.7 | +0.2 |
+| 8 | 10/10 | 320.9 | 320.9 | 325.7 | +4.9 |
+| 32 | 0/0 | - | - | - | - |
+| 64 | 0/0 | - | - | - | - |
+| 80 | 0/0 | - | - | - | - |
+
+all lengths: min 316.2 us, max 325.7 us
+
+### long256
+
+| blocks | decoded | median us | min us | max us | median - 316 us |
+|---|---|---|---|---|---|
+| 1 | 30/30 | 316.2 | 311.5 | 325.7 | +0.2 |
+| 8 | 0/0 | - | - | - | - |
+| 32 | 0/0 | - | - | - | - |
+| 64 | 0/0 | - | - | - | - |
+| 80 | 0/0 | - | - | - | - |
+
+all lengths: min 311.5 us, max 325.7 us
+
+### long4
+
+| blocks | decoded | median us | min us | max us | median - 316 us |
+|---|---|---|---|---|---|
+| 1 | 30/30 | 316.2 | 311.5 | 320.9 | +0.2 |
+| 8 | 0/0 | - | - | - | - |
+| 32 | 0/0 | - | - | - | - |
+| 64 | 0/0 | - | - | - | - |
+| 80 | 0/0 | - | - | - | - |
+
+all lengths: min 311.5 us, max 320.9 us

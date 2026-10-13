@@ -1,0 +1,3 @@
+rxend: EOF sample byte -> RxEnd with thread lag 0: 1-of-4 max 0, 1-of-256 max 31 sample bytes
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:226: 1-of-256 RxEnd 31 sample bytes after EOF (EOF must be seen by the ISR)
+FAILED: 1/201 checks failed

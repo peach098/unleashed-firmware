@@ -1,0 +1,123 @@
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: rd1 n=13 lag=0: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: rd1: restarts 0/14
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: rdm8 n=14 lag=0: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: rdm8: restarts 0/15
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: rd1 n=13 lag=1: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: rd1: restarts 0/14
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: rdm8 n=14 lag=1: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: rdm8: restarts 0/15
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: rd1 n=13 lag=5: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: rd1: restarts 0/14
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: rdm8 n=14 lag=5: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: rdm8: restarts 0/15
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: rd1 n=13 lag=31: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: rd1: restarts 0/11
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: rdm8 n=14 lag=31: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: rdm8: restarts 0/13
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: rd1 n=13 lag=-31: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: rd1: restarts 0/13
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: rdm8 n=14 lag=-31: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: rdm8: restarts 0/14
+rxend: EOF sample byte -> RxEnd with thread lag 0: 1-of-4 max 0, 1-of-256 max 99 sample bytes
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:226: 1-of-256 RxEnd 99 sample bytes after EOF (EOF must be seen by the ISR)
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: all values n=256 lag=0: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: all values: restarts 0/256
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: all values lag n=256 lag=-31: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: all values lag: restarts 0/255
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: all values desc n=256 lag=3: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: all values desc: restarts 0/257
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=1 lag=-31: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/1
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=2 lag=-21: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/3
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=3 lag=0: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/4
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=4 lag=-21: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/5
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=5 lag=-3: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/5
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=6 lag=-5: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/7
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=7 lag=-29: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/7
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=8 lag=-9: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/9
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=9 lag=-31: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/10
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=10 lag=-18: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/11
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=11 lag=-27: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/12
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=12 lag=-23: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/13
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=13 lag=-26: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/14
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=14 lag=-24: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/14
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=15 lag=-23: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/15
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=16 lag=-18: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/17
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=17 lag=-1: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/18
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=18 lag=-1: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/19
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=19 lag=-13: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/20
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=20 lag=-13: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/21
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=21 lag=-16: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/21
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=22 lag=-26: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/22
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=23 lag=-13: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/24
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=24 lag=-3: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/25
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=25 lag=-21: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/24
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=26 lag=-12: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/27
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=27 lag=-14: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/28
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=28 lag=-11: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/29
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=29 lag=-28: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/27
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=30 lag=-11: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/30
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=31 lag=-10: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/32
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=32 lag=-28: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/33
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=33 lag=-5: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/34
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=34 lag=-18: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/35
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=35 lag=-13: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/36
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=36 lag=-29: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/36
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=37 lag=-29: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/37
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=38 lag=-2: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/39
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=39 lag=-21: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/40
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: random n=40 lag=-1: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: random: restarts 0/41
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: capacity n=1024 lag=-31: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: capacity: restarts 0/982
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:203: two pauses (two sample bytes): next good frame lost
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:203: two pauses (one sample byte): next good frame lost
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:203: no pause: next good frame lost
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:203: pause in the first half slot: next good frame lost
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:203: pause in the first half slot (bit 0): next good frame lost
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:203: EOF inside a byte: next good frame lost
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:203: missing EOF: next good frame lost
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:203: noise: next good frame lost
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:203: 0xAA sample byte: next good frame lost
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:185: after a truncated bad frame n=14 lag=0: 1-of-256 rx_end=0 len=0
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:186: after a truncated bad frame: restarts 0/15
+FAIL /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/host/parser_test.c:348: forced 1-of-256
+FAILED: 121/201 checks failed

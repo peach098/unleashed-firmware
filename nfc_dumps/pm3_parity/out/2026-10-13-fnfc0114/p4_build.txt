@@ -1,0 +1,5 @@
+780487f52 furi_hal: nfc: iso15693: FDT compensation for 1-of-256 requests (FNFC-01.14)
+ M lib/digital_signal/digital_sequence.c
+ M lib/nfc/nfc.c
+ M lib/signal_reader/parsers/iso15693/iso15693_parser.c
+fbt args: --extra-define=NFC_1OF256_PROBE

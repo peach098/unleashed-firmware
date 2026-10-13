@@ -1,0 +1,8 @@
+log debug
+Current log level: debug
+Use <log ?> to list available log levels
+Press CTRL+C to stop...
+42439 [0;32m[I][Iso15693Parser] [0m[P14T] n=1 mode=0 len=7 eof2rx=71.0 eof2dma=320.2
+42442 [0;32m[I][Iso15693Parser] [0m[P14T] n=2 mode=0 len=7 eof2rx=71.1 eof2dma=320.3
+42446 [0;32m[I][Iso15693Parser] [0m[P14C] frame=1 kind=1 n=32 fail_idx=8 fail_val=20
+42450 [0;32m[I][Iso15693Parser] [0m[P14D] 0000 0000000000000000200000000000000000000000000000000000000000000000

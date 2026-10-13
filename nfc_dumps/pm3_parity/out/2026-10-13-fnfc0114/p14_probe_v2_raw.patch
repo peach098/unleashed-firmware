@@ -1,0 +1,281 @@
+FNFC-01.14 probe v2 = v1 + NFC_1OF256_PROBE_RAW: the 1-of-256 decoder only captures 1000 raw sample bytes (whole frame incl. EOF), never decodes. Temporary, NOT for commit.
+
+diff --git a/lib/digital_signal/digital_sequence.c b/lib/digital_signal/digital_sequence.c
+index 0090dab20..0e92ff58d 100644
+--- a/lib/digital_signal/digital_sequence.c
++++ b/lib/digital_signal/digital_sequence.c
+@@ -195,8 +195,16 @@ void digital_sequence_set_prefill_size(DigitalSequence* sequence, uint32_t prefi
+     sequence->prefill_size = MIN(prefill_size, DIGITAL_SEQUENCE_RING_BUFFER_PREFILL_SIZE_MAX);
+ }
+ 
++#ifdef NFC_1OF256_PROBE
++// FNFC-01.14 probe: DWT->CYCCNT when the first DMA transfer of a frame is started
++volatile uint32_t digital_sequence_probe_dma_start_cyc = 0;
++#endif
++
+ static inline void digital_sequence_start_dma(DigitalSequence* sequence) {
+     furi_assert(sequence);
++#ifdef NFC_1OF256_PROBE
++    digital_sequence_probe_dma_start_cyc = DWT->CYCCNT;
++#endif
+ 
+     LL_DMA_Init(DMA1, LL_DMA_CHANNEL_1, &sequence->dma_config_gpio);
+     LL_DMA_Init(DMA1, LL_DMA_CHANNEL_2, &sequence->dma_config_timer);
+diff --git a/lib/nfc/nfc.c b/lib/nfc/nfc.c
+index 20cbbde27..c55fae420 100644
+--- a/lib/nfc/nfc.c
++++ b/lib/nfc/nfc.c
+@@ -12,6 +12,14 @@
+ #define NFC_FELICA_LISTENER_RESPONSE_TIME_A_FC (512 * 64)
+ #define NFC_FELICA_LISTENER_RESPONSE_TIME_B_FC (256 * 64)
+ 
++#ifdef NFC_1OF256_PROBE
++// FNFC-01.14 probe (temporary, NOT for commit)
++#include <stm32wbxx.h>
++extern volatile uint32_t digital_sequence_probe_dma_start_cyc;
++void iso15693_parser_probe_timing(uint32_t rx_end_cyc, uint32_t dma_cyc, uint32_t len);
++static uint32_t nfc_probe_rx_end_cyc;
++#endif
++
+ typedef enum {
+     NfcStateIdle,
+     NfcStateRunning,
+@@ -142,6 +150,9 @@ static int32_t nfc_worker_listener(void* context) {
+         }
+         if(event & FuriHalNfcEventRxEnd) {
+             furi_hal_nfc_timer_block_tx_start(instance->fdt_listen_fc);
++#ifdef NFC_1OF256_PROBE
++            nfc_probe_rx_end_cyc = DWT->CYCCNT;
++#endif
+ 
+             nfc_event.type = NfcEventTypeRxEnd;
+             furi_hal_nfc_listener_rx(
+@@ -360,6 +371,10 @@ NfcError nfc_listener_tx(Nfc* instance, const BitBuffer* tx_buffer) {
+         }
+ 
+         error = furi_hal_nfc_listener_tx(tx_data, tx_bits);
++#ifdef NFC_1OF256_PROBE
++        iso15693_parser_probe_timing(
++            nfc_probe_rx_end_cyc, digital_sequence_probe_dma_start_cyc, tx_bits / 8);
++#endif
+         if(error != FuriHalNfcErrorNone) {
+             FURI_LOG_D(TAG, "Failed in listener TX");
+             ret = nfc_process_hal_error(error);
+diff --git a/lib/signal_reader/parsers/iso15693/iso15693_parser.c b/lib/signal_reader/parsers/iso15693/iso15693_parser.c
+index ba4b8c9df..66f902f22 100644
+--- a/lib/signal_reader/parsers/iso15693/iso15693_parser.c
++++ b/lib/signal_reader/parsers/iso15693/iso15693_parser.c
+@@ -15,6 +15,89 @@
+ 
+ #define TAG "Iso15693Parser"
+ 
++#ifdef NFC_1OF256_PROBE
++// FNFC-01.14 probe (temporary, NOT for commit). Build with --extra-define=NFC_1OF256_PROBE.
++// Captures the raw sample bytes of 1-of-256 frames and the decoder verdict; stamps DWT->CYCCNT at
++// EOF detection. A Low priority thread prints the records only once `log debug` is attached, so no
++// USB logging happens while the signal reader runs.
++#include <stm32wbxx.h>
++#define P14_CAP_SIZE (1000)
++static uint8_t p14_cap[P14_CAP_SIZE];
++static volatile size_t p14_cap_n;
++static volatile bool p14_cap_busy, p14_cap_on;
++static volatile uint32_t p14_fail_idx, p14_fail_val, p14_kind, p14_consumed, p14_frames;
++volatile uint32_t iso15693_parser_probe_eof_cyc;
++volatile uint32_t iso15693_parser_probe_mode;
++typedef struct {
++    uint32_t mode, len, eof2rx, eof2dma, n;
++} P14Tim;
++static FuriMessageQueue* p14_queue;
++static FuriThread* p14_thread;
++static int32_t p14_printer(void* ctx) {
++    UNUSED(ctx);
++    char line[140];
++    while(true) {
++        while(furi_log_get_level() < FuriLogLevelDebug) furi_delay_ms(200);
++        P14Tim t;
++        while(furi_message_queue_get(p14_queue, &t, 0) == FuriStatusOk) {
++            FURI_LOG_I(
++                TAG,
++                "[P14T] n=%lu mode=%lu len=%lu eof2rx=%lu.%lu eof2dma=%lu.%lu",
++                t.n,
++                t.mode,
++                t.len,
++                t.eof2rx / 64,
++                (t.eof2rx % 64) * 10 / 64,
++                t.eof2dma / 64,
++                (t.eof2dma % 64) * 10 / 64);
++        }
++        if(p14_cap_busy) {
++            FURI_LOG_I(
++                TAG,
++                "[P14C] frame=%lu kind=%lu n=%u fail_idx=%lu fail_val=%02lX",
++                p14_frames,
++                p14_kind,
++                p14_cap_n,
++                p14_fail_idx,
++                p14_fail_val);
++            for(size_t i = 0; i < p14_cap_n; i += 64) {
++                size_t k = 0;
++                for(size_t j = i; j < MIN(i + 64, (size_t)p14_cap_n); j++) {
++                    const char* hx = "0123456789ABCDEF";
++                    line[k++] = hx[p14_cap[j] >> 4];
++                    line[k++] = hx[p14_cap[j] & 15];
++                }
++                line[k] = 0;
++                FURI_LOG_I(TAG, "[P14D] %04u %s", i, line);
++            }
++            p14_cap_busy = false;
++        }
++        furi_delay_ms(100);
++    }
++    return 0;
++}
++static void p14_done(uint32_t kind, uint32_t idx, uint32_t val) {
++    if(!p14_cap_on) return;
++    p14_cap_on = false;
++    p14_kind = kind;
++    p14_fail_idx = idx;
++    p14_fail_val = val;
++    p14_frames++;
++    p14_cap_busy = true;
++}
++void iso15693_parser_probe_timing(uint32_t rx_end_cyc, uint32_t dma_cyc, uint32_t len) {
++    static uint32_t n = 0;
++    P14Tim t = {
++        .mode = iso15693_parser_probe_mode,
++        .len = len,
++        .eof2rx = rx_end_cyc - iso15693_parser_probe_eof_cyc,
++        .eof2dma = dma_cyc - iso15693_parser_probe_eof_cyc,
++        .n = ++n,
++    };
++    if(p14_queue) furi_message_queue_put(p14_queue, &t, 0);
++}
++#endif
++
+ typedef enum {
+     Iso15693ParserStateParseSoF,
+     Iso15693ParserStateParseFrame,
+@@ -78,6 +161,14 @@ Iso15693Parser* iso15693_parser_alloc(const GpioPin* pin, size_t max_frame_size)
+     signal_reader_set_pull(instance->signal_reader, GpioPullDown);
+     signal_reader_set_polarity(instance->signal_reader, SignalReaderPolarityNormal);
+     signal_reader_set_trigger(instance->signal_reader, SignalReaderTriggerRisingFallingEdge);
++#ifdef NFC_1OF256_PROBE
++    if(!p14_queue) {
++        p14_queue = furi_message_queue_alloc(200, sizeof(P14Tim));
++        p14_thread = furi_thread_alloc_ex("P14Log", 2048, p14_printer, NULL);
++        furi_thread_set_priority(p14_thread, FuriThreadPriorityLow);
++        furi_thread_start(p14_thread);
++    }
++#endif
+ 
+     return instance;
+ }
+@@ -166,19 +257,43 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
+             instance->state = Iso15693ParserStateParseFrame;
+         } else if(event.data->data[0] == sof_1_out_of_256) {
+             if(instance->detect_mode) instance->mode = Iso15693ParserMode1OutOf256;
++#ifdef NFC_1OF256_PROBE
++            if(!p14_cap_busy) {
++                p14_cap_on = true;
++                p14_cap_n = 0;
++                p14_consumed = 0;
++            }
++#endif
+             instance->state = Iso15693ParserStateParseFrame;
+         } else if(event.data->data[0] == eof_single) {
+             instance->eof_received = true;
++#ifdef NFC_1OF256_PROBE
++            iso15693_parser_probe_eof_cyc = DWT->CYCCNT;
++            iso15693_parser_probe_mode = instance->mode;
++#endif
+             instance->callback(Iso15693ParserEventDataReceived, instance->context);
+         } else {
+             instance->state = Iso15693ParserStateFail;
+             instance->callback(Iso15693ParserEventDataReceived, instance->context);
+         }
+     } else {
++#ifdef NFC_1OF256_PROBE
++        if(p14_cap_on) {
++            if(p14_cap_n < P14_CAP_SIZE) {
++                p14_cap[p14_cap_n++] = event.data->data[0];
++            } else {
++                p14_done(4, p14_cap_n, 0);
++            }
++        }
++#endif
+         const bool frame_1_out_of_4 = (instance->state == Iso15693ParserStateParseFrame) &&
+                                       (instance->mode == Iso15693ParserMode1OutOf4);
+         if(frame_1_out_of_4 && (event.data->data[0] == eof)) {
+             instance->eof_received = true;
++#ifdef NFC_1OF256_PROBE
++            iso15693_parser_probe_eof_cyc = DWT->CYCCNT;
++            iso15693_parser_probe_mode = instance->mode;
++#endif
+             instance->callback(Iso15693ParserEventDataReceived, instance->context);
+         } else if(
+             frame_1_out_of_4 && (event.data->data[0] == no_pause) &&
+@@ -187,6 +302,10 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
+             // whole byte means the reader has stopped modulating: its EOF pause was not sampled.
+             // End the frame here; the CRC check of the frame still applies.
+             instance->eof_received = true;
++#ifdef NFC_1OF256_PROBE
++            iso15693_parser_probe_eof_cyc = DWT->CYCCNT;
++            iso15693_parser_probe_mode = instance->mode;
++#endif
+             instance->callback(Iso15693ParserEventDataReceived, instance->context);
+         } else {
+             iso15693_parser_push_symbol(instance, event.data->data[0]);
+@@ -264,6 +383,11 @@ static Iso15693ParserCommand iso15693_parser_parse_1_out_of_4(Iso15693Parser* in
+ }
+ 
+ static Iso15693ParserCommand iso15693_parser_parse_1_out_of_256(Iso15693Parser* instance) {
++#ifdef NFC_1OF256_PROBE_RAW
++    // probe v2: capture only, never decode; drop the frame once the capture is full
++    iso15693_parser_consume(instance, instance->bytes_to_process);
++    return p14_cap_on ? Iso15693ParserCommandWaitData : Iso15693ParserCommandFail;
++#endif
+     Iso15693ParserCommand command = Iso15693ParserCommandWaitData;
+     const uint8_t eof = 0x04;
+     const size_t count = instance->bytes_to_process;
+@@ -274,6 +398,11 @@ static Iso15693ParserCommand iso15693_parser_parse_1_out_of_256(Iso15693Parser*
+             if(instance->bitstream_buff[i] == eof) {
+                 instance->frame_parsed = true;
+                 command = Iso15693ParserCommandSuccess;
++#ifdef NFC_1OF256_PROBE
++                iso15693_parser_probe_eof_cyc = DWT->CYCCNT;
++                iso15693_parser_probe_mode = instance->mode;
++                p14_done(0, p14_consumed + i, 0);
++#endif
+                 break;
+             }
+         }
+@@ -281,6 +410,9 @@ static Iso15693ParserCommand iso15693_parser_parse_1_out_of_256(Iso15693Parser*
+         if(instance->zero_found) {
+             if(instance->bitstream_buff[i] != 0x00) {
+                 command = Iso15693ParserCommandFail;
++#ifdef NFC_1OF256_PROBE
++                p14_done(1, p14_consumed + i, instance->bitstream_buff[i]);
++#endif
+                 break;
+             }
+         } else {
+@@ -302,6 +434,9 @@ static Iso15693ParserCommand iso15693_parser_parse_1_out_of_256(Iso15693Parser*
+         instance->next_byte_part = (instance->next_byte_part + 1) % 64;
+     }
+     iso15693_parser_consume(instance, count);
++#ifdef NFC_1OF256_PROBE
++    p14_consumed += count;
++#endif
+     instance->byte_idx = 0;
+ 
+     return command;
+@@ -314,6 +449,9 @@ static const Iso15693ParserStateHandler iso15693_parser_state_handlers[Iso15693P
+ 
+ bool iso15693_parser_run(Iso15693Parser* instance) {
+     if(instance->state == Iso15693ParserStateFail) {
++#ifdef NFC_1OF256_PROBE
++        p14_done(3, p14_cap_n, 0);
++#endif
+         iso15693_parser_stop(instance);
+         iso15693_parser_start_signal_reader(instance);
+     } else if((instance->state == Iso15693ParserStateParseSoF) && (instance->eof_received)) {

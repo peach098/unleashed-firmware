@@ -1,0 +1,2 @@
+780487f52 furi_hal: nfc: iso15693: FDT compensation for 1-of-256 requests (FNFC-01.14)
+fbt args: 

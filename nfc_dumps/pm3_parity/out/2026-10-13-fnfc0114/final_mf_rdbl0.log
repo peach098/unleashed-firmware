@@ -1,0 +1,16 @@
+[=] Output will be flushed after every print.
+
+[=] No preferences file will be loaded
+[+] execute command from commandline: hf mf rdbl --blk 0 -k FFFFFFFFFFFF
+
+[+] Using UART port /dev/serial/by-id/usb-proxmark.org_proxmark3_iceman-if00
+[+] Communicating with PM3 over USB-CDC
+[+] Max frame size: 624 bytes
+[+] Emulator memory: 8192 bytes
+[=] No history will be recorded
+[usb|script] pm3 --> hf mf rdbl --blk 0 -k FFFFFFFFFFFF
+
+[=]   # | sector 00 / 0x00                                | ascii
+[=] ----+-------------------------------------------------+-----------------
+[=]   0 | E3 04 83 29 4D 08 04 00 04 57 2D D5 B3 0A A6 90 | ...)M....W-.....
+

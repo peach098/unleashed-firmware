@@ -1,0 +1,27 @@
+[=] Output will be flushed after every print.
+
+[=] No preferences file will be loaded
+[+] execute command from commandline: data clear; trace clear; hf 15 raw -a -c  -d 2220AC839A01090104E000; trace list -t 15; trace save -f /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/long4_rd1_19
+
+[+] Using UART port /dev/serial/by-id/usb-proxmark.org_proxmark3_iceman-if00
+[+] Communicating with PM3 over USB-CDC
+[+] Max frame size: 624 bytes
+[+] Emulator memory: 8192 bytes
+[=] No history will be recorded
+[usb|script] pm3 --> data clear
+[usb|script] pm3 --> trace clear
+[=] Trace buffer is already empty
+[usb|script] pm3 --> hf 15 raw -a -c  -d 2220AC839A01090104E000
+[#] Buffer cleared (35080 bytes)
+[+] (7) 00 00 00 00 00 77 CF 
+[usb|script] pm3 --> trace list -t 15
+[+] Recorded activity ( 39 bytes )
+[=] start = start of start frame. end = end of frame. src = source of transfer.
+[=] ISO15693 / iCLASS - all times are in carrier periods (1/13.56MHz)
+
+      Start |        End | Src | Data (! denotes parity error)                                           | CRC | Annotation
+------------+------------+-----+-------------------------------------------------------------------------+-----+--------------------
+          0 |      54784 | Rdr |22  20  AC  83  9A  01  09  01  04  E0  00  B5  C1                       |  ok | READBLOCK(0)
+      59136 |      91904 | Tag |00  00  00  00  00  77  CF                                               |  ok | 
+[usb|script] pm3 --> trace save -f /opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/long4_rd1_19
+[+] Saved 39 bytes to binary file `/opt/ai-team/projects/flipper-nfc/.claude/worktrees/fnfc013-push/nfc_dumps/pm3_parity/out/2026-10-13-fnfc0114/long4_rd1_19.trace`
