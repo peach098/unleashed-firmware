@@ -1,0 +1,24 @@
+[=] Output will be flushed after every print.
+
+[=] No preferences file will be loaded
+[+] execute command from commandline: hf 14a info
+
+[+] Using UART port /dev/serial/by-id/usb-proxmark.org_proxmark3_iceman-if00
+[+] Communicating with PM3 over USB-CDC
+[+] Max frame size: 624 bytes
+[+] Emulator memory: 8192 bytes
+[=] No history will be recorded
+[usb|script] pm3 --> hf 14a info
+
+[=] ---------- ISO14443-A Information ----------
+[+]  UID: E3 04 83 29   ( ONUID, re-used )
+[+] ATQA: 00 04
+[+]  SAK: 08 [2]
+[+] Possible types:
+[+]    MIFARE Classic 1K
+[=] 
+[=] Proprietary non iso14443-4 card found
+[=] RATS not supported
+
+[?] Hint: Try `hf mf info`
+

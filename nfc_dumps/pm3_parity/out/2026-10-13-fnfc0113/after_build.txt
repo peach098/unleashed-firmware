@@ -1,0 +1,1 @@
+88414bf8c nfc: iso15693_3: send 00 after a single EOF for Write/Lock with the option flag (FNFC-01.13)

@@ -1,0 +1,24 @@
+before_wrbl_noopt.log: opt=False reply=00 78 f0 len=3 gap=4096 fc = 302.1 us
+before_wrbl_opt_1.log: opt=True reply=00 00 len=2 gap=306944 fc = 22636.0 us; EOF->SOF <= 4608 fc = 339.8 us
+before_wrbl_opt_2.log: opt=True reply=00 00 len=2 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+before_wrbl_opt_3.log: opt=True reply=00 00 len=2 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+before_wrbl_opt_4.log: opt=True reply=00 00 len=2 gap=306944 fc = 22636.0 us; EOF->SOF <= 4608 fc = 339.8 us
+before_wrbl_opt_5.log: opt=True reply=00 00 len=2 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+before_wrbl_opt_scan.log: opt=True reply=00 00 len=2 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+after_wrbl_noopt_1.log: opt=False reply=00 78 f0 len=3 gap=4224 fc = 311.5 us
+after_wrbl_noopt_2.log: opt=False reply=00 78 f0 len=3 gap=4096 fc = 302.1 us
+after_wrbl_noopt_3.log: opt=False reply=00 78 f0 len=3 gap=4096 fc = 302.1 us
+after_wrbl_opt_10.log: opt=True reply=00 78 f0 len=3 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+after_wrbl_opt_1.log: opt=True reply=00 78 f0 len=3 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+after_wrbl_opt_2.log: opt=True reply=00 78 f0 len=3 gap=306944 fc = 22636.0 us; EOF->SOF <= 4608 fc = 339.8 us
+after_wrbl_opt_3.log: opt=True reply=00 78 f0 len=3 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+after_wrbl_opt_4.log: opt=True reply=00 78 f0 len=3 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+after_wrbl_opt_5.log: opt=True reply=00 78 f0 len=3 gap=306944 fc = 22636.0 us; EOF->SOF <= 4608 fc = 339.8 us
+after_wrbl_opt_6.log: opt=True reply=00 78 f0 len=3 gap=306944 fc = 22636.0 us; EOF->SOF <= 4608 fc = 339.8 us
+after_wrbl_opt_7.log: opt=True reply=00 78 f0 len=3 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+after_wrbl_opt_8.log: opt=True reply=00 78 f0 len=3 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+after_wrbl_opt_9.log: opt=True reply=00 78 f0 len=3 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+after_wrbl_opt_scan.log: opt=True reply=00 78 f0 len=3 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+release_wrbl_opt_1.log: opt=True reply=00 78 f0 len=3 gap=306944 fc = 22636.0 us; EOF->SOF <= 4608 fc = 339.8 us
+release_wrbl_opt_2.log: opt=True reply=00 78 f0 len=3 gap=307008 fc = 22640.7 us; EOF->SOF <= 4672 fc = 344.5 us
+release_wrbl_opt_3.log: opt=True reply=00 78 f0 len=3 gap=306944 fc = 22636.0 us; EOF->SOF <= 4608 fc = 339.8 us

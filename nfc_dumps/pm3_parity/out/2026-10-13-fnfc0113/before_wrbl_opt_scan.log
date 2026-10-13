@@ -1,0 +1,27 @@
+[=] Output will be flushed after every print.
+
+[=] No preferences file will be loaded
+[+] execute command from commandline: data clear; hf 15 wrbl -* -b 3 -d 025A5005 -o; trace list -t 15
+
+[+] Using UART port /dev/serial/by-id/usb-proxmark.org_proxmark3_iceman-if00
+[+] Communicating with PM3 over USB-CDC
+[+] Max frame size: 624 bytes
+[+] Emulator memory: 8192 bytes
+[=] No history will be recorded
+[usb|script] pm3 --> data clear
+[usb|script] pm3 --> hf 15 wrbl -* -b 3 -d 025A5005 -o
+[=] Using scan mode
+[#] Buffer cleared (35080 bytes)
+[-] crc ( fail )
+[-] Writing to page 03 (0x03) | 02 5A 50 05   ( fail )
+[usb|script] pm3 --> trace list -t 15
+[+] Recorded activity ( 75 bytes )
+[=] start = start of start frame. end = end of frame. src = source of transfer.
+[=] ISO15693 / iCLASS - all times are in carrier periods (1/13.56MHz)
+
+      Start |        End | Src | Data (! denotes parity error)                                           | CRC | Annotation
+------------+------------+-----+-------------------------------------------------------------------------+-----+--------------------
+          0 |      22016 | Rdr |26  01  00  F6  0A                                                       |  ok | INVENTORY
+      26304 |      79552 | Tag |00  01  AC  83  9A  01  09  01  04  E0  0F  00                           |  ok | 
+        448 |      71616 | Rdr |62  21  AC  83  9A  01  09  01  04  E0  03  02  5A  50  05  72  16       |  ok | WRITEBLOCK(3)
+     378624 |     390912 | Tag |00  00                                                                   |     | 
