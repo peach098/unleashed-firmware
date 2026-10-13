@@ -21,7 +21,7 @@
 #define FURI_HAL_NFC_ISO15693_RESP_PATTERN_1    (0x02U)
 
 // Derived experimentally
-#define FURI_HAL_NFC_ISO15693_POLLER_FWT_COMP_FC   (-1300)
+#define FURI_HAL_NFC_ISO15693_POLLER_FWT_COMP_FC          (-1300)
 // Listener FDT (t1): the reply SOF must start 4320/fc after the request EOF (window 4192..4384/fc).
 // nfc.c starts the block TX timer on RxEnd for (ISO15693_3_FDT_LISTEN_FC - COMP), so
 //   EOF->DMA = t_rx + (4320 - COMP) / fc + t_timer + t_tx
@@ -41,7 +41,17 @@
 // expected to miss the timer for long replies, which then start late (after t1), not early.
 // The former 2850 expired ~108 us after RxEnd, before any reply was ready, so the SOF delay
 // followed the handler and encoding time (370..539 us for 1..80 blocks).
-#define FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_FC (1385)
+#define FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_FC        (1385)
+// The calibration above holds for 1-of-4 requests. A 1-of-256 request reaches RxEnd earlier: its
+// EOF is detected by the ISR exactly like in 1-of-4, but a 1-of-256 byte is 64 sample bytes, two
+// whole parser chunks, so the worker has nothing left to decode, while a 1-of-4 request leaves up
+// to 31 symbols to decode after the EOF. Measured with DWT (FNFC-01.14, read single block, ISR EOF
+// -> RxEnd): 1-of-4 71.6 us, 1-of-256 53.3 us (typically constant: nothing to decode for any
+// length while the worker keeps up with whole chunks; if it falls behind, RxEnd and the reply
+// come later, never earlier). The same t1 needs the timer longer by the difference:
+//   COMP_1OF256 = COMP - (t_rx(1-of-4) - t_rx(1-of-256)) * fc
+//               = 1385 - 18.3 us * 13.56 MHz = 1137 fc
+#define FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_1OF256_FC (1137)
 
 #define BITS_IN_BYTE (8U)
 
@@ -499,6 +509,15 @@ static FuriHalNfcError furi_hal_nfc_iso15693_listener_rx(
     return FuriHalNfcErrorNone;
 }
 
+static int32_t furi_hal_nfc_iso15693_listener_get_fdt_comp(void) {
+    // The parser keeps the coding of the received frame until it is restarted for the next one
+    if(furi_hal_nfc_iso15693_listener &&
+       iso15693_parser_is_1outof256(furi_hal_nfc_iso15693_listener->parser)) {
+        return FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_1OF256_FC;
+    }
+    return FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_FC;
+}
+
 FuriHalNfcError furi_hal_nfc_iso15693_listener_sleep(const FuriHalSpiBusHandle* handle) {
     UNUSED(handle);
 
@@ -525,6 +544,7 @@ const FuriHalNfcTechBase furi_hal_nfc_iso15693 = {
             .compensation =
                 {
                     .fdt = FURI_HAL_NFC_ISO15693_LISTENER_FDT_COMP_FC,
+                    .get_fdt = furi_hal_nfc_iso15693_listener_get_fdt_comp,
                 },
             .init = furi_hal_nfc_iso15693_listener_init,
             .deinit = furi_hal_nfc_iso15693_listener_deinit,
