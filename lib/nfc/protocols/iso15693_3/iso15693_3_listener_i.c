@@ -667,8 +667,11 @@ static Iso15693_3Error iso15693_3_listener_handle_standard_request(
             error = Iso15693_3ErrorNone;
         }
 
-        // Several commands may not require an answer
-        if(error == Iso15693_3ErrorFormat || error == Iso15693_3ErrorIgnore) break;
+        // Several commands may not require an answer, not even after a single EOF
+        if(error == Iso15693_3ErrorFormat || error == Iso15693_3ErrorIgnore) {
+            instance->session_state.wait_for_eof = false;
+            break;
+        }
 
         if(error != Iso15693_3ErrorNone) {
             bit_buffer_set_size(instance->tx_buffer, 0);
@@ -765,6 +768,10 @@ Iso15693_3Error
 Iso15693_3Error
     iso15693_3_listener_process_request(Iso15693_3Listener* instance, const BitBuffer* rx_buffer) {
     Iso15693_3Error error = Iso15693_3ErrorNone;
+
+    // A reply waiting for a single EOF is dropped by any request; a Write/Lock request with
+    // the option flag sets up its own
+    instance->session_state.wait_for_eof = false;
 
     do {
         typedef struct {
