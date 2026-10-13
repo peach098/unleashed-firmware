@@ -1,0 +1,1 @@
+e3b768c55 nfc_dumps: FNFC-01.11 report with on-device results, test_nfc 56/56 on the final code

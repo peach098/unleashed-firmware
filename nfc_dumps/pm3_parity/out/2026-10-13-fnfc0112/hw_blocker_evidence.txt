@@ -1,0 +1,25 @@
+FNFC-01.12 hardware blocker, 2026-10-13 (times MSK)
+
+11:00-11:07  clean e3b768c55 (release) flashed and verified (pre_device_info.txt); 30 x hf 15 dump (pre_dump_*).
+11:14        probe v1 flashed (NFC_RX_MISS_PROBE; e3b768c5 dirty). v1 printed the [P12] line from the NFC worker
+             right after the signal reader was re-armed. With `log info` attached the series died after 2 records:
+               41136 [I][Nfc] [P12] n=1 len=5 b0=26 cmd=01 blk=0 crc=1 tx=1/12B eof2dma=313 txend2arm=40819552 armed2sof=250024 rearm=3 sofail=1 pfail=0 restarts=1 ovf=0 maxb=20 wake=0 bad=0A
+               41718 [I][Nfc] [P12] n=2 len=5 b0=26 cmd=01 blk=0 crc=1 tx=1/12B eof2dma=316 txend2arm=329678 armed2sof=250025 rearm=3 sofail=1 pfail=0 restarts=1 ovf=0 maxb=20 wake=0 bad=0A
+             GET_SYSTEM_INFO was answered (PM3 trace), the next READBLOCK(0) was not, `uptime` then read 0h0m19s
+             (reboot). Without `log` attached the same build answered 2B/20 normally. A second try with `log info`
+             attached: no answer after the first request, USB re-enumerated at 11:18:08 (second reboot).
+             Cause (probe defect, not firmware): the USB log blocked the worker for milliseconds while the signal
+             reader ISR kept appending to the 32-byte bitstream buffer (no bounds check in the ISR) -> memory
+             corruption -> crash. Probe v2 (rx_miss_probe.patch) queues the record and prints it from a Low
+             priority thread instead; it builds cleanly but has NOT run on the device.
+11:19        flcli "uptime": no output.
+11:23:53     flash of probe v2: selfupdate.py stopped at 'Installing "f7-update-local"' and never returned (no file
+             was sent: CDC no longer accepted data). Killed at 11:33 (probev2_flash_interrupted.log).
+11:33-12:00  every write to the Flipper CDC: "Write timeout"; setting DTR: OSError [Errno 71] Protocol error (EPROTO).
+             /dev/serial/by-id/...Flipper... symlink unchanged since 11:18:08 (no re-enumeration). No sudo / no
+             usbreset available to reset the port from this host.
+             hung_*: the series that ran after the killed flash, against the hung Flipper (PM3: no tag found).
+
+Needed from a human: look at the Flipper screen (crash / updater screen?), then unplug and replug the Flipper
+USB (if it does not boot, hold Left+Back to reboot). Nothing needs to change on the antenna (only the Flipper is
+on it; no real card involved yet).

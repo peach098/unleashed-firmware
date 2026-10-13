@@ -1,0 +1,45 @@
+	SDKCHK	targets/f7/api_symbols.csv
+[32mAPI version 88.17 is up to date[0m
+	CDB	build/f7-firmware-C/compile_commands.json
+[32mLinking build/f7-firmware-C as latest built dir (./build/latest/)[0m
+	CC	lib/nfc/nfc.c
+	CC	lib/signal_reader/parsers/iso15693/iso15693_parser.c
+	AR	build/f7-updater-C/signal_reader/libsignal_reader.a
+	RANLIB	build/f7-updater-C/signal_reader/libsignal_reader.a
+	AR	build/f7-updater-C/nfc/libnfc.a
+	INSTALL	build/f7-updater-C/lib/libsignal_reader.a
+	RANLIB	build/f7-updater-C/nfc/libnfc.a
+	INSTALL	build/f7-updater-C/lib/libnfc.a
+	LINK	build/f7-updater-C/updater.elf
+	INFO	
+Loaded 275 app definitions.
+[1;32mFirmware modules configuration:[0m
+[32mService:
+	[0m gui, input, notification, storage, updater
+[32mSettings:
+	[0m storage_settings
+[32mStartupHook:
+	[0m storage_start
+[32mExtSettings:
+	[0m input_settings, notification_settings
+Firmware size
+.text         101924 ( 99.54 K)
+.rodata        17104 ( 16.70 K)
+.data            204 (  0.20 K)
+.bss            4168 (  4.07 K)
+	DIST	dist_updater_package
+2026-10-13 11:23:48,988 [INFO] [1;32mFirmware binaries can be found at:
+	dist/f7-C[0m
+2026-10-13 11:23:48,990 [INFO] Using guessed radio address 0x080D7000, verify with Release_Notes or specify --radioaddr[0m
+2026-10-13 11:23:50,685 [INFO] Resources compression ratio: 44.14%[0m
+2026-10-13 11:23:50,732 [INFO] [1;32mUse this directory to self-update your Flipper:
+	dist/f7-C/f7-update-local[0m
+2026-10-13 11:23:50,894 [INFO] Bundling SDK[0m
+2026-10-13 11:23:53,353 [INFO] [1;32mSDK bundle can be found at:
+	dist/f7-C/flipper-z-f7-sdk-local.zip[0m
+python3 scripts/selfupdate.py -p /dev/serial/by-id/usb-Flipper_Devices_Inc._Flipper_E17ana_flip_E17ana-if00 dist/f7-C/f7-update-local/update.fuf
+2026-10-13 11:23:53,422 [INFO] Installing "f7-update-local" from /ext/update/f7-update-local[0m
+scons: *** [build/usbinstall.flag] Error -15
+
+[91m[1m********** FBT ERRORS **********[0m[0m
+[33mbuild/usbinstall.flag[0m: Error -15
