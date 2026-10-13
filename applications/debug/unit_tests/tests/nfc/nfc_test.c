@@ -1279,6 +1279,303 @@ MU_TEST(iso15693_3_listener_short_after_long_test) {
     nfc_test_read_multi_run(true, cases, COUNT_OF(cases));
 }
 
+// ---- Write/Lock with the option flag: reply after a single EOF ---------------------------
+// With the option flag a Write/Lock request is answered only after the reader sends a single
+// EOF (ISO15693-3): 00 on success, 01 <code> on error - the same code as without the option
+// flag. An EOF with no pending reply gets no reply, and any new request drops a pending one.
+
+#define NFC_TEST_OPT_FRAME_MAX (12U)
+#define NFC_TEST_OPT_BLOCK     (60U) // above the fixture's protection pointer (0x32)
+
+typedef enum {
+    NfcTestOptReplySilence,
+    NfcTestOptReplyExact, // reply equals expected (without CRC)
+    NfcTestOptReplyCapture, // an error reply (01 xx), remembered as the reference
+    NfcTestOptReplyCaptured, // reply equals the last captured one
+} NfcTestOptReply;
+
+typedef struct {
+    uint8_t frame[NFC_TEST_OPT_FRAME_MAX]; // request without CRC
+    uint8_t frame_size; // 0: single EOF
+    NfcTestOptReply reply;
+    uint8_t expected[NFC_TEST_OPT_FRAME_MAX];
+    uint8_t expected_size;
+} NfcTestOptStep;
+
+typedef struct {
+    FuriThreadId thread_id;
+    Nfc* nfc;
+    const NfcTestOptStep* steps;
+    size_t step_count;
+    size_t steps_passed;
+    int failed_step;
+    uint8_t failed_rx[4]; // what the failed step got back (reply without CRC check)
+    size_t failed_rx_size;
+} NfcTestOptContext;
+
+#define NFC_TEST_OPT_FLAGS(option) \
+    (ISO15693_3_REQ_FLAG_DATA_RATE_HI | ((option) ? ISO15693_3_REQ_FLAG_T4_OPTION : 0))
+
+#define NFC_TEST_OPT_TX(...) \
+    .frame = {__VA_ARGS__}, .frame_size = sizeof((const uint8_t[]){__VA_ARGS__})
+#define NFC_TEST_OPT_RX(...)                                  \
+    .reply = NfcTestOptReplyExact, .expected = {__VA_ARGS__}, \
+    .expected_size = sizeof((const uint8_t[]){__VA_ARGS__})
+
+#define NFC_TEST_OPT_EOF(reply_type) {.frame_size = 0, .reply = (reply_type)}
+#define NFC_TEST_OPT_EOF_OK          {.frame_size = 0, NFC_TEST_OPT_RX(ISO15693_3_RESP_FLAG_NONE)}
+#define NFC_TEST_OPT_SILENT(...)     {NFC_TEST_OPT_TX(__VA_ARGS__), .reply = NfcTestOptReplySilence}
+#define NFC_TEST_OPT_CAPTURE(...)    {NFC_TEST_OPT_TX(__VA_ARGS__), .reply = NfcTestOptReplyCapture}
+
+#define NFC_TEST_OPT_WRITE(option, block, ...) \
+    NFC_TEST_OPT_FLAGS(option), ISO15693_3_CMD_WRITE_BLOCK, (block), __VA_ARGS__
+#define NFC_TEST_OPT_LOCK(option, block) \
+    NFC_TEST_OPT_FLAGS(option), ISO15693_3_CMD_LOCK_BLOCK, (block)
+#define NFC_TEST_OPT_READ(option, block) \
+    NFC_TEST_OPT_FLAGS(option), ISO15693_3_CMD_READ_BLOCK, (block)
+
+static bool nfc_test_opt_trx(
+    Nfc* nfc,
+    const NfcTestOptStep* step,
+    BitBuffer* tx,
+    BitBuffer* rx,
+    BitBuffer* captured) {
+    bit_buffer_reset(rx);
+    bit_buffer_copy_bytes(tx, step->frame, step->frame_size);
+    // A single EOF is a frame of zero length, without CRC
+    if(step->frame_size) iso13239_crc_append(Iso13239CrcTypeDefault, tx);
+
+    const NfcError error = nfc_poller_trx(nfc, tx, rx, ISO15693_3_FDT_POLL_FC);
+    if(step->reply == NfcTestOptReplySilence) return error == NfcErrorTimeout;
+    if(error != NfcErrorNone) return false;
+
+    if(!iso13239_crc_check(Iso13239CrcTypeDefault, rx)) return false;
+    iso13239_crc_trim(rx);
+
+    const size_t rx_size = bit_buffer_get_size_bytes(rx);
+    const uint8_t* rx_data = bit_buffer_get_data(rx);
+
+    if(step->reply == NfcTestOptReplyExact) {
+        return rx_size == step->expected_size && memcmp(rx_data, step->expected, rx_size) == 0;
+    } else if(step->reply == NfcTestOptReplyCapture) {
+        if(rx_size != 2 || rx_data[0] != ISO15693_3_RESP_FLAG_ERROR) return false;
+        bit_buffer_copy(captured, rx);
+        return true;
+    } else {
+        return rx_size == bit_buffer_get_size_bytes(captured) &&
+               memcmp(rx_data, bit_buffer_get_data(captured), rx_size) == 0;
+    }
+}
+
+NfcCommand nfc_test_opt_callback(NfcGenericEvent event, void* context) {
+    NfcTestOptContext* ctx = context;
+    const Iso15693_3PollerEvent* iso15_event = event.event_data;
+
+    if(iso15_event->type == Iso15693_3PollerEventTypeReady) {
+        BitBuffer* tx = bit_buffer_alloc(NFC_TEST_OPT_FRAME_MAX + ISO13239_CRC_SIZE);
+        BitBuffer* rx = bit_buffer_alloc(ISO15693_3_LISTENER_TEST_RX_SIZE);
+        BitBuffer* captured = bit_buffer_alloc(ISO15693_3_LISTENER_TEST_RX_SIZE);
+
+        for(size_t i = 0; i < ctx->step_count; ++i) {
+            if(!nfc_test_opt_trx(ctx->nfc, &ctx->steps[i], tx, rx, captured)) {
+                ctx->failed_step = i;
+                ctx->failed_rx_size = bit_buffer_get_size_bytes(rx);
+                bit_buffer_write_bytes(
+                    rx, ctx->failed_rx, MIN(ctx->failed_rx_size, sizeof(ctx->failed_rx)));
+                break;
+            }
+            ctx->steps_passed++;
+        }
+
+        bit_buffer_free(captured);
+        bit_buffer_free(rx);
+        bit_buffer_free(tx);
+    }
+
+    furi_thread_flags_set(ctx->thread_id, NFC_TEST_FLAG_WORKER_DONE);
+    return NfcCommandStop;
+}
+
+// Runs the steps against a SLIX or a plain ISO15693-3 listener (Slix_cap_default fixture with
+// the AFI and DSFID unlocked); block NFC_TEST_OPT_BLOCK must end as 11 22 33 44, locked, and
+// the DSFID locked; the AFI as given (SLIX: Lock AFI needs the EAS/AFI password)
+static void nfc_test_opt_run(
+    NfcProtocol protocol,
+    const NfcTestOptStep* steps,
+    size_t count,
+    bool afi_locked) {
+    Nfc* poller = nfc_alloc();
+    Nfc* listener = nfc_alloc();
+
+    NfcDevice* nfc_device = nfc_device_alloc();
+    mu_assert(
+        nfc_device_load(nfc_device, EXT_PATH("unit_tests/nfc/Slix_cap_default.nfc")),
+        "nfc_device_load() failed\r\n");
+
+    SlixData* slix_data = slix_alloc();
+    slix_copy(slix_data, nfc_device_get_data(nfc_device, NfcProtocolSlix));
+    Iso15693_3Data* iso_data = iso15693_3_alloc();
+    iso15693_3_copy(iso_data, slix_get_base_data(slix_data));
+
+    Iso15693_3Data* data = (protocol == NfcProtocolSlix) ? slix_data->iso15693_3_data : iso_data;
+    data->settings.lock_bits.afi = false;
+    data->settings.lock_bits.dsfid = false;
+    mu_assert(!iso15693_3_is_block_locked(data, NFC_TEST_OPT_BLOCK), "fixture block locked\r\n");
+    mu_assert(
+        !slix_is_block_protected(slix_data, SlixPasswordTypeWrite, NFC_TEST_OPT_BLOCK),
+        "fixture block write protected\r\n");
+
+    NfcListener* nfc_listener = nfc_listener_alloc(
+        listener, protocol, (protocol == NfcProtocolSlix) ? (void*)slix_data : (void*)iso_data);
+    nfc_listener_start(nfc_listener, NULL, NULL);
+
+    NfcTestOptContext ctx = {
+        .thread_id = furi_thread_get_current_id(),
+        .nfc = poller,
+        .steps = steps,
+        .step_count = count,
+        .steps_passed = 0,
+        .failed_step = -1,
+        .failed_rx = {0},
+        .failed_rx_size = 0,
+    };
+
+    NfcPoller* iso_poller = nfc_poller_alloc(poller, NfcProtocolIso15693_3);
+    nfc_poller_start(iso_poller, nfc_test_opt_callback, &ctx);
+
+    uint32_t flag =
+        furi_thread_flags_wait(NFC_TEST_FLAG_WORKER_DONE, FuriFlagWaitAny, FuriWaitForever);
+    mu_assert(flag == NFC_TEST_FLAG_WORKER_DONE, "Wrong thread flag\r\n");
+
+    nfc_poller_stop(iso_poller);
+    nfc_poller_free(iso_poller);
+    nfc_listener_stop(nfc_listener);
+
+    // The listener works on its own copy of the data: the written block and the locks are there
+    const Iso15693_3Data* image =
+        (protocol == NfcProtocolSlix) ?
+            slix_get_base_data(nfc_listener_get_data(nfc_listener, NfcProtocolSlix)) :
+            nfc_listener_get_data(nfc_listener, NfcProtocolIso15693_3);
+    static const uint8_t block_expected[] = {0x11, 0x22, 0x33, 0x44};
+    const bool block_ok = memcmp(
+                              iso15693_3_get_block_data(image, NFC_TEST_OPT_BLOCK),
+                              block_expected,
+                              sizeof(block_expected)) == 0 &&
+                          iso15693_3_is_block_locked(image, NFC_TEST_OPT_BLOCK);
+    const bool locks_ok = image->settings.lock_bits.dsfid &&
+                          image->settings.lock_bits.afi == afi_locked;
+    nfc_listener_free(nfc_listener);
+
+    iso15693_3_free(iso_data);
+    slix_free(slix_data);
+    nfc_device_free(nfc_device);
+    nfc_free(listener);
+    nfc_free(poller);
+
+    char message[80];
+    snprintf(
+        message,
+        sizeof(message),
+        "Option flag step %d: reply differs, got %zu B %02X %02X %02X %02X\r\n",
+        ctx.failed_step,
+        ctx.failed_rx_size,
+        ctx.failed_rx[0],
+        ctx.failed_rx[1],
+        ctx.failed_rx[2],
+        ctx.failed_rx[3]);
+    mu_assert(ctx.failed_step < 0, message);
+    mu_assert(ctx.steps_passed == count, "Poller did not run all steps\r\n");
+    mu_assert(block_ok, "Block data or lock not in the listener image\r\n");
+    mu_assert(locks_ok, "AFI/DSFID lock state in the listener image differs\r\n");
+}
+
+// clang-format off
+#define NFC_TEST_OPT_COMMON_STEPS                                                              \
+    /* Write Single Block: silent, 00 after the EOF, nothing for a second EOF */               \
+    NFC_TEST_OPT_SILENT(NFC_TEST_OPT_WRITE(true, NFC_TEST_OPT_BLOCK, 0xDE, 0xAD, 0xBE, 0xEF)), \
+    NFC_TEST_OPT_EOF_OK,                                                                       \
+    NFC_TEST_OPT_EOF(NfcTestOptReplySilence),                                                  \
+    {NFC_TEST_OPT_TX(NFC_TEST_OPT_READ(true, NFC_TEST_OPT_BLOCK)),                             \
+     NFC_TEST_OPT_RX(0x00, 0x00, 0xDE, 0xAD, 0xBE, 0xEF)},                                     \
+    /* The read reply above has gone out: an EOF does not send it again */                     \
+    NFC_TEST_OPT_EOF(NfcTestOptReplySilence),                                                  \
+    /* A new request drops the pending reply and is answered right away */                     \
+    NFC_TEST_OPT_SILENT(NFC_TEST_OPT_WRITE(true, NFC_TEST_OPT_BLOCK, 0x11, 0x22, 0x33, 0x44)), \
+    {NFC_TEST_OPT_TX(NFC_TEST_OPT_READ(false, NFC_TEST_OPT_BLOCK)),                            \
+     NFC_TEST_OPT_RX(0x00, 0x11, 0x22, 0x33, 0x44)},                                           \
+    NFC_TEST_OPT_EOF(NfcTestOptReplySilence),                                                  \
+    /* Malformed (no block data): no reply, before or after the EOF */                         \
+    NFC_TEST_OPT_SILENT(NFC_TEST_OPT_FLAGS(true), ISO15693_3_CMD_WRITE_BLOCK,                  \
+                        NFC_TEST_OPT_BLOCK),                                                   \
+    NFC_TEST_OPT_EOF(NfcTestOptReplySilence),                                                  \
+    /* Lock Block */                                                                           \
+    NFC_TEST_OPT_SILENT(NFC_TEST_OPT_LOCK(true, NFC_TEST_OPT_BLOCK)),                          \
+    NFC_TEST_OPT_EOF_OK,                                                                       \
+    {NFC_TEST_OPT_TX(NFC_TEST_OPT_READ(true, NFC_TEST_OPT_BLOCK)),                             \
+     NFC_TEST_OPT_RX(0x00, 0x01, 0x11, 0x22, 0x33, 0x44)},                                     \
+    /* Errors: the code after the EOF is the one sent without the option flag */               \
+    NFC_TEST_OPT_CAPTURE(NFC_TEST_OPT_WRITE(false, NFC_TEST_OPT_BLOCK, 0x55, 0x66, 0x77, 0x88)), \
+    NFC_TEST_OPT_SILENT(NFC_TEST_OPT_WRITE(true, NFC_TEST_OPT_BLOCK, 0x55, 0x66, 0x77, 0x88)), \
+    NFC_TEST_OPT_EOF(NfcTestOptReplyCaptured),                                                 \
+    NFC_TEST_OPT_CAPTURE(NFC_TEST_OPT_LOCK(false, NFC_TEST_OPT_BLOCK)),                        \
+    NFC_TEST_OPT_SILENT(NFC_TEST_OPT_LOCK(true, NFC_TEST_OPT_BLOCK)),                          \
+    NFC_TEST_OPT_EOF(NfcTestOptReplyCaptured),                                                 \
+    NFC_TEST_OPT_CAPTURE(NFC_TEST_OPT_WRITE(false, 200, 0x55, 0x66, 0x77, 0x88)),              \
+    NFC_TEST_OPT_SILENT(NFC_TEST_OPT_WRITE(true, 200, 0x55, 0x66, 0x77, 0x88)),                \
+    NFC_TEST_OPT_EOF(NfcTestOptReplyCaptured),                                                 \
+    /* Lock DSFID: 00 after the EOF, then already locked */                                    \
+    NFC_TEST_OPT_SILENT(NFC_TEST_OPT_FLAGS(true), ISO15693_3_CMD_LOCK_DSFID),                  \
+    NFC_TEST_OPT_EOF_OK,                                                                       \
+    NFC_TEST_OPT_CAPTURE(NFC_TEST_OPT_FLAGS(false), ISO15693_3_CMD_LOCK_DSFID),                \
+    NFC_TEST_OPT_SILENT(NFC_TEST_OPT_FLAGS(true), ISO15693_3_CMD_LOCK_DSFID),                  \
+    NFC_TEST_OPT_EOF(NfcTestOptReplyCaptured)
+// clang-format on
+
+MU_TEST(iso15693_3_listener_option_flag_eof_test) {
+    static const NfcTestOptStep steps[] = {
+        NFC_TEST_OPT_COMMON_STEPS,
+        // Lock AFI: 00 after the EOF, then already locked
+        NFC_TEST_OPT_SILENT(NFC_TEST_OPT_FLAGS(true), ISO15693_3_CMD_LOCK_AFI),
+        NFC_TEST_OPT_EOF_OK,
+        NFC_TEST_OPT_CAPTURE(NFC_TEST_OPT_FLAGS(false), ISO15693_3_CMD_LOCK_AFI),
+        NFC_TEST_OPT_SILENT(NFC_TEST_OPT_FLAGS(true), ISO15693_3_CMD_LOCK_AFI),
+        NFC_TEST_OPT_EOF(NfcTestOptReplyCaptured),
+        // Write Multiple Blocks 0..1
+        NFC_TEST_OPT_SILENT(
+            NFC_TEST_OPT_FLAGS(true),
+            ISO15693_3_CMD_WRITE_MULTI_BLOCKS,
+            0x00,
+            0x01,
+            0xA0,
+            0xA1,
+            0xA2,
+            0xA3,
+            0xB0,
+            0xB1,
+            0xB2,
+            0xB3),
+        NFC_TEST_OPT_EOF_OK,
+        {NFC_TEST_OPT_TX(NFC_TEST_OPT_READ(false, 1)),
+         NFC_TEST_OPT_RX(0x00, 0xB0, 0xB1, 0xB2, 0xB3)},
+    };
+    nfc_test_opt_run(NfcProtocolIso15693_3, steps, COUNT_OF(steps), true);
+}
+
+MU_TEST(slix_listener_option_flag_eof_test) {
+    static const NfcTestOptStep steps[] = {
+        NFC_TEST_OPT_COMMON_STEPS,
+        // Below the protection pointer (write protected): error after the EOF
+        NFC_TEST_OPT_CAPTURE(NFC_TEST_OPT_WRITE(false, 0, 0x55, 0x66, 0x77, 0x88)),
+        NFC_TEST_OPT_SILENT(NFC_TEST_OPT_WRITE(true, 0, 0x55, 0x66, 0x77, 0x88)),
+        NFC_TEST_OPT_EOF(NfcTestOptReplyCaptured),
+        // Lock AFI without the EAS/AFI password: error after the EOF
+        NFC_TEST_OPT_CAPTURE(NFC_TEST_OPT_FLAGS(false), ISO15693_3_CMD_LOCK_AFI),
+        NFC_TEST_OPT_SILENT(NFC_TEST_OPT_FLAGS(true), ISO15693_3_CMD_LOCK_AFI),
+        NFC_TEST_OPT_EOF(NfcTestOptReplyCaptured),
+    };
+    nfc_test_opt_run(NfcProtocolSlix, steps, COUNT_OF(steps), false);
+}
+
 // Bitwise ISO13239 CRC, as implemented before FNFC-01.3
 static uint16_t nfc_test_iso13239_crc_reference(bool picopass, const uint8_t* data, size_t size) {
     uint16_t crc = picopass ? 0xE012U : 0xFFFFU;
@@ -1601,6 +1898,8 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(iso15693_3_listener_read_multi_blocks_test);
     MU_RUN_TEST(iso15693_3_listener_read_multi_blocks_read_protected_test);
     MU_RUN_TEST(iso15693_3_listener_short_after_long_test);
+    MU_RUN_TEST(iso15693_3_listener_option_flag_eof_test);
+    MU_RUN_TEST(slix_listener_option_flag_eof_test);
 
     MU_RUN_TEST(mf_plus_crypto_cmac_rfc4493);
     MU_RUN_TEST(mf_plus_crypto_data_iv_layout);
