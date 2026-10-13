@@ -12,7 +12,8 @@
 #define ISO15693_PARSER_BITSTREAM_CHUNK         (32)
 #define ISO15693_PARSER_BITSTREAM_BUFF_SIZE     (2 * ISO15693_PARSER_BITSTREAM_CHUNK)
 #define ISO15693_PARSER_BITRATE_F64MHZ          (603U)
-// 1-of-256: a data byte is 256 slots of 2 half slots, one sample per half slot, i.e. 64 sample bytes
+// 1-of-256: a data byte is 256 slots of 2 half slots, one sample per half slot,
+// i.e. 64 sample bytes
 #define ISO15693_PARSER_1OF256_BYTE_SYMBOLS     (64U)
 
 #define TAG "Iso15693Parser"
