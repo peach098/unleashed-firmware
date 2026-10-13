@@ -254,7 +254,9 @@ static Iso15693ParserCommand iso15693_parser_parse_1_out_of_4(Iso15693Parser* in
         }
     }
 
-    iso15693_parser_consume(instance, count);
+    // A finished or failed frame is dropped by the parser restart: only an incomplete one hands the
+    // buffer back (keeps the critical section off the request EOF -> reply path)
+    if(command == Iso15693ParserCommandWaitData) iso15693_parser_consume(instance, count);
 
     return command;
 }
