@@ -5,9 +5,10 @@
 #include <furi/furi.h>
 
 #define ISO15693_PARSER_SIGNAL_READER_BUFF_SIZE (2)
-// The signal reader ISR appends one 1-of-4 symbol (8 samples, ~75.5 us) per event and wakes the worker
-// thread every ISO15693_PARSER_BITSTREAM_CHUNK symbols. The buffer holds twice that, so symbols that arrive
-// while the thread is still consuming a chunk are kept instead of being lost or written out of bounds.
+// The signal reader ISR appends one 1-of-4 symbol (8 samples, ~75.5 us) per event and wakes the
+// worker thread every ISO15693_PARSER_BITSTREAM_CHUNK symbols. The buffer holds twice that, so
+// symbols that arrive while the thread is still consuming a chunk are kept instead of being lost
+// or written out of bounds.
 #define ISO15693_PARSER_BITSTREAM_CHUNK         (32)
 #define ISO15693_PARSER_BITSTREAM_BUFF_SIZE     (2 * ISO15693_PARSER_BITSTREAM_CHUNK)
 #define ISO15693_PARSER_BITRATE_F64MHZ          (603U)
@@ -155,7 +156,8 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
     const uint8_t eof = 0x04;
     const uint8_t no_pause = 0x00;
 
-    // The frame has ended: the reader may keep sampling until the thread stops it, ignore the idle carrier
+    // The frame has ended: the reader may keep sampling until the thread stops it,
+    // ignore the idle carrier
     if(instance->eof_received) return;
 
     if(instance->state == Iso15693ParserStateParseSoF) {
@@ -181,9 +183,9 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
         } else if(
             frame_1_out_of_4 && (event.data->data[0] == no_pause) &&
             (instance->symbols_received > 0) && (instance->symbols_received % 4 == 0)) {
-            // Every 1-of-4 symbol has exactly one pause, so a symbol slot without one after a whole byte
-            // means the reader has stopped modulating: its EOF pause was not sampled. End the frame here;
-            // the CRC check of the frame still applies.
+            // Every 1-of-4 symbol has exactly one pause, so a symbol slot without one after a
+            // whole byte means the reader has stopped modulating: its EOF pause was not sampled.
+            // End the frame here; the CRC check of the frame still applies.
             instance->eof_received = true;
             instance->callback(Iso15693ParserEventDataReceived, instance->context);
         } else {
@@ -254,8 +256,8 @@ static Iso15693ParserCommand iso15693_parser_parse_1_out_of_4(Iso15693Parser* in
         }
     }
 
-    // A finished or failed frame is dropped by the parser restart: only an incomplete one hands the
-    // buffer back (keeps the critical section off the request EOF -> reply path)
+    // 1-of-4: a finished or failed frame is dropped by the parser restart, only an incomplete one
+    // hands the buffer back (keeps the critical section off the request EOF -> reply path)
     if(command == Iso15693ParserCommandWaitData) iso15693_parser_consume(instance, count);
 
     return command;
