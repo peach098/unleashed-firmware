@@ -43,6 +43,7 @@ struct Iso15693Parser {
     uint8_t bit_offset;
     size_t byte_idx;
     volatile size_t bytes_to_process; // written by the ISR, consumed by the thread
+    size_t symbols_received; // 1-of-4 data symbols since SOF (ISR)
 
     uint8_t next_byte;
     uint16_t next_byte_part;
@@ -102,6 +103,7 @@ void iso15693_parser_reset(Iso15693Parser* instance) {
     instance->bit_offset = 0;
     instance->byte_idx = 0;
     instance->bytes_to_process = 0;
+    instance->symbols_received = 0;
     instance->signal_detected = false;
     instance->bit_offset_calculated = false;
 
@@ -119,6 +121,7 @@ static void iso15693_parser_push_symbol(Iso15693Parser* instance, uint8_t symbol
     if(n < ISO15693_PARSER_BITSTREAM_BUFF_SIZE) {
         instance->bitstream_buff[n] = symbol;
         instance->bytes_to_process = n + 1;
+        instance->symbols_received++;
         if(n + 1 == ISO15693_PARSER_BITSTREAM_CHUNK) {
             instance->callback(Iso15693ParserEventDataReceived, instance->context);
         }
@@ -150,6 +153,10 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
     const uint8_t sof_1_out_of_256 = 0x81;
     const uint8_t eof_single = 0x01;
     const uint8_t eof = 0x04;
+    const uint8_t no_pause = 0x00;
+
+    // The frame has ended: the reader may keep sampling until the thread stops it, ignore the idle carrier
+    if(instance->eof_received) return;
 
     if(instance->state == Iso15693ParserStateParseSoF) {
         if(event.data->data[0] == sof_1_out_of_4) {
@@ -166,7 +173,17 @@ static void signal_reader_callback(SignalReaderEvent event, void* context) {
             instance->callback(Iso15693ParserEventDataReceived, instance->context);
         }
     } else {
-        if((instance->mode == Iso15693ParserMode1OutOf4) && (event.data->data[0] == eof)) {
+        const bool frame_1_out_of_4 = (instance->state == Iso15693ParserStateParseFrame) &&
+                                      (instance->mode == Iso15693ParserMode1OutOf4);
+        if(frame_1_out_of_4 && (event.data->data[0] == eof)) {
+            instance->eof_received = true;
+            instance->callback(Iso15693ParserEventDataReceived, instance->context);
+        } else if(
+            frame_1_out_of_4 && (event.data->data[0] == no_pause) &&
+            (instance->symbols_received > 0) && (instance->symbols_received % 4 == 0)) {
+            // Every 1-of-4 symbol has exactly one pause, so a symbol slot without one after a whole byte
+            // means the reader has stopped modulating: its EOF pause was not sampled. End the frame here;
+            // the CRC check of the frame still applies.
             instance->eof_received = true;
             instance->callback(Iso15693ParserEventDataReceived, instance->context);
         } else {
