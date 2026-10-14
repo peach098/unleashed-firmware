@@ -1495,6 +1495,7 @@ MU_TEST(slix2_eas_copy_equal_reset_test) {
 typedef enum {
     NfcTestEasStepRaw, // send flags/cmd/manufacturer [+ UID] [+ data]
     NfcTestEasStepSetPassword, // GET RANDOM + SET PASSWORD (EAS/AFI, 00000000)
+    NfcTestEasStepDestroy, // GET RANDOM + DESTROY, password in data[0..3] (MSB first)
 } NfcTestEasStepType;
 
 typedef enum {
@@ -1624,6 +1625,27 @@ NfcCommand nfc_test_eas_callback(NfcGenericEventEx event, void* context) {
                          slix_poller_set_password(
                              poller, SlixPasswordTypeEasAfi, 0x00000000U, random_number) ==
                              SlixErrorNone;
+            } else if(step->type == NfcTestEasStepDestroy) {
+                // XOR password as in slix_poller_set_password()
+                SlixRandomNumber random_number = 0;
+                if(slix_poller_get_random_number(poller, &random_number) == SlixErrorNone) {
+                    const uint8_t rn_l = random_number >> 8;
+                    const uint8_t rn_h = random_number;
+                    bit_buffer_reset(tx);
+                    bit_buffer_append_byte(tx, step->flags);
+                    bit_buffer_append_byte(tx, SLIX_CMD_DESTROY);
+                    bit_buffer_append_byte(tx, SLIX_NXP_MANUFACTURER_CODE);
+                    if(step->flags & ISO15693_3_REQ_FLAG_T4_ADDRESSED) {
+                        iso15693_3_append_uid(poller->data->iso15693_3_data, tx);
+                    }
+                    const uint8_t xor_bytes[4] = {rn_h, rn_l, rn_h, rn_l};
+                    for(size_t j = 0; j < 4; ++j) {
+                        bit_buffer_append_byte(tx, step->data[j] ^ xor_bytes[j]);
+                    }
+                    const SlixError error =
+                        slix_poller_send_frame(poller, tx, rx, ISO15693_3_FDT_POLL_FC);
+                    passed = nfc_test_eas_reply_matches(step->reply, 0, error, rx);
+                }
             } else {
                 bit_buffer_reset(tx);
                 bit_buffer_append_byte(tx, step->flags);
@@ -1632,7 +1654,9 @@ NfcCommand nfc_test_eas_callback(NfcGenericEventEx event, void* context) {
                 if(step->command >= SLIX_CMD_CUSTOM_START) {
                     bit_buffer_append_byte(tx, SLIX_NXP_MANUFACTURER_CODE);
                 }
-                if(step->flags & ISO15693_3_REQ_FLAG_T4_ADDRESSED) {
+                // Bit 5 is the Nb_slots flag in an inventory request, not the Address flag
+                if((step->flags & ISO15693_3_REQ_FLAG_T4_ADDRESSED) &&
+                   !(step->flags & ISO15693_3_REQ_FLAG_INVENTORY_T5)) {
                     iso15693_3_append_uid(poller->data->iso15693_3_data, tx);
                 }
                 bit_buffer_append_bytes(tx, step->data, step->data_size);
@@ -2758,6 +2782,177 @@ MU_TEST(slix_inventory_reset_1_slot_quiet_test) {
     nfc_test_inventory_run(NfcProtocolSlix, steps, COUNT_OF(steps));
 }
 
+// ---- NXP custom commands B0/B1, B9, BC and unknown ones (FNFC-01.9) ----------------
+// SLIX2 has no INVENTORY PAGE READ (B0/B1); like any command it does not support (datasheet
+// SL2S2602 9.6.2, card reference for A8) it is answered with 01 0F when addressed or
+// selected and not at all when non-addressed or with the Inventory flag.
+// The SLIX2_eas_on fixture has the Destroy password 0F0F0F0F.
+
+#define NFC_TEST_CUSTOM_INVENTORY(reply_type) \
+    {NfcTestEasStepRaw, NFC_TEST_INV_FLAGS_1, ISO15693_3_CMD_INVENTORY, {0x00}, 1, (reply_type), 9}
+#define NFC_TEST_CUSTOM_DESTROY(fl, b, reply_type) \
+    {NfcTestEasStepDestroy, (fl), SLIX_CMD_DESTROY, {(b), (b), (b), (b)}, 4, (reply_type), 0}
+
+// Starts a SLIX listener on the SLIX2_eas_on image (SLIX-L with `slix_l`), runs the steps and
+// checks that the listener's own image did not change.
+static void nfc_test_custom_run(const NfcTestEasStep* steps, size_t step_count, bool slix_l) {
+    NfcDevice* nfc_device = nfc_device_alloc();
+    mu_assert(nfc_device_load(nfc_device, SLIX2_EAS_ON_FIXTURE), "nfc_device_load() failed\r\n");
+    SlixData* slix_data = slix_alloc();
+    slix_copy(slix_data, nfc_device_get_data(nfc_device, NfcProtocolSlix));
+    nfc_device_free(nfc_device);
+    if(slix_l) {
+        slix_data->iso15693_3_data->uid[2] = 0x03; // ICODE type byte: SLIX-L
+    }
+    SlixData* original = slix_alloc();
+    slix_copy(original, slix_data);
+
+    const bool steps_ok = nfc_test_eas_run(slix_data, NfcProtocolSlix, steps, step_count);
+    const bool image_ok = slix_is_equal(slix_data, original);
+
+    slix_free(original);
+    slix_free(slix_data);
+    mu_assert(steps_ok, "custom command reply differs\r\n");
+    mu_assert(image_ok, "emulation image changed\r\n");
+}
+
+// Unknown custom commands, B0/B1 and codes past the SLIX table: 01 0F addressed / selected,
+// silence non-addressed and with the Inventory flag; the session goes on
+MU_TEST(slix_custom_unsupported_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, 0xA8, NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, 0xA8, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, 0xAF, NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, 0xB8, NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, 0xBE, NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, 0xDF, NfcTestEasReplySilence),
+        // B0 / B1 addressed: first block 00, 2 blocks
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR,
+            SLIX_CMD_INVENTORY_PAGE_READ,
+            0x00,
+            0x01,
+            NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR,
+            SLIX_CMD_INVENTORY_PAGE_READ_FAST,
+            0x00,
+            0x01,
+            NfcTestEasReplyError),
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_NONADDR,
+            SLIX_CMD_INVENTORY_PAGE_READ,
+            0x00,
+            0x01,
+            NfcTestEasReplySilence),
+        // B0 / B1 as inventory requests (1 slot, mask length 0, first block 00, 2 blocks)
+        {NfcTestEasStepRaw,
+         NFC_TEST_INV_FLAGS_1,
+         SLIX_CMD_INVENTORY_PAGE_READ,
+         {0x00, 0x00, 0x01},
+         3,
+         NfcTestEasReplySilence,
+         0},
+        {NfcTestEasStepRaw,
+         NFC_TEST_INV_FLAGS_16,
+         SLIX_CMD_INVENTORY_PAGE_READ_FAST,
+         {0x00, 0x00, 0x01},
+         3,
+         NfcTestEasReplySilence,
+         0},
+        // Still answering
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_EAS_ALARM, NfcTestEasReplySequence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_SELECT, NfcTestEasReplyOk),
+        NFC_TEST_EAS_RAW(NFC_TEST_ERR_FLAGS_SELECTED, 0xA8, NfcTestEasReplyError),
+        NFC_TEST_CUSTOM_INVENTORY(NfcTestEasReplyData),
+    };
+    nfc_test_custom_run(steps, COUNT_OF(steps), false);
+}
+
+// STAY QUIET PERSISTENT: no reply, then INVENTORY and non-addressed requests are ignored and
+// addressed ones answered, until RESET TO READY
+MU_TEST(slix_stay_quiet_persistent_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_CUSTOM_INVENTORY(NfcTestEasReplyData),
+        // Non-addressed or with data: ignored, the tag stays ready
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_NONADDR, SLIX_CMD_STAY_QUIET_PERSISTENT, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_STAY_QUIET_PERSISTENT, 0x00, NfcTestEasReplySilence),
+        NFC_TEST_CUSTOM_INVENTORY(NfcTestEasReplyData),
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_STAY_QUIET_PERSISTENT, NfcTestEasReplySilence),
+        NFC_TEST_CUSTOM_INVENTORY(NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_EAS_FLAGS_NONADDR, ISO15693_3_CMD_READ_BLOCK, 0x00, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_NONADDR, 0xA8, NfcTestEasReplySilence),
+        NFC_TEST_EAS_DATA1(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_BLOCK, 0x00, 4),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, 0xA8, NfcTestEasReplyError),
+        // Non-addressed RESET TO READY is ignored in Quiet: INVENTORY stays silent
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_NONADDR, ISO15693_3_CMD_RESET_TO_READY, NfcTestEasReplySilence),
+        NFC_TEST_CUSTOM_INVENTORY(NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_RESET_TO_READY, NfcTestEasReplyOk),
+        NFC_TEST_CUSTOM_INVENTORY(NfcTestEasReplyData),
+        NFC_TEST_EAS_DATA1(NFC_TEST_EAS_FLAGS_NONADDR, ISO15693_3_CMD_READ_BLOCK, 0x00, 4),
+    };
+    nfc_test_custom_run(steps, COUNT_OF(steps), false);
+}
+
+// STAY QUIET PERSISTENT is a SLIX2 feature: ignored by a SLIX-L image. Unknown custom
+// commands and B0/B1 keep the old reply on other SLIX types: silence in every mode
+MU_TEST(slix_stay_quiet_persistent_non_slix2_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_STAY_QUIET_PERSISTENT, NfcTestEasReplySilence),
+        NFC_TEST_CUSTOM_INVENTORY(NfcTestEasReplyData),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, 0xA8, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, 0xBE, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW2(
+            NFC_TEST_EAS_FLAGS_ADDR,
+            SLIX_CMD_INVENTORY_PAGE_READ,
+            0x00,
+            0x01,
+            NfcTestEasReplySilence),
+    };
+    nfc_test_custom_run(steps, COUNT_OF(steps), true);
+}
+
+// DESTROY: wrong password and non-addressed requests are ignored; with the Destroy password
+// the tag answers 00 and then nothing, standard or custom; the image stays as it was
+MU_TEST(slix_destroy_test) {
+    static const NfcTestEasStep steps[] = {
+        NFC_TEST_CUSTOM_DESTROY(NFC_TEST_EAS_FLAGS_ADDR, 0x00, NfcTestEasReplySilence),
+        NFC_TEST_CUSTOM_DESTROY(NFC_TEST_EAS_FLAGS_NONADDR, 0x0F, NfcTestEasReplySilence),
+        // Malformed (3 password bytes): ignored
+        {NfcTestEasStepRaw,
+         NFC_TEST_EAS_FLAGS_ADDR,
+         SLIX_CMD_DESTROY,
+         {0x0F, 0x0F, 0x0F},
+         3,
+         NfcTestEasReplySilence,
+         0},
+        NFC_TEST_CUSTOM_INVENTORY(NfcTestEasReplyData),
+        NFC_TEST_CUSTOM_DESTROY(NFC_TEST_EAS_FLAGS_ADDR, 0x0F, NfcTestEasReplyOk),
+        NFC_TEST_CUSTOM_INVENTORY(NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_READ_BLOCK, 0x00, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW1(
+            NFC_TEST_EAS_FLAGS_NONADDR, ISO15693_3_CMD_READ_BLOCK, 0x00, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_GET_SYS_INFO, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_RESET_TO_READY, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, ISO15693_3_CMD_SELECT, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(
+            NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_GET_RANDOM_NUMBER, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, SLIX_CMD_EAS_ALARM, NfcTestEasReplySilence),
+        NFC_TEST_EAS_RAW(NFC_TEST_EAS_FLAGS_ADDR, 0xA8, NfcTestEasReplySilence),
+        NFC_TEST_CUSTOM_INVENTORY(NfcTestEasReplySilence),
+    };
+    nfc_test_custom_run(steps, COUNT_OF(steps), false);
+}
+
 // AES-CMAC known-answer vectors from RFC 4493 (Appendix D.1), NIST AES-128 key. Exercises
 // the empty / single-complete-block / partial-final / multi-block paths of the CMAC plus the
 // cmac8 odd-index truncation used by MIFARE Plus SL3.
@@ -3049,6 +3244,10 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(slix_error_locked_test);
     MU_RUN_TEST(iso15693_3_error_locked_test);
     MU_RUN_TEST(slix_inventory_reset_1_slot_quiet_test);
+    MU_RUN_TEST(slix_custom_unsupported_test);
+    MU_RUN_TEST(slix_stay_quiet_persistent_test);
+    MU_RUN_TEST(slix_stay_quiet_persistent_non_slix2_test);
+    MU_RUN_TEST(slix_destroy_test);
 
     MU_RUN_TEST(iso15693_signal_encode_equivalence);
     MU_RUN_TEST(iso15693_signal_tick_exact);

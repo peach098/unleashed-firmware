@@ -143,6 +143,8 @@ static SlixError slix_listener_check_eas_write(SlixListener* instance, size_t da
 }
 
 // Custom SLIX request handlers
+
+// Not implemented: silence
 static SlixError slix_listener_default_handler(
     SlixListener* instance,
     const uint8_t* data,
@@ -155,6 +157,35 @@ static SlixError slix_listener_default_handler(
 
     // Empty placeholder handler
     return SlixErrorNotSupported;
+}
+
+// A command SLIX2 does not support (datasheet SL2S2602, 9.6.2), SLIX2 images only: error 0F when addressed or
+// selected, no reply when non-addressed or with the Inventory or Protocol Extension flag.
+// Card reference (FNFC-01.1, card_AC / card_79, A8): addressed 01 0F or silence at random,
+// non-addressed silence. The emulation always picks 01 0F, as for READ SINGLE BLOCK past the
+// end (see slix_listener_iso15693_3_error_handler).
+static SlixError slix_listener_unsupported_handler(
+    SlixListener* instance,
+    const uint8_t* data,
+    size_t data_size,
+    uint8_t flags) {
+    UNUSED(data);
+    UNUSED(data_size);
+
+    // Other SLIX types keep the old reply (silence): their command sets differ (SLIX-S has
+    // INVENTORY PAGE READ) and there is no card reference for them
+    if(slix_get_type(instance->data) != SlixTypeSlix2) {
+        return SlixErrorNotSupported;
+    }
+
+    if(flags & (ISO15693_3_REQ_FLAG_INVENTORY_T5 | ISO15693_3_REQ_FLAG_EXTENSION)) {
+        return SlixErrorNotSupported;
+    }
+
+    const Iso15693_3ListenerSessionState* session_state =
+        &instance->iso15693_3_listener->session_state;
+    return (session_state->addressed || session_state->selected) ? SlixErrorInternal :
+                                                                   SlixErrorNotSupported;
 }
 
 static SlixError slix_listener_set_eas_handler(
@@ -527,6 +558,93 @@ static SlixError slix_listener_enable_privacy_handler(
     return error;
 }
 
+// DESTROY: with the Destroy password (XOR-ed with the random number, as ENABLE PRIVACY) the
+// tag answers 00 and then nothing at all. Emulation only: the tag stays silent until the
+// emulation is restarted; the image (SlixData) is not changed, so nothing is saved to the
+// .shd file. The password is checked in this request: a Destroy password accepted earlier by
+// SET PASSWORD (password_match lasts the whole emulation run) does not count.
+static SlixError slix_listener_destroy_handler(
+    SlixListener* instance,
+    const uint8_t* data,
+    size_t data_size,
+    uint8_t flags) {
+    UNUSED(flags);
+    SlixError error = SlixErrorNone;
+
+    do {
+        typedef struct {
+            SlixPassword password_xored;
+        } SlixDestroyRequestLayout;
+
+        Iso15693_3Listener* iso15693_3_listener = instance->iso15693_3_listener;
+
+        // Addressed or selected mode only (datasheet 9.5.3.8)
+        if(!iso15693_3_listener->session_state.addressed &&
+           !iso15693_3_listener->session_state.selected) {
+            error = SlixErrorNotSupported;
+            break;
+        }
+
+        if(data_size != sizeof(SlixDestroyRequestLayout)) {
+            error = SlixErrorFormat;
+            break;
+        }
+
+        const SlixDestroyRequestLayout* request = (const SlixDestroyRequestLayout*)data;
+
+        const SlixPassword password_received =
+            slix_listener_unxor_password(request->password_xored, instance->session_state.random);
+
+        error = slix_listener_set_password(instance, SlixPasswordTypeDestroy, password_received);
+        if(error != SlixErrorNone) break;
+
+        // The 00 reply is still sent, every later request is ignored
+        iso15693_3_listener_silence(iso15693_3_listener);
+    } while(false);
+
+    return error;
+}
+
+// STAY QUIET PERSISTENT: same as STAY QUIET (no reply, INVENTORY and non-addressed requests
+// are ignored until an addressed RESET TO READY or SELECT). Emulation: the state lasts until the emulation
+// is restarted, the field going off does not matter (as for STAY QUIET).
+static SlixError slix_listener_stay_quiet_persistent_handler(
+    SlixListener* instance,
+    const uint8_t* data,
+    size_t data_size,
+    uint8_t flags) {
+    UNUSED(data);
+    UNUSED(flags);
+    SlixError error = SlixErrorNone;
+
+    do {
+        // SLIX2 feature (SLIX_FEATURE_FLAG_PERSISTENT_QUIET)
+        if(slix_get_type(instance->data) != SlixTypeSlix2) {
+            error = SlixErrorNotSupported;
+            break;
+        }
+
+        if(data_size != 0) {
+            error = SlixErrorFormat;
+            break;
+        }
+
+        // Always addressed (datasheet 9.5.3.19)
+        Iso15693_3Listener* iso15693_3_listener = instance->iso15693_3_listener;
+        if(!iso15693_3_listener->session_state.addressed) {
+            error = SlixErrorNotSupported;
+            break;
+        }
+
+        iso15693_3_listener_quiet(iso15693_3_listener);
+
+        // No reply
+        error = SlixErrorNotSupported;
+    } while(false);
+
+    return error;
+}
+
 static SlixError slix_listener_read_signature_handler(
     SlixListener* instance,
     const uint8_t* data,
@@ -548,27 +666,29 @@ static const SlixRequestHandler slix_request_handler_table[SLIX_CMD_CUSTOM_COUNT
     slix_listener_eas_alarm_handler,
     slix_listener_password_protect_eas_afi_handler,
     slix_listener_write_eas_id_handler,
-    slix_listener_default_handler, // UNUSED (0xA8U)
-    slix_listener_default_handler, // UNUSED (0xA9U)
-    slix_listener_default_handler, // UNUSED (0xAAU)
+    slix_listener_unsupported_handler, // UNUSED (0xA8U)
+    slix_listener_unsupported_handler, // UNUSED (0xA9U)
+    slix_listener_unsupported_handler, // UNUSED (0xAAU)
     slix_listener_get_nxp_system_info_handler,
-    slix_listener_default_handler, // UNUSED (0xACU)
-    slix_listener_default_handler, // UNUSED (0xADU)
-    slix_listener_default_handler, // UNUSED (0xAEU)
-    slix_listener_default_handler, // UNUSED (0xAFU)
-    slix_listener_default_handler, // SLIX_CMD_INVENTORY_PAGE_READ (0xB0U)
-    slix_listener_default_handler, // SLIX_CMD_INVENTORY_PAGE_READ_FAST (0xB1U)
+    slix_listener_unsupported_handler, // UNUSED (0xACU)
+    slix_listener_unsupported_handler, // UNUSED (0xADU)
+    slix_listener_unsupported_handler, // UNUSED (0xAEU)
+    slix_listener_unsupported_handler, // UNUSED (0xAFU)
+    // INVENTORY PAGE READ (0xB0U) and its FAST variant (0xB1U) are ICODE SLI-S / SLIX-S
+    // commands, SLIX2 has none (datasheet SL2S2602 9.5.3)
+    slix_listener_unsupported_handler, // SLIX_CMD_INVENTORY_PAGE_READ (0xB0U)
+    slix_listener_unsupported_handler, // SLIX_CMD_INVENTORY_PAGE_READ_FAST (0xB1U)
     slix_listener_get_random_number_handler,
     slix_listener_set_password_handler,
     slix_listener_write_password_handler,
-    slix_listener_default_handler, // SLIX_CMD_64_BIT_PASSWORD_PROTECTION (0xB5U)
+    slix_listener_default_handler, // SLIX_CMD_LOCK_PASSWORD (0xB5U), not implemented
     slix_listener_protect_page_handler,
-    slix_listener_default_handler, // SLIX_CMD_LOCK_PAGE_PROTECTION_CONDITION (0xB7U)
-    slix_listener_default_handler, // UNUSED (0xB8U)
-    slix_listener_default_handler, // SLIX_CMD_DESTROY (0xB9U)
+    slix_listener_default_handler, // SLIX_CMD_LOCK_PAGE_PROTECTION_CONDITION (0xB7U), not implemented
+    slix_listener_unsupported_handler, // UNUSED (0xB8U)
+    slix_listener_destroy_handler,
     slix_listener_enable_privacy_handler,
-    slix_listener_default_handler, // UNUSED (0xBBU)
-    slix_listener_default_handler, // SLIX_CMD_STAY_QUIET_PERSISTENT (0xBCU)
+    slix_listener_default_handler, // SLIX_CMD_64_BIT_PASSWORD_PROTECTION (0xBBU), not implemented
+    slix_listener_stay_quiet_persistent_handler,
     slix_listener_read_signature_handler,
 };
 
@@ -812,10 +932,9 @@ SlixError slix_listener_process_request(SlixListener* instance, const BitBuffer*
             }
         }
 
+        // INVENTORY READ (0xA0U) and FAST INVENTORY READ (0xA1U) are not implemented
         const uint8_t command = request->command;
-        const bool is_valid_slix_command = command >= SLIX_CMD_CUSTOM_START &&
-                                           command < SLIX_CMD_CUSTOM_END;
-        if(!is_valid_slix_command) {
+        if(command < SLIX_CMD_CUSTOM_START) {
             error = SlixErrorNotSupported;
             break;
         }
@@ -827,7 +946,10 @@ SlixError slix_listener_process_request(SlixListener* instance, const BitBuffer*
         const uint8_t* request_data = &request->data[uid_field_size];
         const size_t request_data_size = buf_size - buf_size_min;
 
-        SlixRequestHandler handler = slix_request_handler_table[command - SLIX_CMD_CUSTOM_START];
+        SlixRequestHandler handler =
+            command < SLIX_CMD_CUSTOM_END ?
+                slix_request_handler_table[command - SLIX_CMD_CUSTOM_START] :
+                slix_listener_unsupported_handler;
         error = handler(instance, request_data, request_data_size, request->flags);
 
         // It's a trick! Send no reply.

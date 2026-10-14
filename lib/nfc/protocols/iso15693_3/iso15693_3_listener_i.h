@@ -26,6 +26,8 @@ typedef enum {
     Iso15693_3ListenerStateReady,
     Iso15693_3ListenerStateSelected,
     Iso15693_3ListenerStateQuiet,
+    // Answers nothing until the listener is restarted (SLIX DESTROY, emulation only)
+    Iso15693_3ListenerStateSilent,
 } Iso15693_3ListenerState;
 
 typedef struct {
@@ -75,6 +77,12 @@ Iso15693_3Error iso15693_3_listener_set_extension_handler_table(
     void* context);
 
 Iso15693_3Error iso15693_3_listener_ready(Iso15693_3Listener* instance);
+
+// STAY QUIET: only addressed requests are answered until RESET TO READY or SELECT
+Iso15693_3Error iso15693_3_listener_quiet(Iso15693_3Listener* instance);
+
+// No request is answered any more until the listener is restarted (SLIX DESTROY)
+Iso15693_3Error iso15693_3_listener_silence(Iso15693_3Listener* instance);
 
 Iso15693_3Error
     iso15693_3_listener_send_frame(Iso15693_3Listener* instance, const BitBuffer* tx_buffer);
