@@ -722,6 +722,25 @@ static Iso15693_3Error slix_listener_iso15693_3_write_lock_afi_extension_handler
                Iso15693_3ErrorNone;
 }
 
+// Error replies of the standard commands where SLIX2 cards differ from ISO15693-3 Table 7.
+// Reference: FNFC-01.1 (pm3-parity-plan.md 0.7). READ SINGLE BLOCK past the last block is
+// answered with 01 0F or not at all (at random) when addressed or selected, never with
+// 01 10, and is never answered when non-addressed. The emulation always picks 01 0F: it is
+// one of the card's own replies and a reader gets it faster than a timeout.
+static Iso15693_3Error slix_listener_iso15693_3_error_handler(
+    SlixListener* instance,
+    uint8_t command,
+    Iso15693_3Error error) {
+    if(command == ISO15693_3_CMD_READ_BLOCK && error == Iso15693_3ErrorBlockUnavailable) {
+        const Iso15693_3ListenerSessionState* session_state =
+            &instance->iso15693_3_listener->session_state;
+        error = (session_state->addressed || session_state->selected) ? Iso15693_3ErrorInternal :
+                                                                        Iso15693_3ErrorIgnore;
+    }
+
+    return error;
+}
+
 // Extended ISO15693-3 standard commands handler table (NULL = no extension)
 static const Iso15693_3ExtensionHandlerTable slix_iso15693_extension_handler_table = {
     .mandatory =
@@ -746,6 +765,7 @@ static const Iso15693_3ExtensionHandlerTable slix_iso15693_extension_handler_tab
             (Iso15693_3ExtensionHandler)NULL, // ISO15693_3_CMD_GET_SYS_INFO (0x2BU)
             (Iso15693_3ExtensionHandler)NULL, // ISO15693_3_CMD_GET_BLOCKS_SECURITY (0x2CU)
         },
+    .error = (Iso15693_3ExtensionErrorHandler)slix_listener_iso15693_3_error_handler,
 };
 
 SlixError slix_listener_init_iso15693_3_extensions(SlixListener* instance) {

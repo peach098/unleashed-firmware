@@ -45,6 +45,36 @@ static Iso15693_3Error
     return error;
 }
 
+static Iso15693_3Error iso15693_3_listener_extension_error_handler(
+    Iso15693_3Listener* instance,
+    uint8_t command,
+    Iso15693_3Error error) {
+    const Iso15693_3ExtensionHandlerTable* table = instance->extension_table;
+
+    if(table != NULL && table->error != NULL) {
+        error = table->error(instance->extension_context, command, error);
+    }
+
+    return error;
+}
+
+// ISO15693-3 error code (Table 7) of a failed standard command
+static uint8_t iso15693_3_listener_get_error_code(Iso15693_3Error error) {
+    switch(error) {
+    case Iso15693_3ErrorNotSupported:
+        return ISO15693_3_RESP_ERROR_NOT_SUPPORTED;
+    case Iso15693_3ErrorBlockUnavailable:
+        return ISO15693_3_RESP_ERROR_BLOCK_UNAVAILABLE;
+    case Iso15693_3ErrorBlockAlreadyLocked:
+        return ISO15693_3_RESP_ERROR_BLOCK_ALREADY_LOCKED;
+    case Iso15693_3ErrorBlockLocked:
+        return ISO15693_3_RESP_ERROR_BLOCK_LOCKED;
+    default:
+        // No more specific code: protection (password) errors and the like
+        return ISO15693_3_RESP_ERROR_UNKNOWN;
+    }
+}
+
 #define ISO15693_3_UID_BITS         (ISO15693_3_UID_SIZE * 8U)
 #define ISO15693_3_SLOT_NUMBER_BITS (4U)
 #define ISO15693_3_SLOT_NUMBER_MASK ((1U << ISO15693_3_SLOT_NUMBER_BITS) - 1U)
@@ -183,7 +213,7 @@ static Iso15693_3Error iso15693_3_listener_read_block_handler(
         const uint32_t block_count_max = instance->data->system_info.block_count;
 
         if(block_index >= block_count_max) {
-            error = Iso15693_3ErrorInternal;
+            error = Iso15693_3ErrorBlockUnavailable;
             break;
         }
 
@@ -231,13 +261,13 @@ static Iso15693_3Error iso15693_3_listener_write_block_handler(
         const size_t block_size_received = data_size - sizeof(Iso15693_3WriteBlockRequestLayout);
 
         if(block_index >= block_count_max) {
-            error = Iso15693_3ErrorInternal;
+            error = Iso15693_3ErrorBlockUnavailable;
             break;
         } else if(block_size_received != block_size_max) {
             error = Iso15693_3ErrorInternal;
             break;
         } else if(iso15693_3_is_block_locked(instance->data, block_index)) {
-            error = Iso15693_3ErrorInternal;
+            error = Iso15693_3ErrorBlockLocked;
             break;
         }
 
@@ -278,10 +308,10 @@ static Iso15693_3Error iso15693_3_listener_lock_block_handler(
         const uint32_t block_count_max = instance->data->system_info.block_count;
 
         if(block_index >= block_count_max) {
-            error = Iso15693_3ErrorInternal;
+            error = Iso15693_3ErrorBlockUnavailable;
             break;
         } else if(iso15693_3_is_block_locked(instance->data, block_index)) {
-            error = Iso15693_3ErrorInternal;
+            error = Iso15693_3ErrorBlockAlreadyLocked;
             break;
         }
 
@@ -317,9 +347,16 @@ static Iso15693_3Error iso15693_3_listener_read_multi_blocks_handler(
         }
 
         const uint32_t block_index_start = request->first_block_num;
+        const uint32_t block_count_max = instance->data->system_info.block_count;
+
+        if(block_index_start >= block_count_max) {
+            error = Iso15693_3ErrorBlockUnavailable;
+            break;
+        }
+
+        // A range past the end is cut at the last block, as SLIX2 cards do (FNFC-01.1)
         const uint32_t block_index_end =
-            MIN((block_index_start + request->block_count),
-                ((uint32_t)instance->data->system_info.block_count - 1));
+            MIN((block_index_start + request->block_count), (block_count_max - 1));
         const uint32_t block_count = block_index_end - block_index_start + 1;
 
         error = iso15693_3_listener_extension_handler(
@@ -393,8 +430,8 @@ static Iso15693_3Error iso15693_3_listener_write_multi_blocks_handler(
         const size_t block_size = block_data_size / block_count;
         const size_t block_size_max = instance->data->system_info.block_size;
 
-        if(block_count > block_count_available) {
-            error = Iso15693_3ErrorInternal;
+        if(block_index_start >= block_count_max || block_count > block_count_available) {
+            error = Iso15693_3ErrorBlockUnavailable;
             break;
         } else if(block_size != block_size_max) {
             error = Iso15693_3ErrorInternal;
@@ -407,7 +444,7 @@ static Iso15693_3Error iso15693_3_listener_write_multi_blocks_handler(
 
         for(uint32_t i = block_index_start; i <= block_index_end; ++i) {
             if(iso15693_3_is_block_locked(instance->data, i)) {
-                error = Iso15693_3ErrorInternal;
+                error = Iso15693_3ErrorBlockLocked;
                 break;
             }
         }
@@ -479,7 +516,7 @@ static Iso15693_3Error iso15693_3_listener_write_afi_handler(
             error = Iso15693_3ErrorFormat;
             break;
         } else if(instance->data->settings.lock_bits.afi) {
-            error = Iso15693_3ErrorInternal;
+            error = Iso15693_3ErrorBlockLocked;
             break;
         }
 
@@ -508,7 +545,7 @@ static Iso15693_3Error iso15693_3_listener_lock_afi_handler(
         Iso15693_3LockBits* lock_bits = &instance->data->settings.lock_bits;
 
         if(lock_bits->afi) {
-            error = Iso15693_3ErrorInternal;
+            error = Iso15693_3ErrorBlockAlreadyLocked;
             break;
         }
 
@@ -542,7 +579,7 @@ static Iso15693_3Error iso15693_3_listener_write_dsfid_handler(
             error = Iso15693_3ErrorFormat;
             break;
         } else if(instance->data->settings.lock_bits.dsfid) {
-            error = Iso15693_3ErrorInternal;
+            error = Iso15693_3ErrorBlockLocked;
             break;
         }
 
@@ -571,7 +608,7 @@ static Iso15693_3Error iso15693_3_listener_lock_dsfid_handler(
         Iso15693_3LockBits* lock_bits = &instance->data->settings.lock_bits;
 
         if(lock_bits->dsfid) {
-            error = Iso15693_3ErrorInternal;
+            error = Iso15693_3ErrorBlockAlreadyLocked;
             break;
         }
 
@@ -647,14 +684,16 @@ static Iso15693_3Error iso15693_3_listener_get_multi_blocks_security_handler(
         }
 
         const uint32_t block_index_start = request->first_block_num;
-        const uint32_t block_index_end = block_index_start + request->block_count;
-
         const uint32_t block_count_max = instance->data->system_info.block_count;
 
-        if(block_index_end >= block_count_max) {
-            error = Iso15693_3ErrorInternal;
+        if(block_index_start >= block_count_max) {
+            error = Iso15693_3ErrorBlockUnavailable;
             break;
         }
+
+        // A range past the end is cut at the last block, as SLIX2 cards do (FNFC-01.1)
+        const uint32_t block_index_end =
+            MIN((block_index_start + request->block_count), (block_count_max - 1));
 
         for(uint32_t i = block_index_start; i <= block_index_end; ++i) {
             bit_buffer_append_byte(
@@ -722,13 +761,18 @@ static Iso15693_3Error iso15693_3_listener_handle_standard_request(
             error = Iso15693_3ErrorNone;
         }
 
+        // The protocol extension may answer an error the way its cards do
+        if(error != Iso15693_3ErrorNone) {
+            error = iso15693_3_listener_extension_error_handler(instance, command, error);
+        }
+
         // Several commands may not require an answer
         if(error == Iso15693_3ErrorFormat || error == Iso15693_3ErrorIgnore) break;
 
         if(error != Iso15693_3ErrorNone) {
             bit_buffer_set_size(instance->tx_buffer, 0);
             bit_buffer_append_byte(instance->tx_buffer, ISO15693_3_RESP_FLAG_ERROR);
-            bit_buffer_append_byte(instance->tx_buffer, ISO15693_3_RESP_ERROR_UNKNOWN);
+            bit_buffer_append_byte(instance->tx_buffer, iso15693_3_listener_get_error_code(error));
         }
 
         Iso15693_3ListenerSessionState* session_state = &instance->session_state;

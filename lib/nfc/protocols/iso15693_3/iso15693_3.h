@@ -99,6 +99,10 @@ typedef enum {
     Iso15693_3ErrorInternal,
     Iso15693_3ErrorCustom,
     Iso15693_3ErrorUnknown,
+    // Listener errors with a dedicated ISO15693-3 error code (appended to keep the values)
+    Iso15693_3ErrorBlockUnavailable, // ISO15693_3_RESP_ERROR_BLOCK_UNAVAILABLE (0x10)
+    Iso15693_3ErrorBlockAlreadyLocked, // ISO15693_3_RESP_ERROR_BLOCK_ALREADY_LOCKED (0x11)
+    Iso15693_3ErrorBlockLocked, // ISO15693_3_RESP_ERROR_BLOCK_LOCKED (0x12)
 } Iso15693_3Error;
 
 typedef struct {
