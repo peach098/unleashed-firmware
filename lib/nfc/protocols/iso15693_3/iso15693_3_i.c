@@ -238,12 +238,24 @@ void iso15693_3_append_uid(const Iso15693_3Data* data, BitBuffer* buf) {
 }
 
 void iso15693_3_append_block(const Iso15693_3Data* data, uint8_t block_num, BitBuffer* buf) {
-    furi_assert(block_num < data->system_info.block_count);
+    iso15693_3_append_blocks(data, block_num, 1, buf);
+}
 
+void iso15693_3_append_blocks(
+    const Iso15693_3Data* data,
+    uint8_t block_num,
+    uint32_t block_count,
+    BitBuffer* buf) {
+    furi_check(block_num + block_count <= data->system_info.block_count);
+    if(block_count == 0) return;
+
+    // Block data is stored contiguously, so the blocks are copied with a single append
     const uint32_t block_offset = block_num * data->system_info.block_size;
+    const uint32_t data_size = block_count * data->system_info.block_size;
+    furi_check(block_offset + data_size <= simple_array_get_count(data->block_data));
     const uint8_t* block_data = simple_array_cget(data->block_data, block_offset);
 
-    bit_buffer_append_bytes(buf, block_data, data->system_info.block_size);
+    bit_buffer_append_bytes(buf, block_data, data_size);
 }
 
 void iso15693_3_set_block_locked(Iso15693_3Data* data, uint8_t block_index, bool locked) {

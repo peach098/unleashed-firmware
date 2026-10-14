@@ -21,6 +21,7 @@
 #include <nfc/protocols/slix/slix_poller.h>
 #include <nfc/protocols/slix/slix_poller_i.h>
 #include <nfc/protocols/mf_plus/mf_plus_crypto.h>
+#include <nfc/helpers/iso13239_crc.h>
 
 #include <nfc/nfc_poller.h>
 
@@ -35,6 +36,13 @@
 #define NFC_APP_MF_CLASSIC_DICT_UNIT_TEST_PATH EXT_PATH("unit_tests/mf_dict.nfc")
 
 #define NFC_TEST_FLAG_WORKER_DONE (1)
+
+#define ISO15693_3_LISTENER_TEST_RX_SIZE (64U)
+#define ISO15693_3_LISTENER_TEST_CRC_MAX (1027U)
+
+// nfc_iso15693_signal_test.c
+void nfc_iso15693_signal_encode_equivalence_test(void);
+void nfc_iso15693_signal_tick_exact_test(void);
 
 typedef enum {
     NfcTestMfClassicSendFrameTestStateAuth,
@@ -1023,6 +1031,302 @@ MU_TEST(slix_set_password_access_all_passwords_cap) {
         EXT_PATH("unit_tests/nfc/Slix_cap_accept_all_pass.nfc"), 0x12341234, false);
 }
 
+// ---- ISO15693 ReadMultipleBlocks listener response (FNFC-01.3) ----------
+// The listener response is checked byte by byte against a frame built here from the dump.
+// The mock NFC layer limits frames to 64 bytes (poller buffer), so at most 15 blocks per read.
+
+typedef enum {
+    NfcTestRequestReadMulti, // READ_MULTIPLE_BLOCKS (default)
+    NfcTestRequestReadSingle, // READ_SINGLE_BLOCK, block_count_minus_one must be 0
+    NfcTestRequestGetRandom, // SLIX GET_RANDOM_NUMBER: flags + 2 random bytes, only the flags compared
+} NfcTestRequest;
+
+typedef struct {
+    uint8_t first_block;
+    uint8_t block_count_minus_one;
+    bool option; // request block security status
+    NfcTestRequest request;
+} NfcTestReadMultiCase;
+
+typedef struct {
+    FuriThreadId thread_id;
+    const SlixData* slix_data;
+    bool read_protected_low; // blocks below the protection pointer are read protected
+    const NfcTestReadMultiCase* cases;
+    size_t case_count;
+    size_t cases_passed;
+    int failed_case;
+} NfcTestReadMultiContext;
+
+// Expected response without CRC, built independently of the listener code
+static bool nfc_test_read_multi_expected(
+    const NfcTestReadMultiContext* ctx,
+    const NfcTestReadMultiCase* test_case,
+    BitBuffer* expected) {
+    const Iso15693_3Data* data = slix_get_base_data(ctx->slix_data);
+    const uint32_t block_count = iso15693_3_get_block_count(data);
+    const uint32_t first = test_case->first_block;
+    const uint32_t last = MIN(first + test_case->block_count_minus_one, block_count - 1);
+
+    bit_buffer_reset(expected);
+
+    if(test_case->request == NfcTestRequestGetRandom) {
+        bit_buffer_append_byte(expected, 0x00); // Response flags
+        bit_buffer_append_bytes(
+            expected, (const uint8_t[]){0x00, 0x00}, 2); // Random, not compared
+        return true;
+    }
+
+    // first > block count: the listener stays silent (count wraps over the response limit)
+    if(first > last + 1) return false;
+
+    bool protected_block = false;
+    for(uint32_t i = first; i <= last; ++i) {
+        if(i == SLIX_COUNTER_BLOCK_NUM) continue;
+        if(ctx->read_protected_low && i < ctx->slix_data->system_info.protection.pointer) {
+            protected_block = true;
+        }
+    }
+
+    if(protected_block) {
+        bit_buffer_append_byte(expected, ISO15693_3_RESP_FLAG_ERROR);
+        bit_buffer_append_byte(expected, ISO15693_3_RESP_ERROR_UNKNOWN);
+        return true;
+    }
+
+    bit_buffer_append_byte(expected, 0x00); // Response flags
+    for(uint32_t i = first; i <= last; ++i) {
+        if(test_case->option) {
+            bit_buffer_append_byte(expected, iso15693_3_is_block_locked(data, i) ? 1 : 0);
+        }
+        bit_buffer_append_bytes(
+            expected, iso15693_3_get_block_data(data, i), iso15693_3_get_block_size(data));
+    }
+    return true;
+}
+
+NfcCommand nfc_test_read_multi_callback(NfcGenericEventEx event, void* context) {
+    NfcTestReadMultiContext* ctx = context;
+    Iso15693_3PollerEvent* iso15_event = event.parent_event_data;
+    SlixPoller* poller = event.poller;
+
+    // With read protection the poller's own activation (it reads every block) ends with
+    // an error event instead of Ready. The field is still on, so the cases run either way.
+    const bool poller_usable =
+        (iso15_event->type == Iso15693_3PollerEventTypeReady) ||
+        (ctx->read_protected_low && iso15_event->type == Iso15693_3PollerEventTypeError);
+
+    if(poller_usable) {
+        BitBuffer* tx = bit_buffer_alloc(16);
+        BitBuffer* rx = bit_buffer_alloc(ISO15693_3_LISTENER_TEST_RX_SIZE);
+        BitBuffer* expected = bit_buffer_alloc(ISO15693_3_LISTENER_TEST_RX_SIZE);
+
+        for(size_t i = 0; i < ctx->case_count; ++i) {
+            const NfcTestReadMultiCase* test_case = &ctx->cases[i];
+
+            bit_buffer_reset(tx);
+            bit_buffer_append_byte(
+                tx,
+                ISO15693_3_REQ_FLAG_DATA_RATE_HI |
+                    (test_case->option ? ISO15693_3_REQ_FLAG_T4_OPTION : 0));
+            if(test_case->request == NfcTestRequestGetRandom) {
+                bit_buffer_append_byte(tx, SLIX_CMD_GET_RANDOM_NUMBER);
+                bit_buffer_append_byte(tx, SLIX_NXP_MANUFACTURER_CODE);
+            } else if(test_case->request == NfcTestRequestReadSingle) {
+                bit_buffer_append_byte(tx, ISO15693_3_CMD_READ_BLOCK);
+                bit_buffer_append_byte(tx, test_case->first_block);
+            } else {
+                bit_buffer_append_byte(tx, ISO15693_3_CMD_READ_MULTI_BLOCKS);
+                bit_buffer_append_byte(tx, test_case->first_block);
+                bit_buffer_append_byte(tx, test_case->block_count_minus_one);
+            }
+
+            const bool reply_expected = nfc_test_read_multi_expected(ctx, test_case, expected);
+            const SlixError error = slix_poller_send_frame(poller, tx, rx, ISO15693_3_FDT_POLL_FC);
+            // The random part of GET_RANDOM_NUMBER is not compared, only flags and length
+            const size_t compare_size = (test_case->request == NfcTestRequestGetRandom) ?
+                                            1 :
+                                            bit_buffer_get_size_bytes(expected);
+
+            const bool passed =
+                reply_expected ?
+                    (error == SlixErrorNone &&
+                     bit_buffer_get_size_bytes(rx) == bit_buffer_get_size_bytes(expected) &&
+                     memcmp(bit_buffer_get_data(rx), bit_buffer_get_data(expected), compare_size) ==
+                         0) :
+                    (error == SlixErrorTimeout);
+            if(!passed) {
+                ctx->failed_case = i;
+                break;
+            }
+            ctx->cases_passed++;
+        }
+
+        bit_buffer_free(expected);
+        bit_buffer_free(rx);
+        bit_buffer_free(tx);
+    }
+
+    furi_thread_flags_set(ctx->thread_id, NFC_TEST_FLAG_WORKER_DONE);
+    return NfcCommandStop;
+}
+
+static void nfc_test_read_multi_run(
+    bool read_protected_low,
+    const NfcTestReadMultiCase* cases,
+    size_t case_count) {
+    Nfc* poller = nfc_alloc();
+    Nfc* listener = nfc_alloc();
+
+    NfcDevice* nfc_device = nfc_device_alloc();
+    mu_assert(
+        nfc_device_load(nfc_device, EXT_PATH("unit_tests/nfc/Slix_cap_default.nfc")),
+        "nfc_device_load() failed\r\n");
+
+    SlixData* slix_data = slix_alloc();
+    slix_copy(slix_data, nfc_device_get_data(nfc_device, NfcProtocolSlix));
+    // The fixture has no read protection (condition 0x02 = write low)
+    mu_assert(
+        (slix_data->system_info.protection.condition &
+         (SLIX_PP_CONDITION_RL | SLIX_PP_CONDITION_RH)) == 0,
+        "fixture unexpectedly read protected\r\n");
+    if(read_protected_low) {
+        slix_data->system_info.protection.condition |= SLIX_PP_CONDITION_RL;
+    }
+
+    NfcListener* slix_listener = nfc_listener_alloc(listener, NfcProtocolSlix, slix_data);
+    nfc_listener_start(slix_listener, NULL, NULL);
+
+    NfcTestReadMultiContext ctx = {
+        .thread_id = furi_thread_get_current_id(),
+        .slix_data = slix_data,
+        .read_protected_low = read_protected_low,
+        .cases = cases,
+        .case_count = case_count,
+        .cases_passed = 0,
+        .failed_case = -1,
+    };
+
+    NfcPoller* slix_poller = nfc_poller_alloc(poller, NfcProtocolSlix);
+    nfc_poller_start_ex(slix_poller, nfc_test_read_multi_callback, &ctx);
+
+    uint32_t flag =
+        furi_thread_flags_wait(NFC_TEST_FLAG_WORKER_DONE, FuriFlagWaitAny, FuriWaitForever);
+    mu_assert(flag == NFC_TEST_FLAG_WORKER_DONE, "Wrong thread flag\r\n");
+
+    nfc_poller_stop(slix_poller);
+    nfc_poller_free(slix_poller);
+    nfc_listener_stop(slix_listener);
+    nfc_listener_free(slix_listener);
+
+    slix_free(slix_data);
+    nfc_device_free(nfc_device);
+    nfc_free(listener);
+    nfc_free(poller);
+
+    if(ctx.failed_case >= 0) {
+        FURI_LOG_E(TAG, "ReadMultipleBlocks case %d differs", ctx.failed_case);
+    }
+    mu_assert(ctx.failed_case < 0, "ReadMultipleBlocks response differs\r\n");
+    mu_assert(ctx.cases_passed == case_count, "Poller did not run all cases\r\n");
+}
+
+static void nfc_test_read_multi(bool read_protected_low) {
+    static const NfcTestReadMultiCase cases[] = {
+        {0, 0, false, NfcTestRequestReadMulti}, // 1 block
+        {0, 7, false, NfcTestRequestReadMulti}, // 8 blocks
+        {0, 14, false, NfcTestRequestReadMulti}, // 15 blocks (mock frame limit)
+        {32, 14, false, NfcTestRequestReadMulti}, // above the protection pointer
+        // clamped to the last block, includes the counter block
+        {70, 14, false, NfcTestRequestReadMulti},
+        {79, 0, false, NfcTestRequestReadMulti}, // counter block only
+        {80, 0, false, NfcTestRequestReadMulti}, // first block == block count: flags only
+        {81, 0, false, NfcTestRequestReadMulti}, // out of range: no reply
+        {0, 0, true, NfcTestRequestReadMulti}, // with block security
+        // 12 blocks with block security, across the protection pointer
+        {20, 11, true, NfcTestRequestReadMulti},
+        {75, 9, true, NfcTestRequestReadMulti}, // clamped, with block security
+    };
+    nfc_test_read_multi_run(read_protected_low, cases, COUNT_OF(cases));
+}
+
+MU_TEST(iso15693_3_listener_read_multi_blocks_test) {
+    nfc_test_read_multi(false);
+}
+
+MU_TEST(iso15693_3_listener_read_multi_blocks_read_protected_test) {
+    nfc_test_read_multi(true);
+}
+
+// Every reply shorter than the one before it: the tx buffers are reused between requests,
+// so a reply must not carry the previous reply's bytes. Covers the standard reply, the
+// standard error reply and the SLIX extension reply (its own tx buffer, copied in send_frame).
+// Blocks below the protection pointer (32 in the fixture) are read protected here.
+MU_TEST(iso15693_3_listener_short_after_long_test) {
+    static const NfcTestReadMultiCase cases[] = {
+        {32, 14, false, NfcTestRequestReadMulti}, // 15 blocks: 61 B
+        {33, 0, false, NfcTestRequestReadSingle}, // 5 B
+        {40, 11, true, NfcTestRequestReadMulti}, // 12 blocks with block security: 61 B
+        {41, 0, true, NfcTestRequestReadSingle}, // with block security: 6 B
+        {32, 14, false, NfcTestRequestReadMulti}, // 61 B
+        {0, 0, false, NfcTestRequestReadMulti}, // read protected: error reply, 2 B
+        {32, 14, false, NfcTestRequestReadMulti}, // 61 B
+        {0, 0, false, NfcTestRequestGetRandom}, // SLIX extension: 3 B
+        {32, 14, false, NfcTestRequestReadMulti}, // 61 B
+        {80, 0, false, NfcTestRequestReadMulti}, // first block == block count: flags only, 1 B
+        {33, 0, false, NfcTestRequestReadSingle}, // 5 B after 1 B: no stale bytes either way
+    };
+    nfc_test_read_multi_run(true, cases, COUNT_OF(cases));
+}
+
+// Bitwise ISO13239 CRC, as implemented before FNFC-01.3
+static uint16_t nfc_test_iso13239_crc_reference(bool picopass, const uint8_t* data, size_t size) {
+    uint16_t crc = picopass ? 0xE012U : 0xFFFFU;
+    for(size_t i = 0; i < size; ++i) {
+        crc ^= data[i];
+        for(size_t j = 0; j < 8; ++j) {
+            crc = (crc & 1U) ? (crc >> 1) ^ 0x8408U : (crc >> 1);
+        }
+    }
+    return picopass ? crc : (uint16_t)~crc;
+}
+
+MU_TEST(iso13239_crc_table_test) {
+    BitBuffer* buf = bit_buffer_alloc(ISO15693_3_LISTENER_TEST_CRC_MAX + ISO13239_CRC_SIZE);
+    uint8_t* data = malloc(ISO15693_3_LISTENER_TEST_CRC_MAX);
+
+    // Inventory response of a real SLIX2 card (PM3 trace): CRC is 0F 00
+    const uint8_t inventory[] = {0x00, 0x01, 0xAC, 0x83, 0x9A, 0x01, 0x09, 0x01, 0x04, 0xE0};
+    bit_buffer_copy_bytes(buf, inventory, sizeof(inventory));
+    iso13239_crc_append(Iso13239CrcTypeDefault, buf);
+    mu_assert(
+        bit_buffer_get_byte(buf, 10) == 0x0F && bit_buffer_get_byte(buf, 11) == 0x00,
+        "known inventory CRC mismatch\r\n");
+
+    for(size_t i = 0; i < 400; ++i) {
+        const size_t size = (i < 64) ? i :
+                                       (furi_hal_random_get() % ISO15693_3_LISTENER_TEST_CRC_MAX);
+        const bool picopass = i & 1U;
+        const Iso13239CrcType type = picopass ? Iso13239CrcTypePicopass : Iso13239CrcTypeDefault;
+        if(size) furi_hal_random_fill_buf(data, size); // fill_buf rejects 0 bytes
+
+        bit_buffer_copy_bytes(buf, data, size);
+        iso13239_crc_append(type, buf);
+
+        const uint16_t expected = nfc_test_iso13239_crc_reference(picopass, data, size);
+        mu_assert(
+            bit_buffer_get_byte(buf, size) == (expected & 0xFFU) &&
+                bit_buffer_get_byte(buf, size + 1) == (expected >> 8),
+            "table CRC differs from bitwise CRC\r\n");
+        if(size) {
+            mu_assert(iso13239_crc_check(type, buf), "CRC check failed\r\n");
+        }
+    }
+
+    free(data);
+    bit_buffer_free(buf);
+}
+
 // AES-CMAC known-answer vectors from RFC 4493 (Appendix D.1), NIST AES-128 key. Exercises
 // the empty / single-complete-block / partial-final / multi-block paths of the CMAC plus the
 // cmac8 odd-index truncation used by MIFARE Plus SL3.
@@ -1229,6 +1533,14 @@ MU_TEST(mf_plus_crypto_data_iv_layout) {
     mu_assert(memcmp(iv, exp_write_full, 16) == 0, "write IV counter-word mismatch");
 }
 
+MU_TEST(iso15693_signal_encode_equivalence) {
+    nfc_iso15693_signal_encode_equivalence_test();
+}
+
+MU_TEST(iso15693_signal_tick_exact) {
+    nfc_iso15693_signal_tick_exact_test();
+}
+
 MU_TEST_SUITE(nfc) {
     nfc_test_alloc();
 
@@ -1282,6 +1594,13 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(slix_set_password_default_cap_correct_pass);
     MU_RUN_TEST(slix_set_password_default_cap_incorrect_pass);
     MU_RUN_TEST(slix_set_password_access_all_passwords_cap);
+
+    MU_RUN_TEST(iso15693_signal_encode_equivalence);
+    MU_RUN_TEST(iso15693_signal_tick_exact);
+    MU_RUN_TEST(iso13239_crc_table_test);
+    MU_RUN_TEST(iso15693_3_listener_read_multi_blocks_test);
+    MU_RUN_TEST(iso15693_3_listener_read_multi_blocks_read_protected_test);
+    MU_RUN_TEST(iso15693_3_listener_short_after_long_test);
 
     MU_RUN_TEST(mf_plus_crypto_cmac_rfc4493);
     MU_RUN_TEST(mf_plus_crypto_data_iv_layout);

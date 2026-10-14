@@ -128,6 +128,14 @@ typedef struct {
     FuriHalNfcChipConfig deinit; /**< Pointer to the deinit() function. */
     FuriHalNfcWaitEvent wait_event; /**< Pointer to the wait_event() function. */
     FuriHalNfcTx tx; /**< Pointer to the tx() function. */
+    /**
+     * Optional pointer to the tx_prepare() function (NULL if not supported).
+     *
+     * If set, it is called with the same arguments right before tx(), outside of
+     * the frame delay time wait, so that the technology can do the length-dependent
+     * frame encoding in advance and tx() only has to start the transmission.
+     */
+    FuriHalNfcTx tx_prepare;
     FuriHalNfcRx rx; /**< Pointer to the rx() function. */
     FuriHalNfcSleep sleep; /**< Pointer to the sleep() function. */
     FuriHalNfcIdle idle; /**< Pointer to the idle() function. */

@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,88.16,,
+Version,+,88.17,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/services/applications.h,,
 Header,+,applications/services/bt/bt_service/bt.h,,
@@ -1069,11 +1069,14 @@ Function,+,dialog_message_set_icon,void,"DialogMessage*, const Icon*, uint8_t, u
 Function,+,dialog_message_set_text,void,"DialogMessage*, const char*, uint8_t, uint8_t, Align, Align"
 Function,+,dialog_message_show,DialogMessageButton,"DialogsApp*, const DialogMessage*"
 Function,+,dialog_message_show_storage_error,void,"DialogsApp*, const char*"
+Function,-,digital_sequence_add_bytes,void,"DigitalSequence*, const DigitalSequenceBitTable*, const uint8_t*, size_t"
 Function,+,digital_sequence_add_signal,void,"DigitalSequence*, uint8_t"
 Function,-,digital_sequence_alloc,DigitalSequence*,"uint32_t, const GpioPin*"
+Function,-,digital_sequence_bit_table_init,void,"DigitalSequenceBitTable*, uint8_t, uint8_t"
 Function,-,digital_sequence_clear,void,DigitalSequence*
 Function,-,digital_sequence_free,void,DigitalSequence*
 Function,+,digital_sequence_register_signal,void,"DigitalSequence*, uint8_t, const DigitalSignal*"
+Function,-,digital_sequence_set_prefill_size,void,"DigitalSequence*, uint32_t"
 Function,+,digital_sequence_transmit,void,DigitalSequence*
 Function,+,digital_signal_add_period,void,"DigitalSignal*, uint32_t"
 Function,+,digital_signal_add_period_with_level,void,"DigitalSignal*, uint32_t, _Bool"
@@ -1662,6 +1665,7 @@ Function,+,furi_hal_nfc_listener_idle,FuriHalNfcError,
 Function,+,furi_hal_nfc_listener_rx,FuriHalNfcError,"uint8_t*, size_t, size_t*"
 Function,+,furi_hal_nfc_listener_sleep,FuriHalNfcError,
 Function,+,furi_hal_nfc_listener_tx,FuriHalNfcError,"const uint8_t*, size_t"
+Function,+,furi_hal_nfc_listener_tx_prepare,FuriHalNfcError,"const uint8_t*, size_t"
 Function,+,furi_hal_nfc_listener_wait_event,FuriHalNfcEvent,uint32_t
 Function,+,furi_hal_nfc_low_power_mode_start,FuriHalNfcError,
 Function,+,furi_hal_nfc_low_power_mode_stop,FuriHalNfcError,

@@ -37,19 +37,30 @@ uint32_t digital_signal_get_size(const DigitalSignal* signal) {
     return signal->size;
 }
 
+/*
+ * Convert a duration in 10 ps units plus the remainder carried over from the previous period
+ * (5 ps units) to whole timer ticks, rounded to the nearest tick. The new remainder is stored back.
+ * One tick is DIGITAL_SIGNAL_T_TIM = 3125 units of 5 ps, so 3125 input units are exactly 2 ticks:
+ * splitting the input at that point keeps every intermediate value in 32 bits for any input.
+ */
+static inline uint32_t digital_signal_ticks_to_reload(uint32_t ticks, int32_t* remainder) {
+    const uint32_t tick_pairs = ticks / DIGITAL_SIGNAL_T_TIM;
+    /* Rest in 5 ps units, offset by half a tick to round to the nearest: [0, 3 * T_TIM - 3] */
+    const int32_t rest =
+        (int32_t)(ticks % DIGITAL_SIGNAL_T_TIM) * 2 + *remainder + DIGITAL_SIGNAL_T_TIM_DIV2;
+    const uint32_t rest_ticks = (uint32_t)rest / DIGITAL_SIGNAL_T_TIM;
+
+    *remainder = rest - (int32_t)(rest_ticks * DIGITAL_SIGNAL_T_TIM) - DIGITAL_SIGNAL_T_TIM_DIV2;
+
+    return tick_pairs * 2 + rest_ticks;
+}
+
 void digital_signal_add_period(DigitalSignal* signal, uint32_t ticks) {
     furi_check(signal);
     furi_check(signal->size < signal->max_size);
 
-    const uint32_t duration = ticks + signal->remainder;
-
-    uint32_t reload_value = duration / DIGITAL_SIGNAL_T_TIM;
-    int32_t remainder = duration - reload_value * DIGITAL_SIGNAL_T_TIM;
-
-    if(remainder >= DIGITAL_SIGNAL_T_TIM_DIV2) {
-        reload_value += 1;
-        remainder -= DIGITAL_SIGNAL_T_TIM;
-    }
+    int32_t remainder = signal->remainder;
+    const uint32_t reload_value = digital_signal_ticks_to_reload(ticks, &remainder);
 
     furi_check(reload_value > 1);
 
@@ -60,16 +71,10 @@ void digital_signal_add_period(DigitalSignal* signal, uint32_t ticks) {
 static void digital_signal_extend_last_period(DigitalSignal* signal, uint32_t ticks) {
     furi_assert(signal->size <= signal->max_size);
 
-    const uint32_t reload_value_old = signal->data[signal->size - 1] + 1;
-    const uint32_t duration = ticks + signal->remainder + reload_value_old * DIGITAL_SIGNAL_T_TIM;
-
-    uint32_t reload_value = duration / DIGITAL_SIGNAL_T_TIM;
-    int32_t remainder = duration - reload_value * DIGITAL_SIGNAL_T_TIM;
-
-    if(remainder >= DIGITAL_SIGNAL_T_TIM_DIV2) {
-        reload_value += 1;
-        remainder -= DIGITAL_SIGNAL_T_TIM;
-    }
+    /* The stored period is a whole number of ticks: only the added duration needs rounding */
+    int32_t remainder = signal->remainder;
+    const uint32_t reload_value =
+        signal->data[signal->size - 1] + 1 + digital_signal_ticks_to_reload(ticks, &remainder);
 
     furi_check(reload_value > 1);
 

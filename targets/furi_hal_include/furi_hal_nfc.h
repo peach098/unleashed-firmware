@@ -245,6 +245,25 @@ FuriHalNfcError furi_hal_nfc_poller_rx(uint8_t* rx_data, size_t rx_data_size, si
 FuriHalNfcError furi_hal_nfc_listener_tx(const uint8_t* tx_data, size_t tx_bits);
 
 /**
+ * @brief Prepare data for transmission in listener mode.
+ *
+ * Optional step to be called right before furi_hal_nfc_listener_tx() with
+ * the same arguments. Technologies that need a length-dependent amount of work
+ * to build the frame (e.g. ISO15693 signal encoding) do it here, so that it can
+ * be done before waiting for the frame delay time to expire. The subsequent
+ * furi_hal_nfc_listener_tx() call then only starts the transmission.
+ *
+ * Calling furi_hal_nfc_listener_tx() without a preceding call to this function
+ * is always valid. For technologies that do not support preparation, this
+ * function does nothing.
+ *
+ * @param[in] tx_data pointer to a byte array containing the data to be transmitted.
+ * @param[in] tx_bits transmit data size, in bits.
+ * @returns FuriHalNfcErrorNone on success, any other error code on failure.
+ */
+FuriHalNfcError furi_hal_nfc_listener_tx_prepare(const uint8_t* tx_data, size_t tx_bits);
+
+/**
  * @brief Receive data in listener mode.
  *
  * The receive buffer must be big enough to accomodate all of the expected data.

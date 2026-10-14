@@ -4,6 +4,8 @@
 #include <furi.h>
 #include <furi_hal_bus.h>
 
+#include <string.h>
+
 #include <stm32wbxx_ll_dma.h>
 #include <stm32wbxx_ll_tim.h>
 
@@ -31,9 +33,16 @@
 #define DIGITAL_SEQUENCE_GPIO_BUFFER_SIZE 2
 
 /* Maximum capacity of the DMA ring buffer. */
-#define DIGITAL_SEQUENCE_RING_BUFFER_SIZE 128
+#define DIGITAL_SEQUENCE_RING_BUFFER_SIZE 128U
 
-#define DIGITAL_SEQUENCE_RING_BUFFER_MIN_FREE_SIZE 2
+#define DIGITAL_SEQUENCE_RING_BUFFER_MIN_FREE_SIZE 2U
+
+/* Default number of DMA ring buffer entries filled before the transmission starts: all of them. */
+#define DIGITAL_SEQUENCE_RING_BUFFER_PREFILL_SIZE_MAX \
+    (DIGITAL_SEQUENCE_RING_BUFFER_SIZE - DIGITAL_SEQUENCE_RING_BUFFER_MIN_FREE_SIZE)
+
+#define DIGITAL_SEQUENCE_BITS_IN_BYTE   (8U)
+#define DIGITAL_SEQUENCE_BITS_IN_NIBBLE (4U)
 
 /* Maximum amount of registered signals. */
 #define DIGITAL_SEQUENCE_BANK_SIZE 32
@@ -58,6 +67,7 @@ struct DigitalSequence {
 
     uint32_t size;
     uint32_t max_size;
+    uint32_t prefill_size;
 
     LL_DMA_InitTypeDef dma_config_gpio;
     LL_DMA_InitTypeDef dma_config_timer;
@@ -78,6 +88,7 @@ DigitalSequence* digital_sequence_alloc(uint32_t size, const GpioPin* gpio) {
 
     sequence->gpio = gpio;
     sequence->max_size = size;
+    sequence->prefill_size = DIGITAL_SEQUENCE_RING_BUFFER_PREFILL_SIZE_MAX;
 
     sequence->dma_config_gpio.PeriphOrM2MSrcAddress = (uint32_t)&gpio->port->BSRR;
     sequence->dma_config_gpio.MemoryOrM2MDstAddress = (uint32_t)sequence->gpio_buf;
@@ -129,6 +140,59 @@ void digital_sequence_add_signal(DigitalSequence* sequence, uint8_t signal_index
     furi_check(sequence->size < sequence->max_size);
 
     sequence->data[sequence->size++] = signal_index;
+}
+
+void digital_sequence_bit_table_init(
+    DigitalSequenceBitTable* table,
+    uint8_t signal_index_zero,
+    uint8_t signal_index_one) {
+    furi_check(table);
+    furi_check(signal_index_zero < DIGITAL_SEQUENCE_BANK_SIZE);
+    furi_check(signal_index_one < DIGITAL_SEQUENCE_BANK_SIZE);
+
+    for(uint32_t nibble = 0; nibble < COUNT_OF(table->nibble); ++nibble) {
+        uint32_t packed = 0;
+        for(uint32_t bit = 0; bit < DIGITAL_SEQUENCE_BITS_IN_NIBBLE; ++bit) {
+            const uint32_t index = (nibble & (1U << bit)) ? signal_index_one : signal_index_zero;
+            packed |= index << (bit * DIGITAL_SEQUENCE_BITS_IN_BYTE);
+        }
+        table->nibble[nibble] = packed;
+    }
+}
+
+void digital_sequence_add_bytes(
+    DigitalSequence* sequence,
+    const DigitalSequenceBitTable* table,
+    const uint8_t* data,
+    size_t data_size) {
+    furi_check(sequence);
+    furi_check(table);
+    furi_check(data || data_size == 0);
+    furi_check(data_size <= (sequence->max_size - sequence->size) / DIGITAL_SEQUENCE_BITS_IN_BYTE);
+
+    /* The table holds the indices for 4 bits in one word: two (possibly unaligned) word
+     * stores per byte instead of eight checked digital_sequence_add_signal() calls.
+     * memcpy() with a constant size compiles to a single store, not a library call. */
+    uint8_t* dst = &sequence->data[sequence->size];
+    const uint32_t* nibble = table->nibble;
+
+    for(size_t i = 0; i < data_size; ++i) {
+        const uint32_t byte = data[i];
+        const uint32_t lo = nibble[byte & 0x0FU];
+        const uint32_t hi = nibble[byte >> DIGITAL_SEQUENCE_BITS_IN_NIBBLE];
+        memcpy(dst, &lo, sizeof(lo));
+        memcpy(dst + sizeof(lo), &hi, sizeof(hi));
+        dst += DIGITAL_SEQUENCE_BITS_IN_BYTE;
+    }
+
+    sequence->size += data_size * DIGITAL_SEQUENCE_BITS_IN_BYTE;
+}
+
+void digital_sequence_set_prefill_size(DigitalSequence* sequence, uint32_t prefill_size) {
+    furi_check(sequence);
+    furi_check(prefill_size);
+
+    sequence->prefill_size = MIN(prefill_size, DIGITAL_SEQUENCE_RING_BUFFER_PREFILL_SIZE_MAX);
 }
 
 static inline void digital_sequence_start_dma(DigitalSequence* sequence) {
@@ -320,9 +384,11 @@ void digital_sequence_transmit(DigitalSequence* sequence) {
                     const bool end_level = signal_current->start_level ^
                                            ((signal_current->size % 2) == 0);
 
-                    /* If the adjacent levels are equal, carry the current period duration over to the next signal. */
+                    /* If the adjacent levels are equal, carry the current period duration over to the next signal.
+                     * reload_value is the period minus one tick (timer ARR), as is the next signal's first value:
+                     * add the tick back so that the merged period is the sum of both. */
                     if(end_level == signal_next->start_level) {
-                        reload_value_carry = reload_value;
+                        reload_value_carry = reload_value + 1;
                     }
                 } else {
                     /** Special case: during the last period of the last signal, hold the output level indefinitely.
@@ -342,8 +408,7 @@ void digital_sequence_transmit(DigitalSequence* sequence) {
 
             if(sequence->state == DigitalSequenceStateIdle) {
                 const bool is_buffer_filled = sequence->timer_buf.write_pos >=
-                                              (DIGITAL_SEQUENCE_RING_BUFFER_SIZE -
-                                               DIGITAL_SEQUENCE_RING_BUFFER_MIN_FREE_SIZE);
+                                              sequence->prefill_size;
                 const bool is_end_of_data = (signal_next == NULL) && is_last_value;
 
                 if(is_buffer_filled || is_end_of_data) {
@@ -357,11 +422,19 @@ void digital_sequence_transmit(DigitalSequence* sequence) {
         /* Exit the loop here when no further signals are available */
         if(signal_next == NULL) break;
 
-        /* Prevent the rounding error from accumulating by distributing it across multiple periods. */
+        /* Prevent the rounding error from accumulating by distributing it across multiple periods:
+         * add a tick to the first period of the next signal when the edges fall behind by more than half a tick,
+         * remove one when they run ahead by more than half a tick. A tick is not removed if the period would get
+         * shorter than 2 ticks (the digital_signal_add_period() minimum); the correction is then deferred. */
         remainder_ticks += signal_current->remainder;
-        if(remainder_ticks >= DIGITAL_SIGNAL_T_TIM_DIV2) {
+        if(remainder_ticks > DIGITAL_SIGNAL_T_TIM_DIV2) {
             remainder_ticks -= DIGITAL_SIGNAL_T_TIM;
             reload_value_carry += 1;
+        } else if(
+            remainder_ticks < -DIGITAL_SIGNAL_T_TIM_DIV2 &&
+            signal_next->data[0] + reload_value_carry > 1) {
+            remainder_ticks += DIGITAL_SIGNAL_T_TIM;
+            reload_value_carry -= 1;
         }
 
         signal_current = signal_next;

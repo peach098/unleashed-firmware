@@ -39,6 +39,13 @@ void iso15693_3_append_uid(const Iso15693_3Data* data, BitBuffer* buf);
 
 void iso15693_3_append_block(const Iso15693_3Data* data, uint8_t block_num, BitBuffer* buf);
 
+// Appends block_count consecutive blocks starting at block_num in one copy
+void iso15693_3_append_blocks(
+    const Iso15693_3Data* data,
+    uint8_t block_num,
+    uint32_t block_count,
+    BitBuffer* buf);
+
 void iso15693_3_set_block_locked(Iso15693_3Data* data, uint8_t block_index, bool locked);
 
 void iso15693_3_set_block_data(
