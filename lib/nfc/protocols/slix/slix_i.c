@@ -126,6 +126,28 @@ SlixError slix_get_random_number_response_parse(SlixRandomNumber* data, const Bi
     return error;
 }
 
+SlixError slix_eas_alarm_response_parse(bool* active, const BitBuffer* buf) {
+    furi_assert(active);
+    furi_assert(buf);
+
+    *active = false;
+    SlixError error = SlixErrorNone;
+
+    do {
+        if(slix_error_response_parse(&error, buf)) break;
+
+        // flags + EAS sequence (PM3 NxpTestEAS: 32 data bytes = EAS active)
+        if(bit_buffer_get_size_bytes(buf) < 1 + SLIX_EAS_SEQUENCE_SIZE) {
+            error = SlixErrorFormat;
+            break;
+        }
+
+        *active = true;
+    } while(false);
+
+    return error;
+}
+
 void slix_set_password(SlixData* data, SlixPasswordType password_type, SlixPassword password) {
     furi_assert(data);
     furi_assert(password_type < SlixPasswordTypeCount);
@@ -137,6 +159,25 @@ void slix_set_privacy_mode(SlixData* data, bool set) {
     furi_assert(data);
 
     data->privacy = set;
+}
+
+void slix_set_eas(SlixData* data, bool enabled) {
+    furi_assert(data);
+
+    data->eas.enabled = enabled;
+}
+
+void slix_set_eas_id(SlixData* data, uint16_t eas_id) {
+    furi_assert(data);
+
+    data->eas.id = eas_id;
+}
+
+void slix_set_eas_afi_protection(SlixData* data, bool eas_protected, bool afi_protected) {
+    furi_assert(data);
+
+    data->eas.eas_password_protected = eas_protected;
+    data->eas.afi_password_protected = afi_protected;
 }
 
 void slix_increment_counter(SlixData* data) {

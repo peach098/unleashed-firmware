@@ -73,6 +73,25 @@ SlixError slix_poller_read_signature(SlixPoller* instance, SlixSignature* data) 
     return error;
 }
 
+SlixError slix_poller_eas_alarm(SlixPoller* instance, bool* active) {
+    furi_assert(instance);
+    furi_assert(active);
+
+    *active = false;
+    slix_poller_prepare_request(instance, SLIX_CMD_EAS_ALARM, false);
+
+    SlixError error = SlixErrorNone;
+
+    do {
+        error = slix_poller_send_frame(
+            instance, instance->tx_buffer, instance->rx_buffer, ISO15693_3_FDT_POLL_FC);
+        if(error != SlixErrorNone) break;
+        error = slix_eas_alarm_response_parse(active, instance->rx_buffer);
+    } while(false);
+
+    return error;
+}
+
 SlixError slix_poller_get_random_number(SlixPoller* instance, SlixRandomNumber* data) {
     furi_assert(instance);
     furi_assert(data);

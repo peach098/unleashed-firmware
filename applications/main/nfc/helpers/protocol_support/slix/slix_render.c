@@ -54,6 +54,15 @@ void nfc_render_slix_info(const SlixData* data, NfcProtocolFormatType format_typ
         furi_string_cat_printf(str, "Privacy mode: %sabled\n", data->privacy ? "en" : "dis");
     }
 
+    if(slix_type_has_features(slix_type, SLIX_TYPE_FEATURE_EAS)) {
+        furi_string_cat(str, ":::::::::::::::::::::::[EAS]:::::::::::::::::::::::::\n");
+        furi_string_cat_printf(
+            str,
+            "EAS: %s%s\n",
+            slix_is_eas_enabled(data) ? "on" : "off",
+            data->system_info.lock_bits.eas ? ", locked" : "");
+    }
+
     if(slix_type_has_features(slix_type, SLIX_TYPE_FEATURE_SIGNATURE)) {
         furi_string_cat(str, ":::::::::::::::::::[Signature]::::::::::::::::::\n");
         for(uint32_t i = 0; i < 4; ++i) {

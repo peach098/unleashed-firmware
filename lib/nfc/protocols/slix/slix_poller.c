@@ -1,4 +1,5 @@
 #include "slix_poller_i.h"
+#include "slix_i.h"
 
 #include <nfc/protocols/nfc_poller_base.h>
 
@@ -73,14 +74,30 @@ static NfcCommand slix_poller_handler_read_signature(SlixPoller* instance) {
     if(slix_type_has_features(instance->type, SLIX_TYPE_FEATURE_SIGNATURE)) {
         instance->error = slix_poller_read_signature(instance, &instance->data->signature);
         if(instance->error == SlixErrorNone) {
-            instance->poller_state = SlixPollerStateCheckPrivacyPassword;
+            instance->poller_state = SlixPollerStateCheckEas;
         } else {
             instance->poller_state = SlixPollerStateError;
         }
     } else {
-        instance->poller_state = SlixPollerStateCheckPrivacyPassword;
+        instance->poller_state = SlixPollerStateCheckEas;
     }
 
+    return NfcCommandContinue;
+}
+
+// One EAS ALARM probe per read. EAS mode is not reported by any other command, so the
+// reply is the only source: EAS sequence -> on, silence or error -> off. A failed probe
+// never fails the read, and instance->error is left untouched.
+static NfcCommand slix_poller_handler_check_eas(SlixPoller* instance) {
+    if(slix_type_has_features(instance->type, SLIX_TYPE_FEATURE_EAS)) {
+        bool active = false;
+        const SlixError error = slix_poller_eas_alarm(instance, &active);
+        FURI_LOG_D(TAG, "EAS probe: %s (error %d)", active ? "on" : "off", error);
+        UNUSED(error); // FURI_LOG_D is compiled out in release builds
+        slix_set_eas(instance->data, active);
+    }
+
+    instance->poller_state = SlixPollerStateCheckPrivacyPassword;
     return NfcCommandContinue;
 }
 
@@ -188,6 +205,7 @@ static const SlixPollerStateHandler slix_poller_state_handler[SlixPollerStateNum
     [SlixPollerStateError] = slix_poller_handler_error,
     [SlixPollerStateGetNxpSysInfo] = slix_poller_handler_get_nxp_sys_info,
     [SlixPollerStateReadSignature] = slix_poller_handler_read_signature,
+    [SlixPollerStateCheckEas] = slix_poller_handler_check_eas,
     [SlixPollerStateCheckPrivacyPassword] = slix_poller_handler_check_privacy_password,
     [SlixPollerStatePrivacyUnlock] = slix_poller_handler_privacy_unlock,
     [SlixPollerStateReady] = slix_poller_handler_ready,

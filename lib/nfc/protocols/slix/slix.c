@@ -26,6 +26,13 @@
 #define SLIX_PROTECTION_CONDITION_KEY "Protection Condition"
 #define SLIX_LOCK_EAS_KEY             "Lock EAS"
 #define SLIX_LOCK_PPL_KEY             "Lock PPL"
+#define SLIX_EAS_MODE_KEY             "EAS Mode"
+#define SLIX_EAS_ID_KEY               "EAS ID"
+#define SLIX_EAS_PWD_PROTECTED_KEY    "EAS Password Protected"
+#define SLIX_AFI_PWD_PROTECTED_KEY    "AFI Password Protected"
+
+// EAS ID as stored in the file: 2 bytes in on-air order (LSB first), like the passwords.
+#define SLIX_EAS_ID_SIZE (2U)
 
 typedef struct {
     uint8_t iso15693_3[2];
@@ -121,6 +128,7 @@ void slix_reset(SlixData* data) {
 
     memset(&data->system_info, 0, sizeof(SlixSystemInfo));
     memset(data->signature, 0, sizeof(SlixSignature));
+    memset(&data->eas, 0, sizeof(SlixEas));
 
     data->privacy = false;
 }
@@ -136,6 +144,7 @@ void slix_copy(SlixData* data, const SlixData* other) {
     memcpy(data->signature, other->signature, sizeof(SlixSignature));
 
     data->system_info = other->system_info;
+    data->eas = other->eas;
     data->privacy = other->privacy;
 }
 
@@ -187,6 +196,38 @@ static bool slix_load_passwords(SlixPassword* passwords, SlixType slix_type, Fli
             break;
         }
     }
+
+    return ret;
+}
+
+// All EAS keys are optional (added after Version 4 dumps were in use): a missing key
+// keeps the default (EAS off, EAS ID 00 00, no password protection).
+static bool slix_load_eas(SlixEas* eas, FlipperFormat* ff) {
+    bool ret = false;
+
+    memset(eas, 0, sizeof(SlixEas));
+
+    do {
+        if(flipper_format_key_exist(ff, SLIX_EAS_MODE_KEY)) {
+            if(!flipper_format_read_bool(ff, SLIX_EAS_MODE_KEY, &eas->enabled, 1)) break;
+        }
+        if(flipper_format_key_exist(ff, SLIX_EAS_ID_KEY)) {
+            uint8_t eas_id[SLIX_EAS_ID_SIZE];
+            if(!flipper_format_read_hex(ff, SLIX_EAS_ID_KEY, eas_id, SLIX_EAS_ID_SIZE)) break;
+            eas->id = (uint16_t)(eas_id[0] | (eas_id[1] << 8));
+        }
+        if(flipper_format_key_exist(ff, SLIX_EAS_PWD_PROTECTED_KEY)) {
+            if(!flipper_format_read_bool(
+                   ff, SLIX_EAS_PWD_PROTECTED_KEY, &eas->eas_password_protected, 1))
+                break;
+        }
+        if(flipper_format_key_exist(ff, SLIX_AFI_PWD_PROTECTED_KEY)) {
+            if(!flipper_format_read_bool(
+                   ff, SLIX_AFI_PWD_PROTECTED_KEY, &eas->afi_password_protected, 1))
+                break;
+        }
+        ret = true;
+    } while(false);
 
     return ret;
 }
@@ -247,6 +288,10 @@ bool slix_load(SlixData* data, FlipperFormat* ff, uint32_t version) {
             }
         }
 
+        if(slix_type_has_features(slix_type, SLIX_TYPE_FEATURE_EAS)) {
+            if(!slix_load_eas(&data->eas, ff)) break;
+        }
+
         loaded = true;
     } while(false);
 
@@ -296,6 +341,18 @@ static bool
     }
 
     return ret;
+}
+
+static bool slix_save_eas(const SlixEas* eas, FlipperFormat* ff) {
+    const uint8_t eas_id[SLIX_EAS_ID_SIZE] = {eas->id & 0xFFU, eas->id >> 8};
+
+    return flipper_format_write_comment_cstr(ff, "SLIX EAS") &&
+           flipper_format_write_bool(ff, SLIX_EAS_MODE_KEY, &eas->enabled, 1) &&
+           flipper_format_write_hex(ff, SLIX_EAS_ID_KEY, eas_id, SLIX_EAS_ID_SIZE) &&
+           flipper_format_write_bool(
+               ff, SLIX_EAS_PWD_PROTECTED_KEY, &eas->eas_password_protected, 1) &&
+           flipper_format_write_bool(
+               ff, SLIX_AFI_PWD_PROTECTED_KEY, &eas->afi_password_protected, 1);
 }
 
 bool slix_save(const SlixData* data, FlipperFormat* ff) {
@@ -360,10 +417,21 @@ bool slix_save(const SlixData* data, FlipperFormat* ff) {
             if(!flipper_format_write_bool(ff, SLIX_LOCK_PPL_KEY, &lock_bits->ppl, 1)) break;
         }
 
+        if(slix_type_has_features(slix_type, SLIX_TYPE_FEATURE_EAS)) {
+            if(!slix_save_eas(&data->eas, ff)) break;
+        }
+
         saved = true;
     } while(false);
 
     return saved;
+}
+
+// Field-wise: SlixEas has padding, so memcmp() is not reliable.
+static bool slix_eas_is_equal(const SlixEas* a, const SlixEas* b) {
+    return a->enabled == b->enabled && a->id == b->id &&
+           a->eas_password_protected == b->eas_password_protected &&
+           a->afi_password_protected == b->afi_password_protected;
 }
 
 bool slix_is_equal(const SlixData* data, const SlixData* other) {
@@ -372,6 +440,7 @@ bool slix_is_equal(const SlixData* data, const SlixData* other) {
 
     return iso15693_3_is_equal(data->iso15693_3_data, other->iso15693_3_data) &&
            memcmp(&data->system_info, &other->system_info, sizeof(SlixSystemInfo)) == 0 &&
+           slix_eas_is_equal(&data->eas, &other->eas) &&
            memcmp(
                data->passwords, other->passwords, sizeof(SlixPassword) * SlixPasswordTypeCount) ==
                0 &&
@@ -488,6 +557,30 @@ bool slix_is_counter_increment_protected(const SlixData* data) {
         data->iso15693_3_data, SLIX_COUNTER_BLOCK_NUM);
 
     return counter->protection != 0;
+}
+
+bool slix_is_eas_enabled(const SlixData* data) {
+    furi_check(data);
+
+    return data->eas.enabled;
+}
+
+uint16_t slix_get_eas_id(const SlixData* data) {
+    furi_check(data);
+
+    return data->eas.id;
+}
+
+bool slix_is_eas_password_protected(const SlixData* data) {
+    furi_check(data);
+
+    return data->eas.eas_password_protected;
+}
+
+bool slix_is_afi_password_protected(const SlixData* data) {
+    furi_check(data);
+
+    return data->eas.afi_password_protected;
 }
 
 bool slix_type_has_features(SlixType slix_type, SlixTypeFeatures features) {
