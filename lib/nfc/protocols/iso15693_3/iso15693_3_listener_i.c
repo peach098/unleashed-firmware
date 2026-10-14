@@ -45,6 +45,25 @@ static Iso15693_3Error
     return error;
 }
 
+#define ISO15693_3_UID_BITS         (ISO15693_3_UID_SIZE * 8U)
+#define ISO15693_3_SLOT_NUMBER_BITS (4U)
+#define ISO15693_3_SLOT_NUMBER_MASK ((1U << ISO15693_3_SLOT_NUMBER_BITS) - 1U)
+
+// UID as a 64-bit integer in the on-air (LSB first) order: bit 0 is the first bit sent.
+// The UID is stored MSB first (see iso15693_3_append_uid).
+static uint64_t iso15693_3_listener_get_uid_le(const Iso15693_3Data* data) {
+    uint64_t uid_le = 0;
+    for(size_t i = 0; i < ISO15693_3_UID_SIZE; ++i) {
+        uid_le = (uid_le << 8) | data->uid[i];
+    }
+    return uid_le;
+}
+
+static void iso15693_3_listener_append_inventory_response(Iso15693_3Listener* instance) {
+    bit_buffer_append_byte(instance->tx_buffer, instance->data->system_info.dsfid); // DSFID
+    iso15693_3_append_uid(instance->data, instance->tx_buffer); // UID
+}
+
 static Iso15693_3Error iso15693_3_listener_inventory_handler(
     Iso15693_3Listener* instance,
     const uint8_t* data,
@@ -69,23 +88,59 @@ static Iso15693_3Error iso15693_3_listener_inventory_handler(
             }
         }
 
+        // Mask length is in bits, the mask value takes the whole bytes needed for it
         const uint8_t mask_len = *data++;
-        const size_t data_size_required = data_size_min + mask_len;
+        const size_t mask_size = (mask_len + 7U) / 8U;
+        const size_t data_size_required = data_size_min + mask_size;
 
         if(data_size != data_size_required) {
             error = Iso15693_3ErrorFormat;
             break;
         }
 
-        if(mask_len != 0) {
-            // TODO FL-3633: Take mask_len and mask_value into account (if present)
+        // With 16 slots the 4 UID bits after the mask select the slot, so the mask may
+        // take at most 60 bits; a longer mask is malformed and ignored
+        const bool slots_16 = !(flags & ISO15693_3_REQ_FLAG_T5_N_SLOTS_1);
+        const size_t mask_len_max =
+            ISO15693_3_UID_BITS - (slots_16 ? ISO15693_3_SLOT_NUMBER_BITS : 0);
+
+        if(mask_len > mask_len_max) {
+            error = Iso15693_3ErrorFormat;
+            break;
+        }
+
+        // The mask is sent LSB first like the UID; bits of the last mask byte beyond
+        // mask_len are not compared
+        const uint64_t uid_le = iso15693_3_listener_get_uid_le(instance->data);
+        uint64_t mask_value = 0;
+        for(size_t i = 0; i < mask_size; ++i) {
+            mask_value |= (uint64_t)data[i] << (8U * i);
+        }
+        const uint64_t mask_bits = (mask_len >= ISO15693_3_UID_BITS) ? UINT64_MAX :
+                                                                       ((1ULL << mask_len) - 1U);
+
+        if((uid_le ^ mask_value) & mask_bits) {
+            error = Iso15693_3ErrorIgnore;
+            break;
         }
 
         error = iso15693_3_listener_extension_handler(instance, ISO15693_3_CMD_INVENTORY);
         if(error != Iso15693_3ErrorNone) break;
 
-        bit_buffer_append_byte(instance->tx_buffer, instance->data->system_info.dsfid); // DSFID
-        iso15693_3_append_uid(instance->data, instance->tx_buffer); // UID
+        if(slots_16) {
+            const uint8_t slot = (uid_le >> mask_len) & ISO15693_3_SLOT_NUMBER_MASK;
+            if(slot != 0) {
+                // Answer in slot N: after the Nth single EOF (see process_single_eof)
+                Iso15693_3ListenerSessionState* session_state = &instance->session_state;
+                session_state->inventory_pending = true;
+                session_state->inventory_slot = slot;
+                session_state->inventory_eof_count = 0;
+                error = Iso15693_3ErrorIgnore;
+                break;
+            }
+        }
+
+        iso15693_3_listener_append_inventory_response(instance);
     } while(false);
 
     return error;
@@ -766,6 +821,9 @@ Iso15693_3Error
     iso15693_3_listener_process_request(Iso15693_3Listener* instance, const BitBuffer* rx_buffer) {
     Iso15693_3Error error = Iso15693_3ErrorNone;
 
+    // Any request ends a 16-slot INVENTORY round; a new INVENTORY starts its own
+    instance->session_state.inventory_pending = false;
+
     do {
         typedef struct {
             uint8_t flags;
@@ -860,6 +918,23 @@ Iso15693_3Error iso15693_3_listener_process_single_eof(Iso15693_3Listener* insta
     Iso15693_3Error error = Iso15693_3ErrorNone;
 
     do {
+        Iso15693_3ListenerSessionState* session_state = &instance->session_state;
+
+        if(session_state->inventory_pending) {
+            // 16-slot INVENTORY: each single EOF opens the next slot
+            session_state->inventory_eof_count++;
+            if(session_state->inventory_eof_count != session_state->inventory_slot) break;
+
+            session_state->inventory_pending = false;
+
+            // The tx buffer has been emptied for this EOF frame: build the reply again
+            bit_buffer_set_size(instance->tx_buffer, 0);
+            bit_buffer_append_byte(instance->tx_buffer, ISO15693_3_RESP_FLAG_NONE);
+            iso15693_3_listener_append_inventory_response(instance);
+            error = iso15693_3_listener_send_frame(instance, instance->tx_buffer);
+            break;
+        }
+
         if(!instance->session_state.wait_for_eof) {
             error = Iso15693_3ErrorUnexpectedResponse;
             break;
